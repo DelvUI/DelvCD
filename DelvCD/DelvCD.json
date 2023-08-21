@@ -1,0 +1,8 @@
+{
+    "Name": "DelvCD",
+    "Author": "Tischel",
+    "Punchline": "Customizable UI elements to track cooldowns, status and more.",
+    "Description": "DelvCD provides highly customizable UI elements that can be used to track cooldows, status and more with configurable conditions.",
+    "RepoUrl": "https://github.com/DelvUI/DelvCD",
+    "Tags": ["UI"]
+}
