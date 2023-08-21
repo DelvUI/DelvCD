@@ -28,6 +28,7 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>Nullable</WarningsAsErrors>
         <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
 
     <!-- Release Configuration -->
