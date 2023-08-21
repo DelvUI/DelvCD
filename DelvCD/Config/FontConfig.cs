@@ -92,10 +92,10 @@ namespace DelvCD.Config
                     if (ImGui.BeginTable("##Font_Table", 5, tableFlags, new Vector2(size.X - padX * 2, size.Y - ImGui.GetCursorPosY() - padY * 2)))
                     {
                         ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
-                        ImGui.TableSetupColumn("Size", ImGuiTableColumnFlags.WidthFixed, 40, 1);
-                        ImGui.TableSetupColumn("CN/JP", ImGuiTableColumnFlags.WidthFixed, 40, 2);
-                        ImGui.TableSetupColumn("KR", ImGuiTableColumnFlags.WidthFixed, 40, 3);
-                        ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 45, 4);
+                        ImGui.TableSetupColumn("Size", ImGuiTableColumnFlags.WidthFixed, 40 * _scale, 1);
+                        ImGui.TableSetupColumn("CN/JP", ImGuiTableColumnFlags.WidthFixed, 40 * _scale, 2);
+                        ImGui.TableSetupColumn("KR", ImGuiTableColumnFlags.WidthFixed, 40 * _scale, 3);
+                        ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 45 * _scale, 4);
 
                         ImGui.TableSetupScrollFreeze(0, 1);
                         ImGui.TableHeadersRow();

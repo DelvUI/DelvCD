@@ -153,10 +153,10 @@ namespace DelvCD.Config
                     Vector2 buttonSize = new(30 * _scale, 0);
                     int buttonCount = this.Conditions.Count > 1 ? 4 : 2;
                     float actionsWidth = buttonSize.X * buttonCount + padX * (buttonCount - 1);
-                    ImGui.TableSetupColumn("Condition", ImGuiTableColumnFlags.WidthFixed, 55, 0);
-                    ImGui.TableSetupColumn("Data Source", ImGuiTableColumnFlags.WidthFixed, 90, 1);
-                    ImGui.TableSetupColumn("Data", ImGuiTableColumnFlags.WidthFixed, 90, 2);
-                    ImGui.TableSetupColumn("Operator", ImGuiTableColumnFlags.WidthFixed, 55, 3);
+                    ImGui.TableSetupColumn("Condition", ImGuiTableColumnFlags.WidthFixed, 55 * _scale, 0);
+                    ImGui.TableSetupColumn("Data Source", ImGuiTableColumnFlags.WidthFixed, 90 * _scale, 1);
+                    ImGui.TableSetupColumn("Data", ImGuiTableColumnFlags.WidthFixed, 90 * _scale, 2);
+                    ImGui.TableSetupColumn("Operator", ImGuiTableColumnFlags.WidthFixed, 55 * _scale, 3);
                     ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch, 0, 4);
                     ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, actionsWidth, 5);
 

@@ -110,7 +110,7 @@ namespace DelvCD.Config
                     Vector2 buttonSize = new(30 * _scale, 0);
                     int buttonCount = this.TriggerOptions.Count > 1 ? 5 : 3;
                     float actionsWidth = buttonSize.X * buttonCount + padX * (buttonCount - 1);
-                    ImGui.TableSetupColumn("Condition", ImGuiTableColumnFlags.WidthFixed, 60, 0);
+                    ImGui.TableSetupColumn("Condition", ImGuiTableColumnFlags.WidthFixed, 60 * _scale, 0);
                     ImGui.TableSetupColumn("Trigger Name", ImGuiTableColumnFlags.WidthStretch, 0, 1);
                     ImGui.TableSetupColumn("Trigger Type", ImGuiTableColumnFlags.WidthStretch, 0, 2);
                     ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, actionsWidth, 3);

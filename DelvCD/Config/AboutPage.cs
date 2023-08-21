@@ -1,4 +1,5 @@
-﻿using DelvCD.Helpers;
+﻿using Dalamud.Interface;
+using DelvCD.Helpers;
 using ImGuiNET;
 using System.Numerics;
 
@@ -6,6 +7,8 @@ namespace DelvCD.Config
 {
     public class AboutPage : IConfigPage
     {
+        private float _scale = ImGuiHelpers.GlobalScale;
+
         public string Name => "Changelog";
 
         public IConfigPage GetDefault() => new AboutPage();
@@ -17,7 +20,7 @@ namespace DelvCD.Config
                 Vector2 headerSize = Vector2.Zero;
                 if (Plugin.IconTexture is not null)
                 {
-                    Vector2 iconSize = new Vector2(Plugin.IconTexture.Width, Plugin.IconTexture.Height);
+                    Vector2 iconSize = new Vector2(100 * _scale, 100 * _scale);
                     string versionText = $"DelvCD v{Plugin.Version}";
                     Vector2 textSize = ImGui.CalcTextSize(versionText);
                     headerSize = new Vector2(size.X, iconSize.Y + textSize.Y);
@@ -36,7 +39,7 @@ namespace DelvCD.Config
                 ImGui.SetCursorPosY(ImGui.GetCursorPosY() + headerSize.Y);
                 DrawHelpers.DrawSpacing(1);
                 ImGui.Text("Changelog");
-                Vector2 changeLogSize = new Vector2(size.X - padX * 2, size.Y - ImGui.GetCursorPosY() - padY - 30);
+                Vector2 changeLogSize = new Vector2(size.X - padX * 2, size.Y - ImGui.GetCursorPosY() - padY - 10 * _scale);
 
                 if (ImGui.BeginChild("##Changelog", changeLogSize, true))
                 {
