@@ -1,4 +1,5 @@
-﻿using DelvCD.Helpers;
+﻿using Dalamud.Interface;
+using DelvCD.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -9,8 +10,9 @@ namespace DelvCD.Config
 {
     public class IconStyleConfig : IConfigPage
     {
-        [JsonIgnore]
-        public string Name => "Icon";
+        [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
+
+        [JsonIgnore] public string Name => "Icon";
 
         [JsonIgnore] private string _labelInput = string.Empty;
         [JsonIgnore] private string _iconSearchInput = string.Empty;
@@ -53,7 +55,7 @@ namespace DelvCD.Config
         {
             if (ImGui.BeginChild("##IconStyleConfig", new Vector2(size.X, size.Y), true))
             {
-                float height = 50;
+                float height = 50 * _scale;
                 if (this.IconOption == 1 && this.CustomIcon > 0)
                 {
                     Vector2 iconPos = ImGui.GetWindowPos() + new Vector2(padX, padX);
@@ -101,13 +103,13 @@ namespace DelvCD.Config
                     }
                     ImGui.PopItemWidth();
 
-                    if (_iconSearchResults.Any() && ImGui.BeginChild("##IconPicker", new Vector2(size.X - padX * 2, 60), true))
+                    if (_iconSearchResults.Any() && ImGui.BeginChild("##IconPicker", new Vector2(size.X - padX * 2, 60 * _scale), true))
                     {
                         List<uint> icons = _iconSearchResults.Select(t => t.Icon).Distinct().ToList();
                         for (int i = 0; i < icons.Count; i++)
                         {
-                            Vector2 iconPos = ImGui.GetWindowPos().AddX(10) + new Vector2(i * (40 + padX), padY);
-                            Vector2 iconSize = new Vector2(40, 40);
+                            Vector2 iconPos = ImGui.GetWindowPos().AddX(10 * _scale) + new Vector2(i * (40 * _scale + padX), padY);
+                            Vector2 iconSize = new Vector2(40 * _scale, 40 * _scale);
                             this.DrawIconPreview(iconPos, iconSize, icons[i], this.CropIcon, false, true);
 
                             if (ImGui.IsMouseHoveringRect(iconPos, iconPos + iconSize))

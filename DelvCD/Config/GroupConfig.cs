@@ -1,3 +1,4 @@
+using Dalamud.Interface;
 using DelvCD.UIElements;
 using ImGuiNET;
 using Newtonsoft.Json;
@@ -7,6 +8,7 @@ namespace DelvCD.Config
 {
     public class GroupConfig : IConfigPage
     {
+        [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
         [JsonIgnore] private static Vector2 _screenSize = ImGui.GetMainViewport().Size;
 
         public string Name => "Group";
@@ -47,7 +49,7 @@ namespace DelvCD.Config
                 ImGui.SameLine();
                 float padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - 60 + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
-                if (ImGui.Button("Resize", new Vector2(60, 0)))
+                if (ImGui.Button("Resize", new Vector2(60 * _scale, 0)))
                 {
                     if (parent is Group g)
                     {
@@ -63,9 +65,9 @@ namespace DelvCD.Config
                     ImGui.DragFloat("Y Multiplier", ref _mY, 0.01f, 0.01f, 100f);
                     ImGui.Checkbox("Scale positions only", ref this._positionOnly);
                     ImGui.SameLine();
-                    padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - 60 + padX;
+                    padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - 60 * _scale + padX;
                     ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
-                    if (ImGui.Button("Scale", new Vector2(60, 0)))
+                    if (ImGui.Button("Scale", new Vector2(60 * _scale, 0)))
                     {
                         group.ScaleResolution(new(_mX, _mY), _positionOnly);
                     }

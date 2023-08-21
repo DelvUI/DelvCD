@@ -66,6 +66,8 @@ namespace DelvCD.Config
 
     public class StyleConditions<T> : IConfigPage where T : class?, IConfigPage, new()
     {
+        [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
+
         [JsonIgnore] private static readonly string[] _sourceOptions = Enum.GetNames<TriggerDataSource>();
         [JsonIgnore] private static readonly string[] _operatorOptions = new string[] { "==", "!=", "<", ">", "<=", ">=" };
         [JsonIgnore] private static readonly string _text = $"Add Conditions below to specify alternate appearance configurations under certain conditions.";
@@ -148,7 +150,7 @@ namespace DelvCD.Config
 
                 if (ImGui.BeginTable("##Conditions_Table", 6, tableFlags, new Vector2(size.X - padX * 2, size.Y - ImGui.GetCursorPosY() - padY * 2)))
                 {
-                    Vector2 buttonSize = new(30, 0);
+                    Vector2 buttonSize = new(30 * _scale, 0);
                     int buttonCount = this.Conditions.Count > 1 ? 4 : 2;
                     float actionsWidth = buttonSize.X * buttonCount + padX * (buttonCount - 1);
                     ImGui.TableSetupColumn("Condition", ImGuiTableColumnFlags.WidthFixed, 55, 0);
@@ -201,19 +203,19 @@ namespace DelvCD.Config
             {
                 if (i == 0)
                 {
-                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f);
+                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f * _scale);
                     ImGui.Text("IF");
                 }
                 else
                 {
-                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f);
+                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f * _scale);
                     ImGui.Text("ELSE IF");
                 }
             }
 
             if (ImGui.TableSetColumnIndex(1))
             {
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                 ImGui.PushItemWidth(ImGui.GetColumnWidth());
                 ImGui.Combo("##TriggerCombo", ref condition.TriggerDataSourceIndex, _triggerOptions, _triggerCount + 1);
                 ImGui.PopItemWidth();
@@ -221,7 +223,7 @@ namespace DelvCD.Config
 
             if (ImGui.TableSetColumnIndex(2))
             {
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                 ImGui.PushItemWidth(ImGui.GetColumnWidth());
                 ImGui.Combo("##SourceCombo", ref Unsafe.As<TriggerDataSource, int>(ref condition.Source), _sourceOptions, _sourceOptions.Length);
                 ImGui.PopItemWidth();
@@ -229,7 +231,7 @@ namespace DelvCD.Config
 
             if (ImGui.TableSetColumnIndex(3))
             {
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                 ImGui.PushItemWidth(ImGui.GetColumnWidth());
                 ImGui.Combo("##OpCombo", ref Unsafe.As<TriggerDataOp, int>(ref condition.Op), _operatorOptions, _operatorOptions.Length);
                 ImGui.PopItemWidth();
@@ -252,8 +254,8 @@ namespace DelvCD.Config
 
             if (ImGui.TableSetColumnIndex(5))
             {
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
-                Vector2 buttonSize = new(30, 0);
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
+                Vector2 buttonSize = new(30 * _scale, 0);
                 DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Pen, () => Singletons.Get<PluginManager>().Edit(condition), "Edit Style", buttonSize);
 
                 if (this.Conditions.Count > 1)

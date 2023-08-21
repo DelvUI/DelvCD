@@ -11,6 +11,8 @@ namespace DelvCD.Config
 {
     public class FontConfig : IConfigPage
     {
+        [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
+
         public string Name => "Fonts";
 
         public IConfigPage GetDefault() => new FontConfig();
@@ -22,6 +24,7 @@ namespace DelvCD.Config
         [JsonIgnore] private string[] _sizes = Enumerable.Range(1, 40).Select(i => i.ToString()).ToArray();
         [JsonIgnore] private bool _chinese = false;
         [JsonIgnore] private bool _korean = false;
+
 
         public Dictionary<string, FontData> Fonts { get; init; }
 
@@ -54,11 +57,11 @@ namespace DelvCD.Config
                 if (_fontPath is not null)
                 {
                     float cursorY = ImGui.GetCursorPosY();
-                    ImGui.SetCursorPosY(cursorY + 2f);
+                    ImGui.SetCursorPosY(cursorY + 2f * _scale);
                     ImGui.Text("Copy Font Folder Path to Clipboard: ");
                     ImGui.SameLine();
 
-                    Vector2 buttonSize = new Vector2(40, 0);
+                    Vector2 buttonSize = new Vector2(40 * _scale, 0);
                     ImGui.SetCursorPosY(cursorY);
                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Copy, () => ImGui.SetClipboardText(_fontPath), null, buttonSize);
 
@@ -68,7 +71,7 @@ namespace DelvCD.Config
 
                     ImGui.Combo("Size", ref _selectedSize, _sizes, _sizes.Length);
                     ImGui.SameLine();
-                    ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 3f);
+                    ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 3f * _scale);
                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => AddFont(_selectedFont, _selectedSize), "Add Font", buttonSize);
 
                     ImGui.Checkbox("Support Chinese/Japanese", ref _chinese);
@@ -107,25 +110,25 @@ namespace DelvCD.Config
 
                             if (ImGui.TableSetColumnIndex(0))
                             {
-                                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f);
+                                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f * _scale);
                                 ImGui.Text(key);
                             }
 
                             if (ImGui.TableSetColumnIndex(1))
                             {
-                                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f);
+                                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f * _scale);
                                 ImGui.Text(font.Size.ToString());
                             }
 
                             if (ImGui.TableSetColumnIndex(2))
                             {
-                                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f);
+                                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f * _scale);
                                 ImGui.Text(font.Chinese ? "Yes" : "No");
                             }
 
                             if (ImGui.TableSetColumnIndex(3))
                             {
-                                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f);
+                                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f * _scale);
                                 ImGui.Text(font.Korean ? "Yes" : "No");
                             }
 
@@ -133,7 +136,7 @@ namespace DelvCD.Config
                             {
                                 if (!FontsManager.DefaultFontKeys.Contains(key))
                                 {
-                                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
+                                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Trash, () => RemoveFont(key), "Remove Font", new Vector2(45, 0));
                                 }
                             }

@@ -13,7 +13,8 @@ namespace DelvCD.Config
 {
     public class ElementListConfig : IConfigPage
     {
-        private const float MenuBarHeight = 40;
+        [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
+        private float MenuBarHeight => 40 * _scale;
 
         [JsonIgnore] private ElementType _selectedType = ElementType.Icon;
         [JsonIgnore] private string _input = string.Empty;
@@ -40,8 +41,8 @@ namespace DelvCD.Config
 
         private void DrawCreateMenu(Vector2 size, float padX)
         {
-            Vector2 buttonSize = new Vector2(40, 0);
-            float comboWidth = 100;
+            Vector2 buttonSize = new Vector2(40 * _scale, 0);
+            float comboWidth = 100 * _scale;
             float textInputWidth = size.X - buttonSize.X * 2 - comboWidth - padX * 5;
 
             if (ImGui.BeginChild("##Buttons", new Vector2(size.X, MenuBarHeight), true))
@@ -77,14 +78,15 @@ namespace DelvCD.Config
 
             if (ImGui.BeginTable("##UIElements_Table", 4, flags, new Vector2(size.X, size.Y - MenuBarHeight)))
             {
-                Vector2 buttonSize = new Vector2(30, 0);
+                Vector2 buttonSize = new Vector2(30 * _scale, 0);
                 int buttonCount = this.UIElements.Count > 1 ? 5 : 3;
                 float actionsWidth = buttonSize.X * buttonCount + padX * (buttonCount - 1);
-                float typeWidth = 75;
+                float previewWidth = buttonSize.X;
+                float typeWidth = 75 * _scale;
 
                 ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
                 ImGui.TableSetupColumn("Type", ImGuiTableColumnFlags.WidthFixed, typeWidth, 1);
-                ImGui.TableSetupColumn("Pre.", ImGuiTableColumnFlags.WidthFixed, 23, 2);
+                ImGui.TableSetupColumn("Pre.", ImGuiTableColumnFlags.WidthFixed, previewWidth, 2);
                 ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, actionsWidth, 3);
 
                 ImGui.TableSetupScrollFreeze(0, 1);
@@ -105,19 +107,19 @@ namespace DelvCD.Config
 
                     if (ImGui.TableSetColumnIndex(0))
                     {
-                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f);
+                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f * _scale);
                         ImGui.Text(element.Name);
                     }
 
                     if (ImGui.TableSetColumnIndex(1))
                     {
-                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f);
+                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f * _scale);
                         ImGui.Text(element.Type.ToString());
                     }
 
                     if (ImGui.TableSetColumnIndex(2))
                     {
-                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
+                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                         ImGui.Checkbox("##Preview", ref element.Preview);
                         if (ImGui.IsItemHovered())
                         {
@@ -127,7 +129,7 @@ namespace DelvCD.Config
 
                     if (ImGui.TableSetColumnIndex(3))
                     {
-                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
+                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                         DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Pen, () => EditUIElement(element), "Edit", buttonSize);
 
                         if (this.UIElements.Count > 1)

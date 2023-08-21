@@ -12,13 +12,14 @@ namespace DelvCD.Windows
 {
     public class ConfigWindow : Window
     {
-        private const float NavBarHeight = 40;
+        private float NavBarHeight => 40 * _scale;
 
         private bool _back = false;
         private bool _home = false;
         private string _name = string.Empty;
         private Vector2 _windowSize;
         private Stack<IConfigurable> _configStack;
+        private float _scale => ImGuiHelpers.GlobalScale;
 
         public ConfigWindow(string id, Vector2 position, Vector2 size) : base(id)
         {
@@ -32,7 +33,7 @@ namespace DelvCD.Windows
             this.PositionCondition = ImGuiCond.Appearing;
             this.SizeConstraints = new WindowSizeConstraints()
             {
-                MinimumSize = new(size.X, 160),
+                MinimumSize = new(size.X, 160 * _scale),
                 MaximumSize = ImGui.GetMainViewport().Size
             };
 
@@ -111,8 +112,8 @@ namespace DelvCD.Windows
 
         private void DrawNavBar(IConfigPage? openPage, Vector2 size, float padX)
         {
-            Vector2 buttonsize = new Vector2(40, 0);
-            float textInputWidth = 150;
+            Vector2 buttonsize = new Vector2(40 * _scale, 0);
+            float textInputWidth = 150 * _scale;
 
             if (ImGui.BeginChild($"##{this.WindowName}_NavBar", new Vector2(size.X, NavBarHeight), true))
             {
@@ -127,7 +128,7 @@ namespace DelvCD.Windows
 
                 if (_configStack.Peek() is UIElement element)
                 {
-                    offset -= 80;
+                    offset -= 80 * _scale;
                     ImGui.Checkbox("Preview", ref element.Preview);
                     ImGui.SameLine();
                 }

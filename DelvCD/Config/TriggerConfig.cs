@@ -12,6 +12,8 @@ namespace DelvCD.Config
 {
     public class TriggerConfig : IConfigPage
     {
+        [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
+
         [JsonIgnore] public string Name => "Triggers";
 
         [JsonIgnore] private static readonly string[] _typeOptions = Enum.GetNames<TriggerType>();
@@ -105,7 +107,7 @@ namespace DelvCD.Config
 
                 if (ImGui.BeginTable("##Trigger_Table", 4, tableFlags, new Vector2(size.X - padX * 2, (size.Y - ImGui.GetCursorPosY() - padY * 2) / 4)))
                 {
-                    Vector2 buttonSize = new(30, 0);
+                    Vector2 buttonSize = new(30 * _scale, 0);
                     int buttonCount = this.TriggerOptions.Count > 1 ? 5 : 3;
                     float actionsWidth = buttonSize.X * buttonCount + padX * (buttonCount - 1);
                     ImGui.TableSetupColumn("Condition", ImGuiTableColumnFlags.WidthFixed, 60, 0);
@@ -185,7 +187,7 @@ namespace DelvCD.Config
 
             if (ImGui.TableSetColumnIndex(0))
             {
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (i == 0 ? 3f : 1f));
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (i == 0 ? 3f * _scale : 1f * _scale));
                 if (i == 0)
                 {
                     ImGui.Text("IF");
@@ -200,20 +202,20 @@ namespace DelvCD.Config
 
             if (ImGui.TableSetColumnIndex(1))
             {
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (i == 0 ? 3f : 0f));
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (i == 0 ? 3f * _scale : 0f));
                 ImGui.Text($"Trigger {i + 1}");
             }
 
             if (ImGui.TableSetColumnIndex(2))
             {
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (i == 0 ? 3f : 0f));
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (i == 0 ? 3f * _scale : 0f));
                 ImGui.Text($"{trigger.Type}");
             }
 
             if (ImGui.TableSetColumnIndex(3))
             {
-                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
-                Vector2 buttonSize = new Vector2(30, 0);
+                ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
+                Vector2 buttonSize = new Vector2(30 * _scale, 0);
                 DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Pen, () => SelectTrigger(i), "Edit Trigger", buttonSize);
 
                 if (this.TriggerOptions.Count > 1)

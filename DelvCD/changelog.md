@@ -1,5 +1,5 @@
 # Version 0.3.0.0
-
+- Fixed config windows not adjusting to Dalamud's Global Font Scale.
 
 # Version 0.2.3.1
 - Fixed issue with elements tracking status on Target of Target or Focus Target

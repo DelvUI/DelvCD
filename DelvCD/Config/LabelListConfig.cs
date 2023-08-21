@@ -11,11 +11,10 @@ namespace DelvCD.Config
 {
     public class LabelListConfig : IConfigPage
     {
-        [JsonIgnore]
-        public string Name => "Labels";
+        [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
 
-        [JsonIgnore]
-        private string _labelInput = string.Empty;
+        [JsonIgnore] public string Name => "Labels";
+        [JsonIgnore] private string _labelInput = string.Empty;
 
         public List<Label> Labels { get; init; }
 
@@ -76,7 +75,7 @@ namespace DelvCD.Config
 
             if (ImGui.BeginTable("##Label_Table", 2, tableFlags, size))
             {
-                Vector2 buttonSize = new Vector2(30, 0);
+                Vector2 buttonSize = new Vector2(30 * _scale, 0);
                 float actionsWidth = buttonSize.X * 3 + padX * 2;
 
                 ImGui.TableSetupColumn("Label Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
@@ -95,13 +94,13 @@ namespace DelvCD.Config
 
                     if (ImGui.TableSetColumnIndex(0))
                     {
-                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f);
+                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f * _scale);
                         ImGui.Text(label.Name);
                     }
 
                     if (ImGui.TableSetColumnIndex(1))
                     {
-                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
+                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                         DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Pen, () => EditLabel(label), "Edit", buttonSize);
 
                         ImGui.SameLine();
@@ -116,7 +115,7 @@ namespace DelvCD.Config
                 ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
                 if (ImGui.TableSetColumnIndex(0))
                 {
-                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
+                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                     ImGui.PushItemWidth(ImGui.GetColumnWidth());
                     ImGui.InputTextWithHint("##LabelInput", "New Label Name", ref _labelInput, 10000);
                     ImGui.PopItemWidth();

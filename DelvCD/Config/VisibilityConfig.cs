@@ -1,4 +1,5 @@
-﻿using DelvCD.Helpers;
+﻿using Dalamud.Interface;
+using DelvCD.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -12,6 +13,8 @@ namespace DelvCD.Config
 
     public class VisibilityConfig : IConfigPage
     {
+        [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
+
         [JsonIgnore] private string _customJobInput = string.Empty;
 
         public string Name => "Visibility";
@@ -128,12 +131,12 @@ namespace DelvCD.Config
                 {
                     ImGui.SameLine();
                     string[] options = TriggerOptions.OperatorOptions;
-                    ImGui.PushItemWidth(55);
+                    ImGui.PushItemWidth(55 * _scale);
                     ImGui.Combo("##HideIfLevelOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.HideIfLevelOp), options, options.Length);
                     ImGui.PopItemWidth();
 
                     ImGui.SameLine();
-                    ImGui.PushItemWidth(45);
+                    ImGui.PushItemWidth(45 * _scale);
                     ImGui.InputInt(string.Empty, ref this.HideIfLevelValue, 0, 0);
                     ImGui.PopItemWidth();
                 }

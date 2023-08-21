@@ -2,6 +2,7 @@ using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Buddy;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Interface;
 using DelvCD.Helpers;
 using ImGuiNET;
 using System;
@@ -14,6 +15,8 @@ namespace DelvCD.Config
 {
     public class CharacterStateTrigger : TriggerOptions
     {
+        [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
+
         [JsonIgnore] private static readonly string[] _sourceOptions = Enum.GetNames<TriggerSource>();
         [JsonIgnore] private static readonly string[] _petOptions = new[] { "Has Pet", "Has No Pet" };
 
@@ -115,9 +118,9 @@ namespace DelvCD.Config
 
             ImGui.Text("Trigger Conditions");
             string[] operatorOptions = TriggerOptions.OperatorOptions;
-            float optionsWidth = 100 + padX;
-            float opComboWidth = 55;
-            float valueInputWidth = 45;
+            float optionsWidth = 100 * _scale + padX;
+            float opComboWidth = 55 * _scale;
+            float valueInputWidth = 45 * _scale;
             float padWidth = 0;
 
             DrawHelpers.DrawNestIndicator(1);

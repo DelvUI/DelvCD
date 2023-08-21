@@ -1,3 +1,4 @@
+using Dalamud.Interface;
 using DelvCD.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
@@ -10,6 +11,7 @@ namespace DelvCD.Config
 {
     public class ItemCooldownTrigger : TriggerOptions
     {
+        [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
 
         [JsonIgnore] private string _triggerNameInput = string.Empty;
         [JsonIgnore] private string _cooldownValueInput = string.Empty;
@@ -105,9 +107,9 @@ namespace DelvCD.Config
             DrawHelpers.DrawSpacing(1);
             ImGui.Text("Trigger Conditions");
             string[] operatorOptions = TriggerOptions.OperatorOptions;
-            float optionsWidth = 100 + padX;
-            float opComboWidth = 55;
-            float valueInputWidth = 45;
+            float optionsWidth = 100 * _scale + padX;
+            float opComboWidth = 55 * _scale;
+            float valueInputWidth = 45 * _scale;
             float padWidth = 0;
 
             DrawHelpers.DrawNestIndicator(1);
