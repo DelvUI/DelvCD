@@ -19,7 +19,8 @@ namespace DelvCD.Helpers
         Status,
         Cooldown,
         CharacterState,
-        ItemCooldown
+        ItemCooldown,
+        JobGauge
     }
 
     public enum TriggerSource
@@ -58,6 +59,13 @@ namespace DelvCD.Helpers
         GreaterThan,
         LessThanEq,
         GreaterThanEq
+    }
+
+    public enum TriggerConditionType
+    {
+        Numeric,
+        Boolean,
+        Combo
     }
 
     public enum Job

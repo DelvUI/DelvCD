@@ -162,6 +162,7 @@ namespace DelvCD.Config
                             TriggerType.Cooldown => new CooldownTrigger(),
                             TriggerType.CharacterState => new CharacterStateTrigger(),
                             TriggerType.ItemCooldown => new ItemCooldownTrigger(),
+                            TriggerType.JobGauge => new JobGaugeTrigger(),
                             _ => new StatusTrigger()
                         };
                         this.TriggerOptions[_selectedIndex].Condition = oldCond;

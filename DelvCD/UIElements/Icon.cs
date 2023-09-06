@@ -204,35 +204,37 @@ namespace DelvCD.UIElements
             float alpha,
             ImDrawListPtr drawList)
         {
-            if (startValue > 0 && triggeredValue != 0)
+            if (startValue <= 0 || triggeredValue == 0 || startValue < triggeredValue)
             {
-                bool invert = style.InvertSwipe;
-                float percent = (invert ? 0 : 1) - (startValue - triggeredValue) / startValue;
-
-                float radius = (float)Math.Sqrt(Math.Pow(Math.Max(size.X, size.Y), 2) * 2) / 2f;
-                float startAngle = -(float)Math.PI / 2;
-                float endAngle = startAngle - 2f * (float)Math.PI * percent;
-
-                ImGui.PushClipRect(pos, pos + size, false);
-                drawList.PathArcTo(pos + size / 2, radius / 2, startAngle, endAngle, (int)(100f * Math.Abs(percent)));
-                uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
-                drawList.PathStroke(progressAlpha, ImDrawFlags.None, radius);
-                if (style.ShowSwipeLines)
-                {
-                    Vector2 vec = new Vector2((float)Math.Cos(endAngle), (float)Math.Sin(endAngle));
-                    Vector2 start = pos + size / 2;
-                    Vector2 end = start + vec * radius;
-                    float thickness = style.ProgressLineThickness;
-                    Vector4 swipeLineColor = style.ProgressLineColor.Vector.AddTransparency(alpha);
-                    uint color = ImGui.ColorConvertFloat4ToU32(swipeLineColor);
-
-                    drawList.AddLine(start, end, color, thickness);
-                    drawList.AddLine(start, new(pos.X + size.X / 2, pos.Y), color, thickness);
-                    drawList.AddCircleFilled(start + new Vector2(thickness / 4, thickness / 4), thickness / 2, color);
-                }
-
-                ImGui.PopClipRect();
+                return;
             }
+            
+            bool invert = style.InvertSwipe;
+            float percent = (invert ? 0 : 1) - (startValue - triggeredValue) / startValue;
+
+            float radius = (float)Math.Sqrt(Math.Pow(Math.Max(size.X, size.Y), 2) * 2) / 2f;
+            float startAngle = -(float)Math.PI / 2;
+            float endAngle = startAngle - 2f * (float)Math.PI * percent;
+
+            ImGui.PushClipRect(pos, pos + size, false);
+            drawList.PathArcTo(pos + size / 2, radius / 2, startAngle, endAngle, (int)(100f * Math.Abs(percent)));
+            uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
+            drawList.PathStroke(progressAlpha, ImDrawFlags.None, radius);
+            if (style.ShowSwipeLines)
+            {
+                Vector2 vec = new Vector2((float)Math.Cos(endAngle), (float)Math.Sin(endAngle));
+                Vector2 start = pos + size / 2;
+                Vector2 end = start + vec * radius;
+                float thickness = style.ProgressLineThickness;
+                Vector4 swipeLineColor = style.ProgressLineColor.Vector.AddTransparency(alpha);
+                uint color = ImGui.ColorConvertFloat4ToU32(swipeLineColor);
+
+                drawList.AddLine(start, end, color, thickness);
+                drawList.AddLine(start, new(pos.X + size.X / 2, pos.Y), color, thickness);
+                drawList.AddCircleFilled(start + new Vector2(thickness / 4, thickness / 4), thickness / 2, color);
+            }
+
+            ImGui.PopClipRect();
         }
 
         private void DrawIconGlow(Vector2 pos, Vector2 size, int thickness, int segments, float speed, ConfigColor col1, ConfigColor col2, ImDrawListPtr drawList)
