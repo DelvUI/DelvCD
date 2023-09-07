@@ -65,6 +65,14 @@ namespace DelvCD.Config
                 _ => false
             } || Singletons.Get<PluginManager>().IsConfigurableOpen(this);
         }
+
+        public void UpdateDataSources(DataSource[] dataSources)
+        {
+            if (Style is IconStyleConfig iconStyle)
+            {
+                iconStyle.UpdateDataSources(dataSources);
+            }
+        }
     }
 
     public class StyleConditions<T> : IConfigPage where T : class?, IConfigPage, new()
@@ -143,6 +151,11 @@ namespace DelvCD.Config
             }
 
             _sourceOptions = set.ToArray();
+
+            foreach (var condition in Conditions)
+            {
+                condition.UpdateDataSources(dataSources);
+            }
         }
 
         public void UpdateDefaultStyle(T style)

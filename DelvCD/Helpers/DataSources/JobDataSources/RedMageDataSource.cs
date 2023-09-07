@@ -8,19 +8,21 @@
         public int Black_Mana;
         public int Mana_Stacks;
 
-        public override float ProgressValue
-        {
-            get => Mana_Stacks;
-            set => Mana_Stacks = (int)value;
-        }
-
-        public override float ProgressMaxValue => 3;
-
         public override float GetConditionValue(int index) => index switch
         {
             0 => White_Mana,
             1 => Black_Mana,
             2 => Mana_Stacks,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 100,
+            1 => 100,
+            2 => 3,
             _ => 0
         };
 
@@ -31,6 +33,8 @@
                 nameof(Black_Mana),
                 nameof(Mana_Stacks)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

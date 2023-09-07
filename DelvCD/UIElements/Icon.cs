@@ -67,10 +67,18 @@ namespace DelvCD.UIElements
 
         private void OnTriggerOptionsChanged(TriggerConfig sender)
         {
-            if (StyleConditions == null) { return; }
+            DataSource[] dataSources = sender.TriggerOptions.Select(x => x.DataSource).ToArray();
 
-            StyleConditions.UpdateTriggerCount(sender.TriggerOptions.Count);
-            StyleConditions.UpdateDataSources(sender.TriggerOptions.Select(x => x.DataSource).ToArray());
+            if (IconStyleConfig != null)
+            {
+                IconStyleConfig.UpdateDataSources(dataSources);
+            }
+
+            if (StyleConditions != null)
+            {
+                StyleConditions.UpdateTriggerCount(dataSources.Length);
+                StyleConditions.UpdateDataSources(dataSources);
+            }
         }
 
         public override IEnumerable<IConfigPage> GetConfigPages()
@@ -184,16 +192,19 @@ namespace DelvCD.UIElements
                         }
                     }
 
-                    if (style.ShowProgressSwipe)
+                    if (style.ShowProgressSwipe && datas.Length > style.ProgressDataSourceIndex)
                     {
-                        if (style.GcdSwipe && (data.ProgressValue == 0 || data.ProgressMaxValue == 0 || style.GcdSwipeOnly))
+                        float progressValue = datas[style.ProgressDataSourceIndex].GetProgressValue(style.ProgressDataSourceFieldIndex);
+                        float progressMaxValue = datas[style.ProgressDataSourceIndex].GetMaxValue(style.ProgressDataSourceFieldIndex);
+
+                        if (style.GcdSwipe && (progressValue == 0 || progressMaxValue == 0 || style.GcdSwipeOnly))
                         {
                             ActionHelpers.GetGCDInfo(out var recastInfo);
                             DrawProgressSwipe(style, localPos, size, recastInfo.RecastTime - recastInfo.RecastTimeElapsed, recastInfo.RecastTime, alpha, drawList);
                         }
                         else
                         {
-                            DrawProgressSwipe(style, localPos, size, data.ProgressValue, data.ProgressMaxValue, alpha, drawList);
+                            DrawProgressSwipe(style, localPos, size, progressValue, progressMaxValue, alpha, drawList);
                         }
                     }
 

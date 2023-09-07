@@ -1,7 +1,9 @@
 ﻿using Dalamud.Interface;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -19,13 +21,18 @@ namespace DelvCD.Config
         [JsonIgnore] private List<TriggerData> _iconSearchResults = new List<TriggerData>();
         [JsonIgnore] private Vector2 _screenSize = ImGui.GetMainViewport().Size;
 
+        [JsonIgnore] private DataSource[] _dataSources = new DataSource[] { };
+        [JsonIgnore] private string[] _progressDataSourceOptions = new string[] { };
+        [JsonIgnore] private string[] _progressDataSourceFieldOptions = new string[] { };
+
         public Vector2 Position = Vector2.Zero;
         public Vector2 Size = new Vector2(40, 40);
         public bool ShowBorder = true;
         public int BorderThickness = 1;
         public ConfigColor BorderColor = new ConfigColor(0, 0, 0, 1);
         public bool ShowProgressSwipe = true;
-        public int ProgressSourceIndex = 0;
+        public int ProgressDataSourceIndex = 0;
+        public int ProgressDataSourceFieldIndex = 0;
         public float ProgressSwipeOpacity = 0.6f;
         public bool InvertSwipe = false;
         public bool ShowSwipeLines = false;
@@ -51,6 +58,34 @@ namespace DelvCD.Config
         public ConfigColor IconColor = new ConfigColor(1, 0, 0, 1);
 
         public IConfigPage GetDefault() => new IconStyleConfig();
+
+
+        public void UpdateDataSources(DataSource[] dataSources)
+        {
+            _dataSources = dataSources;
+
+            if (dataSources.Length == 0)
+            {
+                _progressDataSourceOptions = new string[] { };
+                _progressDataSourceFieldOptions = new string[] { };
+                ProgressDataSourceIndex = 0;
+                ProgressDataSourceFieldIndex = 0;
+                return;
+            }
+
+            ProgressDataSourceIndex = Math.Clamp(ProgressDataSourceIndex, 0, dataSources.Length);
+
+            List<string> list = new();
+            for (int i = 0; i < dataSources.Length; i++)
+            {
+                list.Add("Trigger " + (i + 1));
+            }
+            
+            _progressDataSourceOptions = list.ToArray();
+            _progressDataSourceFieldOptions = dataSources[ProgressDataSourceIndex].ProgressFieldNames.ToArray();
+
+            ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length);
+        }
 
         public void DrawConfig(IConfigurable parent, Vector2 size, float padX, float padY)
         {
@@ -190,6 +225,23 @@ namespace DelvCD.Config
                     ImGui.Checkbox("Show Progress Swipe", ref ShowProgressSwipe);
                     if (ShowProgressSwipe)
                     {
+                        if (_dataSources.Length > 0)
+                        {
+                            ImGui.PushItemWidth(100 * _scale);
+                            DrawHelpers.DrawNestIndicator(1);
+                            if (ImGui.Combo("##DataSourceCombo", ref ProgressDataSourceIndex, _progressDataSourceOptions, _progressDataSourceOptions.Length))
+                            {
+                                ProgressDataSourceFieldIndex = 0;
+                                _progressDataSourceFieldOptions = _dataSources[ProgressDataSourceIndex].ProgressFieldNames.ToArray();
+                            }
+                            ImGui.PopItemWidth();
+
+                            ImGui.SameLine();
+                            ImGui.PushItemWidth(200 * _scale);
+                            ImGui.Combo("##DataSourceFieldCombo", ref ProgressDataSourceFieldIndex, _progressDataSourceFieldOptions, _progressDataSourceFieldOptions.Length);
+                            ImGui.PopItemWidth();
+                        }
+
                         DrawHelpers.DrawNestIndicator(1);
                         ImGui.DragFloat("Swipe Opacity", ref ProgressSwipeOpacity, .01f, 0, 1);
                         DrawHelpers.DrawNestIndicator(1);

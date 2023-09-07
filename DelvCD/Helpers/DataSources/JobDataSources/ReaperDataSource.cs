@@ -10,14 +10,6 @@
         public int Lemure_Shroud_Stacks;
         public int Void_Shroud_Stacks;
 
-        public override float ProgressValue
-        {
-            get => Enshroud_Timer;
-            set => Enshroud_Timer = value;
-        }
-
-        public override float ProgressMaxValue => 30;
-
         public override float GetConditionValue(int index) => index switch
         {
             0 => Soul,
@@ -25,6 +17,18 @@
             2 => Enshroud_Timer,
             3 => Lemure_Shroud_Stacks,
             4 => Void_Shroud_Stacks,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 100,
+            1 => 100,
+            2 => 30,
+            3 => 5,
+            4 => 5,
             _ => 0
         };
 
@@ -37,6 +41,8 @@
                 nameof(Lemure_Shroud_Stacks),
                 nameof(Void_Shroud_Stacks)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

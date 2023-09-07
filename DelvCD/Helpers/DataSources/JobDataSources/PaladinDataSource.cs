@@ -6,17 +6,17 @@
 
         public int Oath;
 
-        public override float ProgressValue
-        {
-            get => Oath;
-            set => Oath = (int)value;
-        }
-
-        public override float ProgressMaxValue => 100;
-
         public override float GetConditionValue(int index) => index switch
         {
             0 => Oath,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+        
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 100,
             _ => 0
         };
 
@@ -25,6 +25,8 @@
             _conditionFieldNames = new() {
                 nameof(Oath)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

@@ -6,17 +6,17 @@
 
         public int Wrath;
 
-        public override float ProgressValue
-        {
-            get => Wrath;
-            set => Wrath = (int)value;
-        }
-
-        public override float ProgressMaxValue => 100;
-
         public override float GetConditionValue(int index) => index switch
         {
             0 => Wrath,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 100,
             _ => 0
         };
 
@@ -25,6 +25,8 @@
             _conditionFieldNames = new() {
                 nameof(Wrath)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

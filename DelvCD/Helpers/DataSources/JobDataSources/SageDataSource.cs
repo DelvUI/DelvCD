@@ -9,19 +9,22 @@
         public int Addersgall_Stacks;
         public int Addersting_Stacks;
 
-        public override float ProgressValue
-        {
-            get => Addersgall_Timer;
-            set => Addersgall_Timer = value;
-        }
-
-        public override float ProgressMaxValue => 20;
 
         public override float GetConditionValue(int index) => index switch
         {
             0 => Addersgall_Timer,
             1 => Addersgall_Stacks,
             2 => Addersting_Stacks,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 20,
+            1 => 3,
+            2 => 3,
             _ => 0
         };
 
@@ -32,6 +35,8 @@
                 nameof(Addersgall_Stacks),
                 nameof(Addersting_Stacks)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

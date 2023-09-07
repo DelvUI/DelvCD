@@ -9,19 +9,21 @@
         public float Shadow_Timer;
         public bool Dark_Arts;
 
-        public override float ProgressValue
-        {
-            get => Blood;
-            set => Blood = (int)value;
-        }
-
-        public override float ProgressMaxValue => 100;
-
         public override float GetConditionValue(int index) => index switch
         {
             0 => Blood,
             1 => Darkside_Timer,
             2 => Shadow_Timer,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 100,
+            1 => 30,
+            2 => 20,
             _ => 0
         };
 
@@ -32,6 +34,8 @@
                 nameof(Darkside_Timer),
                 nameof(Shadow_Timer)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

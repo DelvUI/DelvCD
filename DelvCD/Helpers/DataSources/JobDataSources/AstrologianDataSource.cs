@@ -1,4 +1,5 @@
-﻿using Lumina.Excel.GeneratedSheets;
+﻿using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using Lumina.Excel.GeneratedSheets;
 
 namespace DelvCD.Helpers.DataSources.JobDataSources
 {
@@ -12,14 +13,9 @@ namespace DelvCD.Helpers.DataSources.JobDataSources
         public bool Astrosign_Lunar;
         public bool Astrosign_Celestial;
 
-        public override float ProgressValue
-        {
-            get => 0; 
-            set { }
-        }
-
-        public override float ProgressMaxValue => 1;
-
         public override float GetConditionValue(int index) => 0;
+
+        public override float GetProgressValue(int index) => 0;
+        public override float GetMaxValue(int index) => 0;
     }
 }

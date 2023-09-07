@@ -81,6 +81,7 @@ namespace DelvCD.Config.JobGauges
 
             _dataSource.Attunement_Timer = gauge.AttunmentTimerRemaining / 1000f;
             _dataSource.Attunement_Stacks = gauge.Attunement;
+            _dataSource.Max_Attunement_Stacks = MaxAttunement(attunement);
 
             if (preview) { return true; }
 
@@ -126,5 +127,13 @@ namespace DelvCD.Config.JobGauges
 
             return NONE_INDEX;
         }
+
+        private int MaxAttunement(int attunement) => attunement switch
+        {
+            IFRIT_INDEX => 2,
+            TITAN_INDEX => 4,
+            GARUDA_INDEX => 4,
+            _ => 0
+        };
     }
 }

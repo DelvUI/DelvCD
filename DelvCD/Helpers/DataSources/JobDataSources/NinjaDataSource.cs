@@ -7,18 +7,20 @@
         public float Huton_Timer;
         public int Ninki;
 
-        public override float ProgressValue
-        {
-            get => Huton_Timer;
-            set => Huton_Timer = value;
-        }
-
-        public override float ProgressMaxValue => 60;
 
         public override float GetConditionValue(int index) => index switch
         {
             0 => Huton_Timer,
             1 => Ninki,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 60,
+            1 => 100,
             _ => 0
         };
 
@@ -28,6 +30,8 @@
                 nameof(Huton_Timer),
                 nameof(Ninki)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

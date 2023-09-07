@@ -10,18 +10,20 @@
         public int Kenki;
         public int Meditation_Stacks;
 
-        public override float ProgressValue
-        {
-            get => Kenki;
-            set => Kenki = (int)value;
-        }
-
-        public override float ProgressMaxValue => 100;
 
         public override float GetConditionValue(int index) => index switch
         {
             0 => Kenki,
             1 => Meditation_Stacks,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 100,
+            1 => 5,
             _ => 0
         };
 
@@ -31,6 +33,8 @@
                 nameof(Kenki),
                 nameof(Meditation_Stacks)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

@@ -11,20 +11,23 @@
         public bool Summon;
         public float Summon_Timer;
 
-        public override float ProgressValue
-        {
-            get => Heat;
-            set => Heat = (int)value;
-        }
-
-        public override float ProgressMaxValue => 100;
-
         public override float GetConditionValue(int index) => index switch
         {
             0 => Heat,
             1 => Overheat_Timer,
             2 => Battery,
             3 => Summon_Timer,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 100,
+            1 => 10,
+            2 => 100,
+            3 => 12,
             _ => 0
         };
 
@@ -36,6 +39,8 @@
                 nameof(Battery),
                 nameof(Summon_Timer)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

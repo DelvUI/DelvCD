@@ -9,13 +9,6 @@
         public int Stacks;
         public int MaxStacks;
 
-        public override float ProgressValue
-        {
-            get => Value;
-            set => Value = value;
-        }
-
-        public override float ProgressMaxValue => MaxValue;
 
         public override float GetConditionValue(int index) => index switch
         {
@@ -25,12 +18,32 @@
             _ => 0
         };
 
+        public override float GetProgressValue(int index) => index switch
+        {
+            0 => Value,
+            1 => Stacks,
+            _ => 0
+        };
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => MaxValue,
+            1 => MaxStacks,
+            _ => 0
+        };
+
         public CooldownDataSource()
         {
             _conditionFieldNames = new() {
                 nameof(Value),
                 nameof(Stacks),
                 nameof(MaxStacks)
+            };
+
+            _progressFieldNames = new()
+            {
+                nameof(Value),
+                nameof(Stacks)
             };
         }
     }

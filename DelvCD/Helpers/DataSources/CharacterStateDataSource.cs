@@ -25,14 +25,6 @@ namespace DelvCD.Helpers.DataSources
         public bool HasPet;
         public float Distance;
 
-        public override float ProgressValue
-        {
-            get => Hp;
-            set => Hp = value;
-        }
-
-        public override float ProgressMaxValue => MaxHp;
-
         public override float GetConditionValue(int index) => index switch
         {
             0 => Hp,
@@ -41,6 +33,24 @@ namespace DelvCD.Helpers.DataSources
             3 => Gp,
             4 => Level,
             5 => Distance,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => index switch
+        {
+            0 => Hp,
+            1 => Mp,
+            2 => Cp,
+            3 => Gp,
+            _ => 0
+        };
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => MaxHp,
+            1 => MaxMp,
+            2 => MaxCp,
+            3 => MaxGp,
             _ => 0
         };
 
@@ -57,6 +67,13 @@ namespace DelvCD.Helpers.DataSources
                 nameof(Gp),
                 nameof(Level),
                 nameof(Distance)
+            };
+
+            _progressFieldNames = new() {
+                nameof(Hp),
+                nameof(Mp),
+                nameof(Cp),
+                nameof(Gp)
             };
         }
     }

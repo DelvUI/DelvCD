@@ -55,6 +55,7 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Last_Active_Song = _comboOptions[0][_values[0]];
             _dataSource.Song_Timer = gauge.SongTimer / 1000f;
             _dataSource.Repertoire_Stacks = gauge.Repertoire;
+            _dataSource.Max_Repertoire_Stacks = MaxRepertoireStacks(gauge.Song);
             _dataSource.Soul_Voice = gauge.SoulVoice;
 
             if (preview) { return true; }
@@ -86,5 +87,12 @@ namespace DelvCD.Config.JobGauges
 
             return true;
         }
+
+        private int MaxRepertoireStacks(Song song) => song switch
+        {
+            Song.ARMY => 4,
+            Song.WANDERER => 3,
+            _ => 0
+        };
     }
 }

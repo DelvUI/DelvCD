@@ -53,7 +53,7 @@ namespace DelvCD.UIElements
             if (StartTime.HasValue && StartData is not null)
             {
                 float secondSinceStart = (float)(DateTime.UtcNow - StartTime.Value).TotalSeconds;
-                float resetValue = StartData.ProgressValue;
+                float resetValue = StartData.PreviewMaxValue;
                 float newValue = resetValue - secondSinceStart;
 
                 if (newValue < 0)
@@ -62,7 +62,7 @@ namespace DelvCD.UIElements
                     newValue = resetValue;
                 }
 
-                data.ProgressValue = newValue;
+                data.PreviewValue = newValue;
                 return data;
             }
 
@@ -95,7 +95,7 @@ namespace DelvCD.UIElements
             }
 
             if (StartData is not null &&
-                data.ProgressValue > StartData.ProgressValue)
+                data.PreviewValue > StartData.PreviewValue)
             {
                 StartData = data;
                 StartTime = DateTime.UtcNow;

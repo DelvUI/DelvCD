@@ -36,7 +36,8 @@ namespace DelvCD.Config.JobGauges
                 "Step #1",
                 "Step #2",
                 "Step #3",
-                "Step #4"
+                "Step #4",
+                "Completed Steps"
             };
 
             _types = new List<TriggerConditionType>() {
@@ -47,7 +48,8 @@ namespace DelvCD.Config.JobGauges
                 TriggerConditionType.Combo,
                 TriggerConditionType.Combo,
                 TriggerConditionType.Combo,
-                TriggerConditionType.Combo
+                TriggerConditionType.Combo,
+                TriggerConditionType.Numeric
             };
 
             string[] steps = new string[] { "None", "Emboite", "Entrechat", "Jete", "Pirouette" };
@@ -68,6 +70,7 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Feather_Stacks = gauge.Feathers;
             _dataSource.Esprit = gauge.Esprit;
             _dataSource.Dancing = gauge.IsDancing;
+            _dataSource.Completed_Steps = gauge.CompletedSteps;
 
             if (preview) { return true; }
 
@@ -79,7 +82,8 @@ namespace DelvCD.Config.JobGauges
                 EvaluateStepCondition(gauge, 0) &&
                 EvaluateStepCondition(gauge, 1) &&
                 EvaluateStepCondition(gauge, 2) &&
-                EvaluateStepCondition(gauge, 3);
+                EvaluateStepCondition(gauge, 3) &&
+                EvaluateCondition(8, _dataSource.Completed_Steps);
         }
 
         private bool EvaluateStepCondition(DNCGauge gauge, int step)

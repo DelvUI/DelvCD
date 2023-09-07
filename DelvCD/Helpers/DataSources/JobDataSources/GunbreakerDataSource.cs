@@ -6,17 +6,17 @@
 
         public int Cartridges;
 
-        public override float ProgressValue
-        {
-            get => Cartridges;
-            set => Cartridges = (int)value;
-        }
-
-        public override float ProgressMaxValue => 3;
-
         public override float GetConditionValue(int index) => index switch
         {
             0 => Cartridges,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 3,
             _ => 0
         };
 
@@ -25,6 +25,8 @@
             _conditionFieldNames = new() {
                 nameof(Cartridges)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

@@ -11,17 +11,17 @@
         public bool Solar_Nadi;
         public bool Lunar_Nadi;
 
-        public override float ProgressValue
-        {
-            get => Chakra_Stacks;
-            set => Chakra_Stacks = (int)value;
-        }
-
-        public override float ProgressMaxValue => 5;
-
         public override float GetConditionValue(int index) => index switch
         {
             0 => Chakra_Stacks,
+            _ => 0
+        };
+
+        public override float GetProgressValue(int index) => GetConditionValue(index);
+
+        public override float GetMaxValue(int index) => index switch
+        {
+            0 => 5,
             _ => 0
         };
 
@@ -30,6 +30,8 @@
             _conditionFieldNames = new() {
                 nameof(Chakra_Stacks)
             };
+
+            _progressFieldNames = _conditionFieldNames;
         }
     }
 }

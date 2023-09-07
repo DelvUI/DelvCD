@@ -165,6 +165,8 @@ namespace DelvCD.Helpers
                 List<string> list = dict.Keys.Select(x => $"[{x}]").ToList();
                 list.Remove("[id]");
                 list.Remove("[icon]");
+                list.Remove("[prewviewvalue]");
+                list.Remove("[prewviewmaxvalue]");
 
                 _textTagsHelpData[name] = list;
             }
