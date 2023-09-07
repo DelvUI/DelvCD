@@ -1,13 +1,15 @@
 ﻿using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class ReaperJobGaugeDataSource : JobGaugeDataSource
+    public class ReaperJobGauge : JobGauge
     {
-        public ReaperJobGaugeDataSource(string rawData) : base(rawData)
+        public ReaperJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -32,19 +34,22 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            RPRGauge gauge = Singletons.Get<JobGauges>().Get<RPRGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            RPRGauge gauge = Singletons.Get<DalamudJobGauges>().Get<RPRGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, gauge.Soul) &&
                 EvaluateCondition(0, gauge.Shroud) &&
                 EvaluateCondition(0, gauge.EnshroudedTimeRemaining) &&
                 EvaluateCondition(0, gauge.LemureShroud) &&
                 EvaluateCondition(0, gauge.VoidShroud);
+
+            return (triggered, data);
         }
     }
 }

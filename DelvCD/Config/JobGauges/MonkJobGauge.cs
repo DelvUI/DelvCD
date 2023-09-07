@@ -2,13 +2,15 @@
 using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class MonkJobGaugeDataSource : JobGaugeDataSource
+    public class MonkJobGauge : JobGauge
     {
-        public MonkJobGaugeDataSource(string rawData) : base(rawData)
+        public MonkJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -43,20 +45,23 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            MNKGauge gauge = Singletons.Get<JobGauges>().Get<MNKGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            MNKGauge gauge = Singletons.Get<DalamudJobGauges>().Get<MNKGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, gauge.Chakra) &&
                 EvaluateMastersGaugeChakraCondition(gauge, 0) &&
                 EvaluateMastersGaugeChakraCondition(gauge, 1) &&
                 EvaluateMastersGaugeChakraCondition(gauge, 2) &&
                 EvaluateCondition(4, (gauge.Nadi & Nadi.SOLAR) != 0) &&
                 EvaluateCondition(5, (gauge.Nadi & Nadi.LUNAR) != 0);
+
+            return (triggered, data);
         }
 
         private bool EvaluateMastersGaugeChakraCondition(MNKGauge gauge, int chakra)

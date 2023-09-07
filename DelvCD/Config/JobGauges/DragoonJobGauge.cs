@@ -1,13 +1,15 @@
 ﻿using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class DragoonJobGaugeDataSource : JobGaugeDataSource
+    public class DragoonJobGauge : JobGauge
     {
-        public DragoonJobGaugeDataSource(string rawData) : base(rawData)
+        public DragoonJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -30,18 +32,21 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            DRGGauge gauge = Singletons.Get<JobGauges>().Get<DRGGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            DRGGauge gauge = Singletons.Get<DalamudJobGauges>().Get<DRGGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, gauge.IsLOTDActive) &&
                 EvaluateCondition(1, gauge.LOTDTimer) &&
                 EvaluateCondition(2, gauge.EyeCount) &&
                 EvaluateCondition(3, gauge.FirstmindsFocusCount);
+
+            return (triggered, data);
         }
     }
 }

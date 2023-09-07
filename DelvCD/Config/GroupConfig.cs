@@ -28,7 +28,7 @@ namespace DelvCD.Config
         {
             if (ImGui.BeginChild("##GroupConfig", new Vector2(size.X, size.Y), true))
             {
-                ImGui.DragFloat2("Group Position", ref this.Position);
+                ImGui.DragFloat2("Group Position", ref Position);
 
                 ImGui.NewLine();
                 ImGui.Text("Resize Icons");
@@ -63,7 +63,7 @@ namespace DelvCD.Config
                     ImGui.Text("Scale Resolution (BACK UP YOUR CONFIG FIRST!)");
                     ImGui.DragFloat("X Multiplier", ref _mX, 0.01f, 0.01f, 100f);
                     ImGui.DragFloat("Y Multiplier", ref _mY, 0.01f, 0.01f, 100f);
-                    ImGui.Checkbox("Scale positions only", ref this._positionOnly);
+                    ImGui.Checkbox("Scale positions only", ref _positionOnly);
                     ImGui.SameLine();
                     padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - 60 * _scale + padX;
                     ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);

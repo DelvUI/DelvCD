@@ -1,13 +1,15 @@
 ﻿using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class MachinistJobGaugeDataSource : JobGaugeDataSource
+    public class MachinistJobGauge : JobGauge
     {
-        public MachinistJobGaugeDataSource(string rawData) : base(rawData)
+        public MachinistJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -34,20 +36,23 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            MCHGauge gauge = Singletons.Get<JobGauges>().Get<MCHGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            MCHGauge gauge = Singletons.Get<DalamudJobGauges>().Get<MCHGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, gauge.Heat) &&
                 EvaluateCondition(1, gauge.IsOverheated) &&
                 EvaluateCondition(2, gauge.OverheatTimeRemaining) &&
                 EvaluateCondition(3, gauge.Battery) &&
                 EvaluateCondition(4, gauge.IsRobotActive) &&
                 EvaluateCondition(5, gauge.SummonTimeRemaining);
+
+            return (triggered, data);
         }
     }
 }

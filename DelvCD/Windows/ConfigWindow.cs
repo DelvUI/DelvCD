@@ -23,15 +23,15 @@ namespace DelvCD.Windows
 
         public ConfigWindow(string id, Vector2 position, Vector2 size) : base(id)
         {
-            this.Flags =
+            Flags =
                 ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoCollapse |
                 ImGuiWindowFlags.NoScrollWithMouse |
                 ImGuiWindowFlags.NoSavedSettings;
 
-            this.Position = position - size / 2;
-            this.PositionCondition = ImGuiCond.Appearing;
-            this.SizeConstraints = new WindowSizeConstraints()
+            Position = position - size / 2;
+            PositionCondition = ImGuiCond.Appearing;
+            SizeConstraints = new WindowSizeConstraints()
             {
                 MinimumSize = new(size.X, 160 * _scale),
                 MaximumSize = ImGui.GetMainViewport().Size
@@ -45,12 +45,12 @@ namespace DelvCD.Windows
         {
             _configStack.Push(configItem);
             _name = configItem.Name;
-            this.IsOpen = true;
+            IsOpen = true;
         }
 
         public bool IsConfigurableOpen(IConfigurable configurable)
         {
-            if (!this.IsOpen || !_configStack.Any())
+            if (!IsOpen || !_configStack.Any())
             {
                 return false;
             }
@@ -62,7 +62,7 @@ namespace DelvCD.Windows
         {
             if (_configStack.Any())
             {
-                this.WindowName = this.GetWindowTitle();
+                WindowName = GetWindowTitle();
                 ImGui.SetNextWindowSize(_windowSize);
             }
         }
@@ -71,7 +71,7 @@ namespace DelvCD.Windows
         {
             if (!_configStack.Any())
             {
-                this.IsOpen = false;
+                IsOpen = false;
                 return;
             }
 
@@ -86,11 +86,11 @@ namespace DelvCD.Windows
             }
 
             IConfigPage? openPage = null;
-            if (ImGui.BeginTabBar($"##{this.WindowName}"))
+            if (ImGui.BeginTabBar($"##{WindowName}"))
             {
                 foreach (IConfigPage page in configItem.GetConfigPages())
                 {
-                    if (ImGui.BeginTabItem($"{page.Name}##{this.WindowName}"))
+                    if (ImGui.BeginTabItem($"{page.Name}##{WindowName}"))
                     {
                         openPage = page;
                         page.DrawConfig(configItem, size.AddY(-ImGui.GetCursorPosY()), spacing.X, spacing.Y);
@@ -103,10 +103,10 @@ namespace DelvCD.Windows
 
             if (drawNavBar)
             {
-                this.DrawNavBar(openPage, size, spacing.X);
+                DrawNavBar(openPage, size, spacing.X);
             }
 
-            this.Position = ImGui.GetWindowPos();
+            Position = ImGui.GetWindowPos();
             _windowSize = ImGui.GetWindowSize();
         }
 
@@ -115,7 +115,7 @@ namespace DelvCD.Windows
             Vector2 buttonsize = new Vector2(40 * _scale, 0);
             float textInputWidth = 150 * _scale;
 
-            if (ImGui.BeginChild($"##{this.WindowName}_NavBar", new Vector2(size.X, NavBarHeight), true))
+            if (ImGui.BeginChild($"##{WindowName}_NavBar", new Vector2(size.X, NavBarHeight), true))
             {
                 DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.LongArrowAltLeft, () => _back = true, "Back", buttonsize);
                 ImGui.SameLine();

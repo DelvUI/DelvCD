@@ -1,7 +1,9 @@
 ﻿using DelvCD.Helpers;
+using DelvCD.UIElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -29,7 +31,7 @@ namespace DelvCD.Config
 
         public LabelStyleConfig(string textFormat)
         {
-            this.TextFormat = textFormat;
+            TextFormat = textFormat;
         }
 
         public IConfigPage GetDefault() => new LabelStyleConfig("[value]");
@@ -38,44 +40,45 @@ namespace DelvCD.Config
         {
             if (ImGui.BeginChild("##LabelStyleConfig", new Vector2(size.X, size.Y), true))
             {
-                ImGui.InputTextWithHint("Text Format", "Hover for Formatting Info", ref this.TextFormat, 64);
+                ImGui.InputTextWithHint("Text Format", "Hover for Formatting Info", ref TextFormat, 64);
+                
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip(Utils.GetTagsTooltip(DataSource.TextTags));
+                    ImGui.SetTooltip(Utils.GetTagsTooltip(TextTagFormatter.TextTagsList()));
                 }
 
-                ImGui.Combo("Number Format", ref this.Rounding, _roundingOptions, _roundingOptions.Length);
-                ImGui.DragFloat2("Position", ref this.Position);
-                ImGui.Combo("Parent Anchor", ref Unsafe.As<DrawAnchor, int>(ref this.ParentAnchor), _anchorOptions, _anchorOptions.Length);
-                ImGui.Combo("Text Align", ref Unsafe.As<DrawAnchor, int>(ref this.TextAlign), _anchorOptions, _anchorOptions.Length);
+                ImGui.Combo("Number Format", ref Rounding, _roundingOptions, _roundingOptions.Length);
+                ImGui.DragFloat2("Position", ref Position);
+                ImGui.Combo("Parent Anchor", ref Unsafe.As<DrawAnchor, int>(ref ParentAnchor), _anchorOptions, _anchorOptions.Length);
+                ImGui.Combo("Text Align", ref Unsafe.As<DrawAnchor, int>(ref TextAlign), _anchorOptions, _anchorOptions.Length);
 
                 string[] fontOptions = FontsManager.GetFontList();
-                if (!FontsManager.ValidateFont(fontOptions, this.FontID, this.FontKey))
+                if (!FontsManager.ValidateFont(fontOptions, FontID, FontKey))
                 {
-                    this.FontID = 0;
+                    FontID = 0;
                     for (int i = 0; i < fontOptions.Length; i++)
                     {
-                        if (this.FontKey.Equals(fontOptions[i]))
+                        if (FontKey.Equals(fontOptions[i]))
                         {
-                            this.FontID = i;
+                            FontID = i;
                         }
                     }
                 }
 
-                ImGui.Combo("Font", ref this.FontID, fontOptions, fontOptions.Length);
-                this.FontKey = fontOptions[this.FontID];
+                ImGui.Combo("Font", ref FontID, fontOptions, fontOptions.Length);
+                FontKey = fontOptions[FontID];
 
                 DrawHelpers.DrawSpacing(1);
-                Vector4 textColor = this.TextColor.Vector;
+                Vector4 textColor = TextColor.Vector;
                 ImGui.ColorEdit4("Text Color", ref textColor);
-                this.TextColor.Vector = textColor;
-                ImGui.Checkbox("Show Outline", ref this.ShowOutline);
-                if (this.ShowOutline)
+                TextColor.Vector = textColor;
+                ImGui.Checkbox("Show Outline", ref ShowOutline);
+                if (ShowOutline)
                 {
                     DrawHelpers.DrawNestIndicator(1);
-                    Vector4 outlineColor = this.OutlineColor.Vector;
+                    Vector4 outlineColor = OutlineColor.Vector;
                     ImGui.ColorEdit4("Outline Color", ref outlineColor);
-                    this.OutlineColor.Vector = outlineColor;
+                    OutlineColor.Vector = outlineColor;
                 }
             }
 

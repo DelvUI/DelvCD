@@ -1,7 +1,9 @@
 using Dalamud.Interface;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
+using System;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -24,13 +26,15 @@ namespace DelvCD.Config
 
         public override TriggerType Type => TriggerType.ItemCooldown;
         public override TriggerSource Source => TriggerSource.Player;
+        [JsonIgnore] public override Type DataSourceType => typeof(CooldownDataSource);
 
-        public override bool IsTriggered(bool preview, out DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            data = new DataSource();
-            if (!this.TriggerData.Any())
+            CooldownDataSource data = new CooldownDataSource();
+
+            if (!TriggerData.Any())
             {
-                return false;
+                return (false, data);
             }
 
             if (preview)
@@ -38,12 +42,13 @@ namespace DelvCD.Config
                 data.Value = 10;
                 data.Stacks = 1;
                 data.MaxStacks = 1;
-                data.Icon = this.TriggerData.FirstOrDefault()?.Icon ?? 0;
-                return true;
+                data.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
+
+                return (true, data);
             }
 
             ActionHelpers helper = Singletons.Get<ActionHelpers>();
-            TriggerData actionTrigger = this.TriggerData.First();
+            TriggerData actionTrigger = TriggerData.First();
             helper.GetItemRecastInfo(actionTrigger.Id, out RecastInfo recastInfo);
 
             data.MaxValue = recastInfo.RecastTime;
@@ -54,7 +59,9 @@ namespace DelvCD.Config
             data.Stacks = GetQuantity(actionTrigger.Id);
             data.MaxStacks = data.Stacks;
 
-            return !this.Cooldown || Utils.GetResult(data.Value, this.CooldownOp, this.CooldownValue);
+            bool triggered = !Cooldown || Utils.GetResult(data.Value, CooldownOp, CooldownValue);
+
+            return (triggered, data);
         }
 
         private unsafe int GetQuantity(uint itemId)
@@ -92,12 +99,12 @@ namespace DelvCD.Config
         {
             if (string.IsNullOrEmpty(_triggerNameInput))
             {
-                _triggerNameInput = this.TriggerName;
+                _triggerNameInput = TriggerName;
             }
 
             if (ImGui.InputTextWithHint("Item", "Item Name or ID", ref _triggerNameInput, 32, ImGuiInputTextFlags.EnterReturnsTrue))
             {
-                this.TriggerData.Clear();
+                TriggerData.Clear();
                 if (!string.IsNullOrEmpty(_triggerNameInput))
                 {
                     ActionHelpers.FindItemEntries(_triggerNameInput).ForEach(t => AddTriggerData(t));
@@ -113,20 +120,20 @@ namespace DelvCD.Config
             float padWidth = 0;
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("Cooldown", ref this.Cooldown);
-            if (this.Cooldown)
+            ImGui.Checkbox("Cooldown", ref Cooldown);
+            if (Cooldown)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(opComboWidth);
-                ImGui.Combo("##CooldownOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.CooldownOp), operatorOptions, operatorOptions.Length);
+                ImGui.Combo("##CooldownOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref CooldownOp), operatorOptions, operatorOptions.Length);
                 ImGui.PopItemWidth();
                 ImGui.SameLine();
 
                 if (string.IsNullOrEmpty(_cooldownValueInput))
                 {
-                    _cooldownValueInput = this.CooldownValue.ToString();
+                    _cooldownValueInput = CooldownValue.ToString();
                 }
 
                 ImGui.PushItemWidth(valueInputWidth);
@@ -134,10 +141,10 @@ namespace DelvCD.Config
                 {
                     if (float.TryParse(_cooldownValueInput, out float value))
                     {
-                        this.CooldownValue = value;
+                        CooldownValue = value;
                     }
 
-                    _cooldownValueInput = this.CooldownValue.ToString();
+                    _cooldownValueInput = CooldownValue.ToString();
                 }
 
                 ImGui.PopItemWidth();
@@ -146,16 +153,16 @@ namespace DelvCD.Config
 
         private void ResetTrigger()
         {
-            this.TriggerData.Clear();
-            this.TriggerName = string.Empty;
-            this._triggerNameInput = string.Empty;
+            TriggerData.Clear();
+            TriggerName = string.Empty;
+            _triggerNameInput = string.Empty;
         }
 
         private void AddTriggerData(TriggerData triggerData)
         {
-            this.TriggerName = triggerData.Name.ToString();
-            _triggerNameInput = this.TriggerName;
-            this.TriggerData.Add(triggerData);
+            TriggerName = triggerData.Name.ToString();
+            _triggerNameInput = TriggerName;
+            TriggerData.Add(triggerData);
             Dalamud.Logging.PluginLog.Information($"{triggerData.Name}: {triggerData.Icon}");
         }
     }

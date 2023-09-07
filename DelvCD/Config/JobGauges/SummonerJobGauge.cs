@@ -1,13 +1,15 @@
 ﻿using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class SummonerJobGaugeDataSource : JobGaugeDataSource
+    public class SummonerJobGauge : JobGauge
     {
-        public SummonerJobGaugeDataSource(string rawData) : base(rawData)
+        public SummonerJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -58,14 +60,15 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            SMNGauge gauge = Singletons.Get<JobGauges>().Get<SMNGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            SMNGauge gauge = Singletons.Get<DalamudJobGauges>().Get<SMNGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, gauge.AetherflowStacks) &&
                 EvaluateCondition(1, NextSummon(gauge)) &&
                 EvaluateCondition(2, ActiveSummon(gauge)) &&
@@ -76,6 +79,8 @@ namespace DelvCD.Config.JobGaugeDataSources
                 EvaluateCondition(7, ActiveAttunement(gauge)) &&
                 EvaluateCondition(8, gauge.AttunmentTimerRemaining) &&
                 EvaluateCondition(9, gauge.Attunement);
+
+            return (triggered, data);
         }
 
         private int NextSummon(SMNGauge gauge)

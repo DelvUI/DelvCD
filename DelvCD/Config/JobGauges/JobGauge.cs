@@ -1,12 +1,13 @@
 ﻿using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public abstract class JobGaugeDataSource
+    public abstract class JobGauge
     {
         private string _rawData = string.Empty;
         public string RawData
@@ -22,6 +23,8 @@ namespace DelvCD.Config.JobGaugeDataSources
         public int ConditionCount => _names.Count;
         public abstract Job Job { get; }
 
+        public Type DataSourceType => typeof(CooldownDataSource);
+
         protected List<int> _enabled;
         protected List<int> _values;
         protected List<int> _operators;
@@ -30,7 +33,7 @@ namespace DelvCD.Config.JobGaugeDataSources
         protected List<TriggerConditionType> _types = new List<TriggerConditionType>();
         protected Dictionary<int, string[]> _comboOptions = new Dictionary<int, string[]>();
 
-        public JobGaugeDataSource(string rawData)
+        public JobGauge(string rawData)
         {
             InitializeConditions();
 
@@ -50,7 +53,7 @@ namespace DelvCD.Config.JobGaugeDataSources
 
         protected abstract void InitializeConditions();
 
-        public abstract bool IsTriggered(bool preview, DataSource data);
+        public abstract (bool, DataSource) IsTriggered(bool preview);
 
         protected bool EvaluateCondition(int index, int value)
         {
@@ -232,14 +235,14 @@ namespace DelvCD.Config.JobGaugeDataSources
             SerializeData();
         }
 
-        public static JobGaugeDataSource? CreateDataSource(Type type, string rawData)
+        public static JobGauge? CreateDataSource(Type type, string rawData)
         {
             try
             {
                 ConstructorInfo? constructor = type.GetConstructor(new Type[] { typeof(string) });
                 if (constructor != null)
                 {
-                    return (JobGaugeDataSource)constructor.Invoke(new object[] { rawData });
+                    return (JobGauge)constructor.Invoke(new object[] { rawData });
                 }
             }
             catch { }

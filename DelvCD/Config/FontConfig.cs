@@ -31,7 +31,7 @@ namespace DelvCD.Config
         public FontConfig()
         {
             RefreshFontList();
-            this.Fonts = new Dictionary<string, FontData>();
+            Fonts = new Dictionary<string, FontData>();
 
             foreach (string fontKey in FontsManager.DefaultFontKeys)
             {
@@ -40,7 +40,7 @@ namespace DelvCD.Config
                 {
                     FontData newFont = new FontData(splits[0], size, false, false);
                     string key = FontsManager.GetFontKey(newFont);
-                    this.Fonts.Add(key, newFont);
+                    Fonts.Add(key, newFont);
                 }
             }
         }
@@ -100,13 +100,13 @@ namespace DelvCD.Config
                         ImGui.TableSetupScrollFreeze(0, 1);
                         ImGui.TableHeadersRow();
 
-                        for (int i = 0; i < this.Fonts.Keys.Count; i++)
+                        for (int i = 0; i < Fonts.Keys.Count; i++)
                         {
                             ImGui.PushID(i.ToString());
                             ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
-                            string key = this.Fonts.Keys.ElementAt(i);
-                            FontData font = this.Fonts[key];
+                            string key = Fonts.Keys.ElementAt(i);
+                            FontData font = Fonts[key];
 
                             if (ImGui.TableSetColumnIndex(0))
                             {
@@ -158,23 +158,23 @@ namespace DelvCD.Config
         public void AddFont(FontData newFont)
         {
             string key = FontsManager.GetFontKey(newFont);
-            if (!this.Fonts.ContainsKey(key))
+            if (!Fonts.ContainsKey(key))
             {
-                this.Fonts.Add(key, newFont);
-                Singletons.Get<FontsManager>().UpdateFonts(this.Fonts.Values);
+                Fonts.Add(key, newFont);
+                Singletons.Get<FontsManager>().UpdateFonts(Fonts.Values);
             }
         }
 
         private void AddFont(int fontIndex, int size)
         {
             FontData newFont = new FontData(_fonts[fontIndex], size + 1, _chinese, _korean);
-            this.AddFont(newFont);
+            AddFont(newFont);
         }
 
         private void RemoveFont(string key)
         {
-            this.Fonts.Remove(key);
-            Singletons.Get<FontsManager>().UpdateFonts(this.Fonts.Values);
+            Fonts.Remove(key);
+            Singletons.Get<FontsManager>().UpdateFonts(Fonts.Values);
         }
     }
 }

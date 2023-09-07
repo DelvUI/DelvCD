@@ -25,7 +25,7 @@ namespace DelvCD
     {
         public const string ConfigFileName = "DelvCD.json";
 
-        public static string Version { get; private set; } = "0.3.0.0";
+        public static string Version { get; private set; } = "0.4.0.0";
 
         public static string ConfigFileDir { get; private set; } = "";
 
@@ -91,6 +91,9 @@ namespace DelvCD
             FontsManager.CopyPluginFontsToUserPath();
             Singletons.Register(new FontsManager(pluginInterface.UiBuilder, config.FontConfig.Fonts.Values));
 
+            // Initialize Text Tags
+            TextTagFormatter.InitializeTextTags();
+
             // Start the plugin
             Singletons.Register(new PluginManager(clientState, commandManager, pluginInterface, config));
         }
@@ -151,7 +154,7 @@ namespace DelvCD
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 

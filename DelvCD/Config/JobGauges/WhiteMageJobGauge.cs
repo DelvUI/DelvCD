@@ -1,13 +1,14 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class WhiteMageJobGaugeDataSource : JobGaugeDataSource
+    public class WhiteMageJobGauge : JobGauge
     {
-        public WhiteMageJobGaugeDataSource(string rawData) : base(rawData)
+        public WhiteMageJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -28,17 +29,20 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            WHMGauge gauge = Singletons.Get<JobGauges>().Get<WHMGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            WHMGauge gauge = Singletons.Get<DalamudJobGauges>().Get<WHMGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, gauge.LilyTimer) &&
                 EvaluateCondition(1, gauge.Lily) &&
                 EvaluateCondition(2, gauge.BloodLily);
+
+            return (triggered, data);
         }
     }
 }

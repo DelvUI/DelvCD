@@ -2,13 +2,15 @@
 using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class BardJobGaugeDataSource : JobGaugeDataSource
+    public class BardJobGauge : JobGauge
     {
-        public BardJobGaugeDataSource(string rawData) : base(rawData)
+        public BardJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -43,20 +45,23 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            BRDGauge gauge = Singletons.Get<JobGauges>().Get<BRDGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            BRDGauge gauge = Singletons.Get<DalamudJobGauges>().Get<BRDGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, (int)gauge.Song) &&
                 EvaluateCondition(1, (int)gauge.LastSong) &&
                 EvaluateCondition(2, gauge.SongTimer) &&
                 EvaluateCondition(3, gauge.Repertoire) &&
                 EvaluateCondition(4, gauge.SoulVoice) &&
                 EvaluateCodaCondition(gauge);
+
+            return (triggered, data);
         }
 
         private bool EvaluateCodaCondition(BRDGauge gauge)

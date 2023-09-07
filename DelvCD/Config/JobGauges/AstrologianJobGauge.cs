@@ -2,13 +2,16 @@
 using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class AstrologianJobGaugeDataSource : JobGaugeDataSource
+    public class AstrologianJobGauge : JobGauge
     {
-        public AstrologianJobGaugeDataSource(string rawData) : base(rawData)
+        public AstrologianJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -36,17 +39,20 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            ASTGauge gauge = Singletons.Get<JobGauges>().Get<ASTGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            ASTGauge gauge = Singletons.Get<DalamudJobGauges>().Get<ASTGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, (int)gauge.DrawnCard) &&
                 EvaluateCrownCardCondition(gauge) &&
                 EvaluateAstrosignsCondition(gauge);
+
+            return (triggered, data);
         }
 
         private bool EvaluateCrownCardCondition(ASTGauge gauge)

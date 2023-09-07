@@ -130,6 +130,15 @@ namespace DelvCD.Helpers
                 {
                     string jsonString = File.ReadAllText(path);
                     config = JsonConvert.DeserializeObject<DelvCDConfig>(jsonString, _serializerSettings);
+
+                    // TODO: Eventualy remove this:
+                    // special migration needed for 0.3.0.0 -> 0.4.0.0
+                    // ugly, but it is what it is...
+                    if (config != null && jsonString.Contains("\"Version\": \"0.3.0.0\""))
+                    {
+                        MigrateStyleConditions(config.ElementList.UIElements);
+                        SaveConfig(config);
+                    }
                 }
             }
             catch (Exception ex)
@@ -152,6 +161,57 @@ namespace DelvCD.Helpers
             }
 
             return config ?? new DelvCDConfig();
+        }
+
+        private static void MigrateStyleConditions(List<UIElement> elements)
+        {
+            foreach (UIElement element in elements)
+            {
+                if (element is Group group)
+                {
+                    MigrateStyleConditions(group.ElementList.UIElements);
+                }
+                else if (element is Icon icon)
+                {
+                    foreach (StyleCondition<IconStyleConfig> condition in icon.StyleConditions.Conditions)
+                    {
+                        condition.DataSourceFieldIndex = DataSourceFieldIndex(condition.Source);
+                    }
+
+                    foreach (Label label in icon.LabelListConfig.Labels)
+                    {
+                        foreach (StyleCondition<LabelStyleConfig> condition in label.StyleConditions.Conditions)
+                        {
+                            condition.DataSourceFieldIndex = DataSourceFieldIndex(condition.Source);
+                        }
+                    }
+                }
+                else if (element is Bar bar)
+                {
+                    foreach (StyleCondition<BarStyleConfig> condition in bar.StyleConditions.Conditions)
+                    {
+                        condition.DataSourceFieldIndex = DataSourceFieldIndex(condition.Source);
+                    }
+                }
+                else if (element is Label label)
+                {
+                    foreach (StyleCondition<LabelStyleConfig> condition in label.StyleConditions.Conditions)
+                    {
+                        condition.DataSourceFieldIndex = DataSourceFieldIndex(condition.Source);
+                    }
+                }
+            }
+        }
+
+        private static int DataSourceFieldIndex(TriggerDataSource source)
+        {
+            int index = (int)source;
+            if (index > 2)
+            {
+                index -= 2;
+            }
+
+            return index;
         }
 
         public static void SaveConfig()
@@ -285,15 +345,15 @@ namespace DelvCD.Helpers
             {
                 if (type.FullName is not null)
                 {
-                    this.typeToName.Add(type, type.FullName);
-                    this.nameToType.Add(type.FullName, type);
+                    typeToName.Add(type, type.FullName);
+                    nameToType.Add(type.FullName, type);
                 }
             }
         }
 
         public void BindToName(Type serializedType, out string? assemblyName, out string? typeName)
         {
-            if (this.typeToName.TryGetValue(serializedType, out string? name))
+            if (typeToName.TryGetValue(serializedType, out string? name))
             {
                 assemblyName = null;
                 typeName = name;
@@ -308,7 +368,7 @@ namespace DelvCD.Helpers
         public Type BindToType(string? assemblyName, string? typeName)
         {
             if (typeName is not null &&
-                this.nameToType.TryGetValue(typeName, out Type? type))
+                nameToType.TryGetValue(typeName, out Type? type))
             {
                 return type;
             }

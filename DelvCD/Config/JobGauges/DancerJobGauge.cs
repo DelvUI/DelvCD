@@ -2,9 +2,11 @@
 using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
     internal enum DNCStep : uint
     {
@@ -15,9 +17,9 @@ namespace DelvCD.Config.JobGaugeDataSources
         Pirouette = 16002
     }
 
-    public class DancerJobGaugeDataSource : JobGaugeDataSource
+    public class DancerJobGauge : JobGauge
     {
-        public DancerJobGaugeDataSource(string rawData) : base(rawData)
+        public DancerJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -58,14 +60,15 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            DNCGauge gauge = Singletons.Get<JobGauges>().Get<DNCGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            DNCGauge gauge = Singletons.Get<DalamudJobGauges>().Get<DNCGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, gauge.Feathers) &&
                 EvaluateCondition(1, gauge.Esprit) &&
                 EvaluateCondition(2, gauge.IsDancing) &&
@@ -74,6 +77,8 @@ namespace DelvCD.Config.JobGaugeDataSources
                 EvaluateStepCondition(gauge, 1) &&
                 EvaluateStepCondition(gauge, 2) &&
                 EvaluateStepCondition(gauge, 3);
+
+            return (triggered, data);
         }
 
         private bool EvaluateStepCondition(DNCGauge gauge, int step)

@@ -1,13 +1,15 @@
 ﻿using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class SamuraiJobGaugeDataSource : JobGaugeDataSource
+    public class SamuraiJobGauge : JobGauge
     {
-        public SamuraiJobGaugeDataSource(string rawData) : base(rawData)
+        public SamuraiJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -32,19 +34,22 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            SAMGauge gauge = Singletons.Get<JobGauges>().Get<SAMGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            SAMGauge gauge = Singletons.Get<DalamudJobGauges>().Get<SAMGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, gauge.HasSetsu) &&
                 EvaluateCondition(1, gauge.HasGetsu) &&
                 EvaluateCondition(2, gauge.HasKa) &&
                 EvaluateCondition(3, gauge.Kenki) &&
                 EvaluateCondition(4, gauge.MeditationStacks);
+
+            return (triggered, data);
         }
     }
 }

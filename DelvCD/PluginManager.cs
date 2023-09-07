@@ -44,16 +44,16 @@ namespace DelvCD
             DalamudPluginInterface pluginInterface,
             DelvCDConfig config)
         {
-            this.ClientState = clientState;
-            this.CommandManager = commandManager;
-            this.PluginInterface = pluginInterface;
-            this.Config = config;
+            ClientState = clientState;
+            CommandManager = commandManager;
+            PluginInterface = pluginInterface;
+            Config = config;
 
-            this.ConfigRoot = new ConfigWindow("ConfigRoot", ImGui.GetMainViewport().Size / 2, _configSize);
-            this.WindowSystem = new WindowSystem("DelvCD");
-            this.WindowSystem.AddWindow(this.ConfigRoot);
+            ConfigRoot = new ConfigWindow("ConfigRoot", ImGui.GetMainViewport().Size / 2, _configSize);
+            WindowSystem = new WindowSystem("DelvCD");
+            WindowSystem.AddWindow(ConfigRoot);
 
-            this.CommandManager.AddHandler(
+            CommandManager.AddHandler(
                 "/delvcd",
                 new CommandInfo(PluginCommand)
                 {
@@ -62,9 +62,9 @@ namespace DelvCD
                 }
             );
 
-            this.ClientState.Logout += OnLogout;
-            this.PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUi;
-            this.PluginInterface.UiBuilder.Draw += Draw;
+            ClientState.Logout += OnLogout;
+            PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUi;
+            PluginInterface.UiBuilder.Draw += Draw;
         }
 
         private void Draw()
@@ -74,7 +74,7 @@ namespace DelvCD
                 return;
             }
 
-            this.WindowSystem.Draw();
+            WindowSystem.Draw();
 
             Vector2 viewPortSize = ImGui.GetMainViewport().Size;
             ImGuiHelpers.ForceNextWindowMainViewport();
@@ -88,13 +88,13 @@ namespace DelvCD
             {
                 if (ImGui.Begin("DelvCD_Root", _mainWindowFlags))
                 {
-                    if (this.Config.VisibilityConfig.IsVisible(true))
+                    if (Config.VisibilityConfig.IsVisible(true))
                     {
                         Singletons.Get<StatusHelpers>().GenerateStatusMap();
                         Singletons.Get<ClipRectsHelper>().Update();
-                        foreach (UIElement element in this.Config.ElementList.UIElements)
+                        foreach (UIElement element in Config.ElementList.UIElements)
                         {
-                            element.Draw((viewPortSize / 2) + this.Config.GroupConfig.Position);
+                            element.Draw((viewPortSize / 2) + Config.GroupConfig.Position);
                         }
                     }
                 }
@@ -108,29 +108,29 @@ namespace DelvCD
 
         public void Edit(IConfigurable config)
         {
-            this.ConfigRoot.PushConfig(config);
+            ConfigRoot.PushConfig(config);
         }
 
         public bool IsConfigOpen()
         {
-            return this.ConfigRoot.IsOpen;
+            return ConfigRoot.IsOpen;
         }
 
         public bool IsConfigurableOpen(IConfigurable configurable)
         {
-            return this.ConfigRoot.IsConfigurableOpen(configurable);
+            return ConfigRoot.IsConfigurableOpen(configurable);
         }
 
         public bool ShouldClip()
         {
-            return this.Config.VisibilityConfig.Clip;
+            return Config.VisibilityConfig.Clip;
         }
 
         private void OpenConfigUi()
         {
-            if (!this.ConfigRoot.IsOpen)
+            if (!ConfigRoot.IsOpen)
             {
-                this.ConfigRoot.PushConfig(this.Config);
+                ConfigRoot.PushConfig(Config);
             }
         }
 
@@ -141,19 +141,19 @@ namespace DelvCD
 
         private void PluginCommand(string command, string arguments)
         {
-            if (this.ConfigRoot.IsOpen)
+            if (ConfigRoot.IsOpen)
             {
-                this.ConfigRoot.IsOpen = false;
+                ConfigRoot.IsOpen = false;
             }
             else
             {
-                this.ConfigRoot.PushConfig(this.Config);
+                ConfigRoot.PushConfig(Config);
             }
         }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -162,11 +162,11 @@ namespace DelvCD
             if (disposing)
             {
                 // Don't modify order
-                this.PluginInterface.UiBuilder.Draw -= Draw;
-                this.PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
-                this.ClientState.Logout -= OnLogout;
-                this.CommandManager.RemoveHandler("/delvcd");
-                this.WindowSystem.RemoveAllWindows();
+                PluginInterface.UiBuilder.Draw -= Draw;
+                PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
+                ClientState.Logout -= OnLogout;
+                CommandManager.RemoveHandler("/delvcd");
+                WindowSystem.RemoveAllWindows();
             }
         }
     }

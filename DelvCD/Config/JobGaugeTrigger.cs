@@ -2,8 +2,9 @@
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Interface;
 using Dalamud.Logging;
-using DelvCD.Config.JobGaugeDataSources;
+using DelvCD.Config.JobGauges;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -23,8 +24,9 @@ namespace DelvCD.Config
 
         public override TriggerType Type => TriggerType.JobGauge;
         public override TriggerSource Source => TriggerSource.Player;
+        [JsonIgnore] public override Type DataSourceType => _dataSource?.DataSourceType ?? typeof(CooldownDataSource);
 
-        [JsonIgnore] private JobGaugeDataSource? _dataSource;
+        [JsonIgnore] private JobGauge? _dataSource;
 
         private int _jobIndex = 0;
         public int JobIndex
@@ -32,7 +34,7 @@ namespace DelvCD.Config
             get { return _jobIndex; }
             set
             {
-                JobGaugeDataSource? newDataSource = JobGaugeDataSource.CreateDataSource(_typesArray[value], _rawData);
+                JobGauge? newDataSource = JobGauge.CreateDataSource(_typesArray[value], _rawData);
                 if (newDataSource != null)
                 {
                     _dataSource = newDataSource;
@@ -58,48 +60,37 @@ namespace DelvCD.Config
 
         [JsonIgnore] private string[] _booleanOptions = new string[] { "Inactive", "Active" };
 
-        public override bool IsTriggered(bool preview, out DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            data = new DataSource();
-            if (!this.TriggerData.Any())
-            {
-                return false;
-            }
+            CooldownDataSource data = new CooldownDataSource();
 
-            if (preview)
-            {
-                data.Value = 10;
-                data.Stacks = 1;
-                data.MaxStacks = 1;
-                data.Icon = this.TriggerData.FirstOrDefault()?.Icon ?? 0;
-                return true;
+            if (!TriggerData.Any() || _dataSource == null) {
+                return (false, data);
             }
-
-            if (_dataSource == null) { return false; }
 
             PlayerCharacter? player = Singletons.Get<ClientState>().LocalPlayer;
             if (player == null || player.ClassJob.Id != (uint)_dataSource.Job)
             {
-                return false;
+                return (false, data);
             }
 
             try
             {
-                return _dataSource.IsTriggered(preview, data);
+                return _dataSource.IsTriggered(preview);
             }
             catch (Exception e)
             {
                 PluginLog.Log(e.Message);
             }
 
-            return false;
+            return (false, data);
         }
 
         public override void DrawTriggerOptions(Vector2 size, float padX, float padY)
         {
             if (string.IsNullOrEmpty(_triggerNameInput))
             {
-                _triggerNameInput = this.TriggerName;
+                _triggerNameInput = TriggerName;
             }
 
             int index = _jobIndex;
@@ -250,25 +241,25 @@ namespace DelvCD.Config
         [JsonIgnore]
         private static Type[] _typesArray = new Type[]
         {
-            typeof(AstrologianJobGaugeDataSource),
-            typeof(BardJobGaugeDataSource),
-            typeof(BlackMageJobGaugeDataSource),
-            typeof(DancerJobGaugeDataSource),
-            typeof(DarkKnightJobGaugeDataSource),
-            typeof(DragoonJobGaugeDataSource),
-            typeof(GunbreakerJobGaugeDataSource),
-            typeof(MachinistJobGaugeDataSource),
-            typeof(MonkJobGaugeDataSource),
-            typeof(NinjaJobGaugeDataSource),
-            typeof(PaladinJobGaugeDataSource),
-            typeof(ReaperJobGaugeDataSource),
-            typeof(RedMageJobGaugeDataSource),
-            typeof(SageJobGaugeDataSource),
-            typeof(SamuraiJobGaugeDataSource),
-            typeof(ScholarJobGaugeDataSource),
-            typeof(SummonerJobGaugeDataSource),
-            typeof(WarriorJobGaugeDataSource),
-            typeof(WhiteMageJobGaugeDataSource),
+            typeof(AstrologianJobGauge),
+            typeof(BardJobGauge),
+            typeof(BlackMageJobGauge),
+            typeof(DancerJobGauge),
+            typeof(DarkKnightJobGauge),
+            typeof(DragoonJobGauge),
+            typeof(GunbreakerJobGauge),
+            typeof(MachinistJobGauge),
+            typeof(MonkJobGauge),
+            typeof(NinjaJobGauge),
+            typeof(PaladinJobGauge),
+            typeof(ReaperJobGauge),
+            typeof(RedMageJobGauge),
+            typeof(SageJobGauge),
+            typeof(SamuraiJobGauge),
+            typeof(ScholarJobGauge),
+            typeof(SummonerJobGauge),
+            typeof(WarriorJobGauge),
+            typeof(WhiteMageJobGauge),
         };
     }
 }

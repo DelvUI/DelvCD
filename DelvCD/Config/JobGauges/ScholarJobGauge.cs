@@ -1,13 +1,15 @@
 ﻿using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class ScholarJobGaugeDataSource : JobGaugeDataSource
+    public class ScholarJobGauge : JobGauge
     {
-        public ScholarJobGaugeDataSource(string rawData) : base(rawData)
+        public ScholarJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -28,17 +30,20 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            SCHGauge gauge = Singletons.Get<JobGauges>().Get<SCHGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            SCHGauge gauge = Singletons.Get<DalamudJobGauges>().Get<SCHGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, gauge.Aetherflow) &&
                 EvaluateCondition(1, gauge.FairyGauge) &&
                 EvaluateCondition(2, gauge.SeraphTimer);
+
+            return (triggered, data);
         }
     }
 }

@@ -20,16 +20,16 @@ namespace DelvCD.UIElements
 
         public Group(string name) : base(name)
         {
-            this.ElementList = new ElementListConfig();
-            this.GroupConfig = new GroupConfig();
-            this.VisibilityConfig = new VisibilityConfig();
+            ElementList = new ElementListConfig();
+            GroupConfig = new GroupConfig();
+            VisibilityConfig = new VisibilityConfig();
         }
 
         public override IEnumerable<IConfigPage> GetConfigPages()
         {
-            yield return this.ElementList;
-            yield return this.GroupConfig;
-            yield return this.VisibilityConfig;
+            yield return ElementList;
+            yield return GroupConfig;
+            yield return VisibilityConfig;
         }
 
         public override void ImportPage(IConfigPage page)
@@ -37,13 +37,13 @@ namespace DelvCD.UIElements
             switch (page)
             {
                 case ElementListConfig newPage:
-                    this.ElementList = newPage;
+                    ElementList = newPage;
                     break;
                 case GroupConfig newPage:
-                    this.GroupConfig = newPage;
+                    GroupConfig = newPage;
                     break;
                 case VisibilityConfig newPage:
-                    this.VisibilityConfig = newPage;
+                    VisibilityConfig = newPage;
                     break;
             }
         }
@@ -52,7 +52,7 @@ namespace DelvCD.UIElements
         {
             base.StopPreview();
 
-            foreach (UIElement element in this.ElementList.UIElements)
+            foreach (UIElement element in ElementList.UIElements)
             {
                 element.StopPreview();
             }
@@ -60,30 +60,30 @@ namespace DelvCD.UIElements
 
         public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
-            bool visible = this.VisibilityConfig.IsVisible(parentVisible);
-            foreach (UIElement element in this.ElementList.UIElements)
+            bool visible = VisibilityConfig.IsVisible(parentVisible);
+            foreach (UIElement element in ElementList.UIElements)
             {
-                if (!this.Preview && this.LastFrameWasPreview)
+                if (!Preview && LastFrameWasPreview)
                 {
                     element.Preview = false;
                 }
                 else
                 {
-                    element.Preview |= this.Preview;
+                    element.Preview |= Preview;
                 }
 
                 if (visible || Singletons.Get<PluginManager>().IsConfigOpen())
                 {
-                    element.Draw(pos + this.GroupConfig.Position, null, visible);
+                    element.Draw(pos + GroupConfig.Position, null, visible);
                 }
             }
 
-            this.LastFrameWasPreview = this.Preview;
+            LastFrameWasPreview = Preview;
         }
 
         public void ResizeIcons(Vector2 size, bool recurse, bool conditions)
         {
-            foreach (UIElement item in this.ElementList.UIElements)
+            foreach (UIElement item in ElementList.UIElements)
             {
                 if (item is Icon icon)
                 {
@@ -98,8 +98,8 @@ namespace DelvCD.UIElements
 
         public void ScaleResolution(Vector2 scaleFactor, bool positionOnly)
         {
-            this.GroupConfig.Position *= scaleFactor;
-            foreach (UIElement item in this.ElementList.UIElements)
+            GroupConfig.Position *= scaleFactor;
+            foreach (UIElement item in ElementList.UIElements)
             {
                 if (item is Icon icon)
                 {

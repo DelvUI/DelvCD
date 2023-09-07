@@ -1,6 +1,8 @@
+using DelvCD.Helpers.DataSources;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -9,6 +11,9 @@ namespace DelvCD.Helpers
     public class TextTagFormatter
     {
         public static Regex TextTagRegex { get; } = new Regex(@"\[(\w*)(:\w)?\.?(\d+)?\]", RegexOptions.Compiled);
+
+        private static Dictionary<Type, Dictionary<string, FieldInfo>> _fieldsMap = new();
+        private static List<string> _textTagsHelp = new List<string>();
 
         private string _format;
         private Dictionary<string, FieldInfo> _fields;
@@ -19,12 +24,52 @@ namespace DelvCD.Helpers
             object source,
             string format,
             int rounding,
-            Dictionary<string, FieldInfo> fields)
+            Type type)
         {
             _source = source;
             _format = format;
             _rounding = rounding;
-            _fields = fields;
+
+            if (_fieldsMap.TryGetValue(type, out Dictionary<string, FieldInfo>? fields) && fields != null)
+            {
+                _fields = fields;
+            }
+            else
+            {
+                _fields = new();
+            }
+        }
+
+        public static void InitializeTextTags()
+        {
+            Type[] types = new Type[]
+            {
+                typeof(CooldownDataSource),
+                typeof(CharacterStateDataSource)
+            };
+
+            foreach (Type type in types)
+            {
+                Dictionary<string, FieldInfo> dict = type.GetFields().ToDictionary((x) => x.Name.ToLower());
+                _fieldsMap[type] = dict;
+
+                MethodInfo? method = type.GetMethod("GetFriendlyName");
+                if (method != null)
+                {
+                    object? name = method.Invoke(type, null);
+                    if (name is string str)
+                    {
+                        _textTagsHelp.Add(str + ":");
+                    }
+                }
+                _textTagsHelp.AddRange(dict.Keys.Select(x => $"[{x}]"));
+                _textTagsHelp.Add(" ");
+            }
+        }
+
+        public static string[] TextTagsList()
+        {
+            return _textTagsHelp.ToArray();
         }
 
         public string Evaluate(Match m)

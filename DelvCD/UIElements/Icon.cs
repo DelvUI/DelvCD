@@ -1,5 +1,6 @@
 ﻿using DelvCD.Config;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -23,25 +24,25 @@ namespace DelvCD.UIElements
 
         public Icon(string name) : base(name)
         {
-            this.IconStyleConfig = new IconStyleConfig();
-            this.LabelListConfig = new LabelListConfig();
-            this.TriggerConfig = new TriggerConfig();
-            this.StyleConditions = new StyleConditions<IconStyleConfig>();
-            this.VisibilityConfig = new VisibilityConfig();
+            IconStyleConfig = new IconStyleConfig();
+            LabelListConfig = new LabelListConfig();
+            TriggerConfig = new TriggerConfig();
+            StyleConditions = new StyleConditions<IconStyleConfig>();
+            VisibilityConfig = new VisibilityConfig();
         }
 
         public override IEnumerable<IConfigPage> GetConfigPages()
         {
-            yield return this.IconStyleConfig;
-            yield return this.LabelListConfig;
-            yield return this.TriggerConfig;
+            yield return IconStyleConfig;
+            yield return LabelListConfig;
+            yield return TriggerConfig;
 
             // ugly hack
-            this.StyleConditions.UpdateTriggerCount(this.TriggerConfig.TriggerOptions.Count);
-            this.StyleConditions.UpdateDefaultStyle(this.IconStyleConfig);
+            StyleConditions.UpdateTriggerCount(TriggerConfig.TriggerOptions.Count);
+            StyleConditions.UpdateDefaultStyle(IconStyleConfig);
 
-            yield return this.StyleConditions;
-            yield return this.VisibilityConfig;
+            yield return StyleConditions;
+            yield return VisibilityConfig;
         }
 
         public override void ImportPage(IConfigPage page)
@@ -49,41 +50,41 @@ namespace DelvCD.UIElements
             switch (page)
             {
                 case IconStyleConfig newPage:
-                    this.IconStyleConfig = newPage;
+                    IconStyleConfig = newPage;
                     break;
                 case LabelListConfig newPage:
-                    this.LabelListConfig = newPage;
+                    LabelListConfig = newPage;
                     break;
                 case TriggerConfig newPage:
-                    this.TriggerConfig = newPage;
+                    TriggerConfig = newPage;
                     break;
                 case StyleConditions<IconStyleConfig> newPage:
                     newPage.UpdateTriggerCount(0);
-                    newPage.UpdateDefaultStyle(this.IconStyleConfig);
-                    this.StyleConditions = newPage;
+                    newPage.UpdateDefaultStyle(IconStyleConfig);
+                    StyleConditions = newPage;
                     break;
                 case VisibilityConfig newPage:
-                    this.VisibilityConfig = newPage;
+                    VisibilityConfig = newPage;
                     break;
             }
         }
 
         public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
-            if (!this.TriggerConfig.TriggerOptions.Any())
+            if (!TriggerConfig.TriggerOptions.Any())
             {
                 return;
             }
 
-            bool visible = this.VisibilityConfig.IsVisible(parentVisible);
-            if (!visible && !this.Preview)
+            bool visible = VisibilityConfig.IsVisible(parentVisible);
+            if (!visible && !Preview)
             {
                 return;
             }
 
-            bool triggered = this.TriggerConfig.IsTriggered(this.Preview, out DataSource[] datas, out int triggeredIndex);
+            bool triggered = TriggerConfig.IsTriggered(Preview, out DataSource[] datas, out int triggeredIndex);
             DataSource data = datas[triggeredIndex];
-            IconStyleConfig style = this.StyleConditions.GetStyle(datas, triggeredIndex) ?? this.IconStyleConfig;
+            IconStyleConfig style = StyleConditions.GetStyle(datas, triggeredIndex) ?? IconStyleConfig;
 
             Vector2 localPos = pos + style.Position;
             Vector2 size = style.Size;
@@ -92,20 +93,22 @@ namespace DelvCD.UIElements
             {
                 ClipRect? clipRect = Singletons.Get<ClipRectsHelper>().GetClipRectForArea(localPos, size);
                 if (clipRect.HasValue)
+                {
                     return;
+                }
             }
 
-            if (triggered || this.Preview)
+            if (triggered || Preview)
             {
-                this.UpdateStartData(data);
-                this.UpdateDragData(localPos, size);
+                UpdateStartData(data);
+                UpdateDragData(localPos, size);
 
-                DrawHelpers.DrawInWindow($"##{this.ID}", localPos, size, this.Preview, this.SetPosition, (drawList) =>
+                DrawHelpers.DrawInWindow($"##{ID}", localPos, size, Preview, SetPosition, (drawList) =>
                 {
-                    if (this.Preview)
+                    if (Preview)
                     {
-                        data = this.UpdatePreviewData(data);
-                        if (this.LastFrameWasDragging)
+                        data = UpdatePreviewData(data);
+                        if (LastFrameWasDragging)
                         {
                             localPos = ImGui.GetWindowPos();
                             style.Position = localPos - pos;
@@ -141,14 +144,14 @@ namespace DelvCD.UIElements
 
                     if (style.ShowProgressSwipe)
                     {
-                        if (style.GcdSwipe && (data.Value == 0 || data.MaxValue == 0 || style.GcdSwipeOnly))
+                        if (style.GcdSwipe && (data.ProgressValue == 0 || data.ProgressMaxValue == 0 || style.GcdSwipeOnly))
                         {
                             ActionHelpers.GetGCDInfo(out var recastInfo);
                             DrawProgressSwipe(style, localPos, size, recastInfo.RecastTime - recastInfo.RecastTimeElapsed, recastInfo.RecastTime, alpha, drawList);
                         }
                         else
                         {
-                            DrawProgressSwipe(style, localPos, size, data.Value, data.MaxValue, alpha, drawList);
+                            DrawProgressSwipe(style, localPos, size, data.ProgressValue, data.ProgressMaxValue, alpha, drawList);
                         }
                     }
 
@@ -164,25 +167,25 @@ namespace DelvCD.UIElements
 
                     if (style.Glow)
                     {
-                        this.DrawIconGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                        DrawIconGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
                     }
                 });
             }
             else
             {
-                this.StartData = null;
-                this.StartTime = null;
+                StartData = null;
+                StartTime = null;
             }
 
-            foreach (Label label in this.LabelListConfig.Labels)
+            foreach (Label label in LabelListConfig.Labels)
             {
-                if (!this.Preview && this.LastFrameWasPreview)
+                if (!Preview && LastFrameWasPreview)
                 {
                     label.Preview = false;
                 }
                 else
                 {
-                    label.Preview |= this.Preview;
+                    label.Preview |= Preview;
                 }
 
                 if (triggered || label.Preview)
@@ -192,7 +195,7 @@ namespace DelvCD.UIElements
                 }
             }
 
-            this.LastFrameWasPreview = this.Preview;
+            LastFrameWasPreview = Preview;
         }
 
         private static void DrawProgressSwipe(
@@ -258,11 +261,11 @@ namespace DelvCD.UIElements
 
         public void Resize(Vector2 size, bool conditions)
         {
-            this.IconStyleConfig.Size = size;
+            IconStyleConfig.Size = size;
 
             if (conditions)
             {
-                foreach (var condition in this.StyleConditions.Conditions)
+                foreach (var condition in StyleConditions.Conditions)
                 {
                     condition.Style.Size = size;
                 }
@@ -271,12 +274,12 @@ namespace DelvCD.UIElements
 
         public void ScaleResolution(Vector2 scaleFactor, bool positionOnly)
         {
-            this.IconStyleConfig.Position *= scaleFactor;
+            IconStyleConfig.Position *= scaleFactor;
 
             if (!positionOnly)
-                this.IconStyleConfig.Size *= scaleFactor;
+                IconStyleConfig.Size *= scaleFactor;
 
-            foreach (var condition in this.StyleConditions.Conditions)
+            foreach (var condition in StyleConditions.Conditions)
             {
                 condition.Style.Position *= scaleFactor;
 

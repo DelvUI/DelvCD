@@ -1,5 +1,7 @@
 using Dalamud.Interface;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
+using DelvCD.UIElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -14,6 +16,7 @@ namespace DelvCD.Config
     {
         public int TriggerDataSourceIndex = 0;
         public TriggerDataSource Source = TriggerDataSource.Value;
+        public int DataSourceFieldIndex = 0;
         public TriggerDataOp Op = TriggerDataOp.GreaterThan;
         public float Value = 0;
 
@@ -21,44 +24,44 @@ namespace DelvCD.Config
 
         public string Name
         {
-            get => this.Style.Name;
+            get => Style.Name;
             set { }
         }
 
-        public override string ToString() => $"Condition [{this.Name}]";
+        public override string ToString() => $"Condition [{Name}]";
 
         public StyleCondition() { }
 
         public StyleCondition(T? defaultStyle)
         {
-            this.Style = ConfigHelpers.SerializedClone<T>(defaultStyle) ?? new T();
+            Style = ConfigHelpers.SerializedClone<T>(defaultStyle) ?? new T();
         }
 
         public IEnumerable<IConfigPage> GetConfigPages()
         {
-            yield return this.Style;
+            yield return Style;
         }
 
         public void ImportPage(IConfigPage page)
         {
             if (page is T t)
             {
-                this.Style = t;
+                Style = t;
             }
         }
 
         public bool GetResult(DataSource data)
         {
-            float value = data.GetDataForSourceType(this.Source);
+            float value = data.GetConditionValue(DataSourceFieldIndex);
 
-            return this.Op switch
+            return Op switch
             {
-                TriggerDataOp.Equals => value == this.Value,
-                TriggerDataOp.NotEquals => value != this.Value,
-                TriggerDataOp.LessThan => value < this.Value,
-                TriggerDataOp.GreaterThan => value > this.Value,
-                TriggerDataOp.LessThanEq => value <= this.Value,
-                TriggerDataOp.GreaterThanEq => value >= this.Value,
+                TriggerDataOp.Equals => value == Value,
+                TriggerDataOp.NotEquals => value != Value,
+                TriggerDataOp.LessThan => value < Value,
+                TriggerDataOp.GreaterThan => value > Value,
+                TriggerDataOp.LessThanEq => value <= Value,
+                TriggerDataOp.GreaterThanEq => value >= Value,
                 _ => false
             } || Singletons.Get<PluginManager>().IsConfigurableOpen(this);
         }
@@ -86,12 +89,12 @@ namespace DelvCD.Config
 
         public T? GetStyle(DataSource[]? data, int triggeredIndex)
         {
-            if (!this.Conditions.Any() || data is null)
+            if (!Conditions.Any() || data is null)
             {
                 return null;
             }
 
-            foreach (var condition in this.Conditions)
+            foreach (var condition in Conditions)
             {
                 int index = condition.TriggerDataSourceIndex == 0
                     ? triggeredIndex
@@ -110,7 +113,7 @@ namespace DelvCD.Config
         {
             if (count < _triggerCount || count == 0)
             {
-                foreach (var condition in this.Conditions)
+                foreach (var condition in Conditions)
                 {
                     condition.TriggerDataSourceIndex = Math.Clamp(condition.TriggerDataSourceIndex, 0, count);
                 }
@@ -151,7 +154,7 @@ namespace DelvCD.Config
                 if (ImGui.BeginTable("##Conditions_Table", 6, tableFlags, new Vector2(size.X - padX * 2, size.Y - ImGui.GetCursorPosY() - padY * 2)))
                 {
                     Vector2 buttonSize = new(30 * _scale, 0);
-                    int buttonCount = this.Conditions.Count > 1 ? 4 : 2;
+                    int buttonCount = Conditions.Count > 1 ? 4 : 2;
                     float actionsWidth = buttonSize.X * buttonCount + padX * (buttonCount - 1);
                     ImGui.TableSetupColumn("Condition", ImGuiTableColumnFlags.WidthFixed, 55 * _scale, 0);
                     ImGui.TableSetupColumn("Data Source", ImGuiTableColumnFlags.WidthFixed, 90 * _scale, 1);
@@ -163,28 +166,28 @@ namespace DelvCD.Config
                     ImGui.TableSetupScrollFreeze(0, 1);
                     ImGui.TableHeadersRow();
 
-                    for (int i = 0; i < this.Conditions.Count; i++)
+                    for (int i = 0; i < Conditions.Count; i++)
                     {
                         ImGui.PushID(i.ToString());
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
-                        this.DrawStyleConditionRow(i);
+                        DrawStyleConditionRow(i);
                     }
 
-                    ImGui.PushID(this.Conditions.Count.ToString());
+                    ImGui.PushID(Conditions.Count.ToString());
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
                     ImGui.TableSetColumnIndex(5);
-                    DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => this.Conditions.Add(new StyleCondition<T>(_defaultStyle)), "New Condition", buttonSize);
+                    DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => Conditions.Add(new StyleCondition<T>(_defaultStyle)), "New Condition", buttonSize);
                 }
 
                 ImGui.EndTable();
 
-                if (_swapX < this.Conditions.Count && _swapX >= 0 &&
-                    _swapY < this.Conditions.Count && _swapY >= 0)
+                if (_swapX < Conditions.Count && _swapX >= 0 &&
+                    _swapY < Conditions.Count && _swapY >= 0)
                 {
-                    var temp = this.Conditions[_swapX];
-                    this.Conditions[_swapX] = this.Conditions[_swapY];
-                    this.Conditions[_swapY] = temp;
+                    var temp = Conditions[_swapX];
+                    Conditions[_swapX] = Conditions[_swapY];
+                    Conditions[_swapY] = temp;
 
                     _swapX = -1;
                     _swapY = -1;
@@ -197,7 +200,7 @@ namespace DelvCD.Config
 
         private void DrawStyleConditionRow(int i)
         {
-            StyleCondition<T> condition = this.Conditions[i];
+            StyleCondition<T> condition = Conditions[i];
 
             if (ImGui.TableSetColumnIndex(0))
             {
@@ -258,7 +261,7 @@ namespace DelvCD.Config
                 Vector2 buttonSize = new(30 * _scale, 0);
                 DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Pen, () => Singletons.Get<PluginManager>().Edit(condition), "Edit Style", buttonSize);
 
-                if (this.Conditions.Count > 1)
+                if (Conditions.Count > 1)
                 {
                     ImGui.SameLine();
                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.ArrowUp, () => Swap(i, i - 1), "Move Up", buttonSize);
@@ -268,7 +271,7 @@ namespace DelvCD.Config
                 }
 
                 ImGui.SameLine();
-                DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Trash, () => this.Conditions.Remove(condition), "Remove Condition", buttonSize);
+                DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Trash, () => Conditions.Remove(condition), "Remove Condition", buttonSize);
             }
         }
 

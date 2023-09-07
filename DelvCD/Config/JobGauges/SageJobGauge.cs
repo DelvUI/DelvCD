@@ -1,13 +1,15 @@
 ﻿using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using System.Collections.Generic;
+using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
-namespace DelvCD.Config.JobGaugeDataSources
+namespace DelvCD.Config.JobGauges
 {
-    public class SageJobGaugeDataSource : JobGaugeDataSource
+    public class SageJobGauge : JobGauge
     {
-        public SageJobGaugeDataSource(string rawData) : base(rawData)
+        public SageJobGauge(string rawData) : base(rawData)
         {
         }
 
@@ -30,18 +32,21 @@ namespace DelvCD.Config.JobGaugeDataSources
             };
         }
 
-        public override bool IsTriggered(bool preview, DataSource data)
+        public override (bool, DataSource) IsTriggered(bool preview)
         {
-            SGEGauge gauge = Singletons.Get<JobGauges>().Get<SGEGauge>();
+            CooldownDataSource data = new CooldownDataSource();
+            SGEGauge gauge = Singletons.Get<DalamudJobGauges>().Get<SGEGauge>();
 
             data.Value = 0;
             data.MaxValue = 100;
 
-            return
+            bool triggered =
                 EvaluateCondition(0, gauge.Eukrasia) &&
                 EvaluateCondition(1, gauge.AddersgallTimer) &&
                 EvaluateCondition(2, gauge.Addersgall) &&
                 EvaluateCondition(3, gauge.Addersting);
+
+            return (triggered, data);
         }
     }
 }
