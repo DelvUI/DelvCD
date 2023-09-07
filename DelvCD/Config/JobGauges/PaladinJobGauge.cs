@@ -1,7 +1,7 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -14,24 +14,24 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.PLD;
+        private PaladinDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
-            _names = new List<string>() { "Oath Gauge" };
+            _names = new List<string>() { "Oath" };
             _types = new List<TriggerConditionType>() { TriggerConditionType.Numeric };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             PLDGauge gauge = Singletons.Get<DalamudJobGauges>().Get<PLDGauge>();
 
-            data.Value = gauge.OathGauge;
-            data.MaxValue = 100;
+            _dataSource.Oath = gauge.OathGauge;
 
-            bool triggered = EvaluateCondition(0, gauge.OathGauge);
+            if (preview) { return true; }
 
-            return (triggered, data);
+            return EvaluateCondition(0, _dataSource.Oath);
         }
     }
 }

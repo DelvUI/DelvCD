@@ -2,6 +2,7 @@
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -14,6 +15,8 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.MCH;
+        private MachinistDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
@@ -36,23 +39,26 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             MCHGauge gauge = Singletons.Get<DalamudJobGauges>().Get<MCHGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Heat = gauge.Heat;
+            _dataSource.Overheat = gauge.IsOverheated;
+            _dataSource.Overheat_Timer = gauge.OverheatTimeRemaining / 1000f;
+            _dataSource.Battery = gauge.Battery;
+            _dataSource.Summon = gauge.IsRobotActive;
+            _dataSource.Summon_Timer = gauge.SummonTimeRemaining / 1000f;
 
-            bool triggered =
-                EvaluateCondition(0, gauge.Heat) &&
-                EvaluateCondition(1, gauge.IsOverheated) &&
-                EvaluateCondition(2, gauge.OverheatTimeRemaining) &&
-                EvaluateCondition(3, gauge.Battery) &&
-                EvaluateCondition(4, gauge.IsRobotActive) &&
-                EvaluateCondition(5, gauge.SummonTimeRemaining);
+            if (preview) { return true; }
 
-            return (triggered, data);
+            return
+                EvaluateCondition(0, _dataSource.Heat) &&
+                EvaluateCondition(1, _dataSource.Overheat) &&
+                EvaluateCondition(2, _dataSource.Overheat_Timer) &&
+                EvaluateCondition(3, _dataSource.Battery) &&
+                EvaluateCondition(4, _dataSource.Summon) &&
+                EvaluateCondition(5, _dataSource.Summon_Timer);
         }
     }
 }

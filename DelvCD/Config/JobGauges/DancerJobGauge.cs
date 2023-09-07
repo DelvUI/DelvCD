@@ -1,8 +1,7 @@
-﻿using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -24,12 +23,14 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.DNC;
+        private DancerDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
             _names = new List<string>() {
                 "Fourfold Feathers Stacks",
-                "Espirit",
+                "Esprit",
                 "Dancing",
                 "Next Step",
                 "Step #1",
@@ -60,25 +61,25 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             DNCGauge gauge = Singletons.Get<DalamudJobGauges>().Get<DNCGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Feather_Stacks = gauge.Feathers;
+            _dataSource.Esprit = gauge.Esprit;
+            _dataSource.Dancing = gauge.IsDancing;
 
-            bool triggered =
-                EvaluateCondition(0, gauge.Feathers) &&
-                EvaluateCondition(1, gauge.Esprit) &&
-                EvaluateCondition(2, gauge.IsDancing) &&
+            if (preview) { return true; }
+
+            return
+                EvaluateCondition(0, _dataSource.Feather_Stacks) &&
+                EvaluateCondition(1, _dataSource.Esprit) &&
+                EvaluateCondition(2, _dataSource.Dancing) &&
                 EvaluateCondition(3, (int)gauge.NextStep - (int)DNCStep.None) &&
                 EvaluateStepCondition(gauge, 0) &&
                 EvaluateStepCondition(gauge, 1) &&
                 EvaluateStepCondition(gauge, 2) &&
                 EvaluateStepCondition(gauge, 3);
-
-            return (triggered, data);
         }
 
         private bool EvaluateStepCondition(DNCGauge gauge, int step)

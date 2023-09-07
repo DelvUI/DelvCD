@@ -1,12 +1,11 @@
 ﻿using DelvCD.Config;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Numerics;
-using DelvCD.Helpers.DataSources;
-using System;
 using System.Linq;
+using System.Numerics;
 
 namespace DelvCD.UIElements
 {
@@ -91,7 +90,9 @@ namespace DelvCD.UIElements
         {
             _data = data;
             _dataIndex = index;
+
             StyleConditions.UpdateTriggerCount(data.Length);
+            StyleConditions.UpdateDataSources(data);
         }
     }
 }

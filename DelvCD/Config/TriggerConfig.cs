@@ -11,6 +11,8 @@ using System.Runtime.CompilerServices;
 
 namespace DelvCD.Config
 {
+    public delegate void TriggerOptionsUpdateEventHandler(TriggerConfig triggerConfig);
+
     public class TriggerConfig : IConfigPage
     {
         [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
@@ -26,34 +28,51 @@ namespace DelvCD.Config
         [JsonIgnore] private int _selectedIndex = 0;
         [JsonIgnore] private TriggerType _selectedType = 0;
 
-        public List<TriggerOptions> TriggerOptions { get; init; }
+        [JsonIgnore] private List<TriggerOptions> _triggerOptions = new() { new StatusTrigger() };
+        public List<TriggerOptions> TriggerOptions
+        {
+            get => _triggerOptions;
+            set
+            {
+                _triggerOptions = value;
+
+                foreach (TriggerOptions option in _triggerOptions)
+                {
+                    option.OnDataSourceChange = () =>
+                    {
+                        TriggerOptionsUpdateEvent?.Invoke(this);
+                    };
+                }
+
+                TriggerOptionsUpdateEvent?.Invoke(this);
+            }
+        }
+
         public int DataTrigger = 0;
+
+        public event TriggerOptionsUpdateEventHandler? TriggerOptionsUpdateEvent;
 
         public TriggerConfig()
         {
-            TriggerOptions = new List<TriggerOptions>() { new StatusTrigger() };
         }
 
         public IConfigPage GetDefault() => new TriggerConfig();
 
-        public bool IsTriggered(bool preview, out DataSource[] data, out int triggeredIndex)
+        public bool IsTriggered(bool preview, out int triggeredIndex)
         {
-            data = new DataSource[TriggerOptions.Count];
             triggeredIndex = DataTrigger == 0 ? 0 : DataTrigger - 1;
             if (!TriggerOptions.Any())
             {
                 return false;
             }
 
-            var (triggered, d) = TriggerOptions[0].IsTriggered(preview);
-            data[0] = d;
+            bool triggered = TriggerOptions[0].IsTriggered(preview);
 
             bool anyTriggered = triggered;
-            for (int i = 1; i < data.Length; i++)
+            for (int i = 1; i < TriggerOptions.Count; i++)
             {
-                var trigger = TriggerOptions[i];
-                var (currentTriggered, currentData) = TriggerOptions[i].IsTriggered(preview);
-                data[i] = currentData;
+                TriggerOptions trigger = NewMethod(i);
+                bool currentTriggered = NewMethod1(preview, i);
 
                 triggered = trigger.Condition switch
                 {
@@ -72,6 +91,16 @@ namespace DelvCD.Config
             }
 
             return triggered;
+        }
+
+        private bool NewMethod1(bool preview, int i)
+        {
+            return TriggerOptions[i].IsTriggered(preview);
+        }
+
+        private TriggerOptions NewMethod(int i)
+        {
+            return TriggerOptions[i];
         }
 
         private string[] GetTriggerDataOptions()
@@ -171,6 +200,8 @@ namespace DelvCD.Config
                             _ => new StatusTrigger()
                         };
                         TriggerOptions[_selectedIndex].Condition = oldCond;
+
+                        TriggerOptionsUpdateEvent?.Invoke(this);
                     }
 
                     selectedTrigger.DrawTriggerOptions(ImGui.GetWindowSize(), padX, padX);
@@ -252,6 +283,16 @@ namespace DelvCD.Config
         {
             TriggerOptions.Add(newTrigger ?? new StatusTrigger());
             SelectTrigger(TriggerOptions.Count - 1);
+
+            if (newTrigger != null)
+            {
+                newTrigger.OnDataSourceChange = () =>
+                {
+                    TriggerOptionsUpdateEvent?.Invoke(this);
+                };
+            }
+
+            TriggerOptionsUpdateEvent?.Invoke(this);
         }
 
         private void ExportTrigger(int i)
@@ -285,6 +326,8 @@ namespace DelvCD.Config
                 {
                     DataTrigger = 0;
                 }
+
+                TriggerOptionsUpdateEvent?.Invoke(this);
             }
         }
 

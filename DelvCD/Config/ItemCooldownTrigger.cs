@@ -26,42 +26,40 @@ namespace DelvCD.Config
 
         public override TriggerType Type => TriggerType.ItemCooldown;
         public override TriggerSource Source => TriggerSource.Player;
-        [JsonIgnore] public override Type DataSourceType => typeof(CooldownDataSource);
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        [JsonIgnore] private CooldownDataSource _dataSource = new();
+        [JsonIgnore] public override DataSource DataSource => _dataSource;
+
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
-
             if (!TriggerData.Any())
             {
-                return (false, data);
+                return false;
             }
 
             if (preview)
             {
-                data.Value = 10;
-                data.Stacks = 1;
-                data.MaxStacks = 1;
-                data.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
+                _dataSource.Value = 10;
+                _dataSource.Stacks = 1;
+                _dataSource.MaxStacks = 1;
+                _dataSource.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
 
-                return (true, data);
+                return true;
             }
 
             ActionHelpers helper = Singletons.Get<ActionHelpers>();
             TriggerData actionTrigger = TriggerData.First();
             helper.GetItemRecastInfo(actionTrigger.Id, out RecastInfo recastInfo);
 
-            data.MaxValue = recastInfo.RecastTime;
-            data.Value = recastInfo.RecastTime - recastInfo.RecastTimeElapsed;
-            data.Icon = actionTrigger.Icon;
-            data.Id = actionTrigger.Id;
+            _dataSource.MaxValue = recastInfo.RecastTime;
+            _dataSource.Value = recastInfo.RecastTime - recastInfo.RecastTimeElapsed;
+            _dataSource.Icon = actionTrigger.Icon;
+            _dataSource.Id = actionTrigger.Id;
 
-            data.Stacks = GetQuantity(actionTrigger.Id);
-            data.MaxStacks = data.Stacks;
+            _dataSource.Stacks = GetQuantity(actionTrigger.Id);
+            _dataSource.MaxStacks = _dataSource.Stacks;
 
-            bool triggered = !Cooldown || Utils.GetResult(data.Value, CooldownOp, CooldownValue);
-
-            return (triggered, data);
+            return !Cooldown || Utils.GetResult(_dataSource.Value, CooldownOp, CooldownValue);
         }
 
         private unsafe int GetQuantity(uint itemId)

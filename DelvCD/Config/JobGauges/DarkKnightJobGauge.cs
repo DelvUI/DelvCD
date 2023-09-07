@@ -1,7 +1,7 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -14,6 +14,8 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.DRK;
+        private DarkKnightDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
@@ -32,21 +34,22 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             DRKGauge gauge = Singletons.Get<DalamudJobGauges>().Get<DRKGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Blood = gauge.Blood;
+            _dataSource.Darkside_Timer = gauge.DarksideTimeRemaining / 1000f;
+            _dataSource.Shadow_Timer = gauge.ShadowTimeRemaining / 1000f;
+            _dataSource.Dark_Arts = gauge.HasDarkArts;
 
-            bool triggered =
-                EvaluateCondition(0, gauge.Blood) &&
-                EvaluateCondition(1, gauge.DarksideTimeRemaining) &&
-                EvaluateCondition(2, gauge.ShadowTimeRemaining) &&
-                EvaluateCondition(3, gauge.HasDarkArts);
+            if (preview) { return true; }
 
-            return (triggered, data);
+            return
+                EvaluateCondition(0, _dataSource.Blood) &&
+                EvaluateCondition(1, _dataSource.Darkside_Timer) &&
+                EvaluateCondition(2, _dataSource.Shadow_Timer) &&
+                EvaluateCondition(3, _dataSource.Dark_Arts);
         }
     }
 }

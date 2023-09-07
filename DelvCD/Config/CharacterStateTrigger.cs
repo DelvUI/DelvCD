@@ -31,7 +31,9 @@ namespace DelvCD.Config
 
         public override TriggerType Type => TriggerType.CharacterState;
         public override TriggerSource Source => TriggerSource;
-        [JsonIgnore] public override Type DataSourceType => typeof(CharacterStateDataSource);
+
+        [JsonIgnore] private CharacterStateDataSource _dataSource = new();
+        [JsonIgnore] public override DataSource DataSource => _dataSource;
 
         public bool Level = false;
         public TriggerDataOp LevelOp = TriggerDataOp.GreaterThan;
@@ -60,13 +62,22 @@ namespace DelvCD.Config
         public bool PetCheck;
         public int PetValue;
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CharacterStateDataSource data = new CharacterStateDataSource();
-
             if (preview)
             {
-                return (true, data);
+                _dataSource.Hp = 50000;
+                _dataSource.MaxHp = 100000;
+                _dataSource.Mp = 5000;
+                _dataSource.MaxMp = 10000;
+                _dataSource.Cp = 50;
+                _dataSource.MaxCp = 100;
+                _dataSource.Gp = 50;
+                _dataSource.MaxGp = 100;
+                _dataSource.Level = 90;
+                _dataSource.Distance = 10;
+                _dataSource.HasPet = false;
+                return true;
             }
 
             GameObject? actor = TriggerSource switch
@@ -80,39 +91,37 @@ namespace DelvCD.Config
 
             if (actor is not null)
             {
-                data.Name = actor.Name.ToString();
+                _dataSource.Name = actor.Name.ToString();
             }
 
             if (actor is Character chara)
             {
-                data.Hp = chara.CurrentHp;
-                data.MaxHp = chara.MaxHp;
-                data.Mp = chara.CurrentMp;
-                data.MaxMp = chara.MaxMp;
-                data.Cp = chara.CurrentCp;
-                data.MaxCp = chara.MaxCp;
-                data.Gp = chara.CurrentGp;
-                data.MaxGp = chara.MaxGp;
-                data.Level = chara.Level;
-                data.Distance = chara.YalmDistanceX;
-                data.HasPet = TriggerSource == TriggerSource.Player &&
+                _dataSource.Hp = chara.CurrentHp;
+                _dataSource.MaxHp = chara.MaxHp;
+                _dataSource.Mp = chara.CurrentMp;
+                _dataSource.MaxMp = chara.MaxMp;
+                _dataSource.Cp = chara.CurrentCp;
+                _dataSource.MaxCp = chara.MaxCp;
+                _dataSource.Gp = chara.CurrentGp;
+                _dataSource.MaxGp = chara.MaxGp;
+                _dataSource.Level = chara.Level;
+                _dataSource.Distance = chara.YalmDistanceX;
+                _dataSource.HasPet = TriggerSource == TriggerSource.Player &&
                     Singletons.Get<BuddyList>().PetBuddy != null;
 
                 unsafe
                 {
-                    data.Job = (Job)((CharacterStruct*)chara.Address)->CharacterData.ClassJob;
+                    _dataSource.Job = (Job)((CharacterStruct*)chara.Address)->CharacterData.ClassJob;
                 }
             }
 
-            bool triggered = 
-                (!Hp || Utils.GetResult(data.Hp, HpOp, MaxHp ? data.MaxHp : HpValue)) &&
-                (!Mp || Utils.GetResult(data.Mp, MpOp, MaxMp ? data.MaxMp : MpValue)) &&
-                (!Cp || Utils.GetResult(data.Cp, CpOp, MaxCp ? data.MaxCp : CpValue)) &&
-                (!Gp || Utils.GetResult(data.Gp, GpOp, MaxGp ? data.MaxGp : GpValue)) &&
-                (!Level || Utils.GetResult(data.Level, LevelOp, LevelValue)) &&
-                (!PetCheck || (PetValue == 0 ? data.HasPet : !data.HasPet));
-
-            return (triggered, data);
+            return
+                (!Hp || Utils.GetResult(_dataSource.Hp, HpOp, MaxHp ? _dataSource.MaxHp : HpValue)) &&
+                (!Mp || Utils.GetResult(_dataSource.Mp, MpOp, MaxMp ? _dataSource.MaxMp : MpValue)) &&
+                (!Cp || Utils.GetResult(_dataSource.Cp, CpOp, MaxCp ? _dataSource.MaxCp : CpValue)) &&
+                (!Gp || Utils.GetResult(_dataSource.Gp, GpOp, MaxGp ? _dataSource.MaxGp : GpValue)) &&
+                (!Level || Utils.GetResult(_dataSource.Level, LevelOp, LevelValue)) &&
+                (!PetCheck || (PetValue == 0 ? _dataSource.HasPet : !_dataSource.HasPet));
         }
 
         public override void DrawTriggerOptions(Vector2 size, float padX, float padY)

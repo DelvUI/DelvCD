@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace DelvCD.UIElements
 {
@@ -15,9 +16,42 @@ namespace DelvCD.UIElements
 
         public IconStyleConfig IconStyleConfig { get; set; }
         public LabelListConfig LabelListConfig { get; set; }
-        public TriggerConfig TriggerConfig { get; set; }
-        public StyleConditions<IconStyleConfig> StyleConditions { get; set; }
         public VisibilityConfig VisibilityConfig { get; set; }
+
+
+        [JsonIgnore] private TriggerConfig _triggerConfig = null!;
+        public TriggerConfig TriggerConfig
+        {
+            get => _triggerConfig;
+            set
+            {
+                if (_triggerConfig != null)
+                {
+                    _triggerConfig.TriggerOptionsUpdateEvent -= OnTriggerOptionsChanged;
+                }
+
+                _triggerConfig = value;
+                _triggerConfig.TriggerOptionsUpdateEvent += OnTriggerOptionsChanged;
+
+                OnTriggerOptionsChanged(TriggerConfig);
+            }
+        }
+
+        
+        [JsonIgnore] private StyleConditions<IconStyleConfig> _styleConditions = null!;
+        public StyleConditions<IconStyleConfig> StyleConditions
+        {
+            get => _styleConditions;
+            set
+            {
+                _styleConditions = value;
+
+                if (TriggerConfig != null)
+                {
+                    OnTriggerOptionsChanged(TriggerConfig);
+                }
+            }
+        }
 
         // Constructor for deserialization
         public Icon() : this(string.Empty) { }
@@ -31,6 +65,14 @@ namespace DelvCD.UIElements
             VisibilityConfig = new VisibilityConfig();
         }
 
+        private void OnTriggerOptionsChanged(TriggerConfig sender)
+        {
+            if (StyleConditions == null) { return; }
+
+            StyleConditions.UpdateTriggerCount(sender.TriggerOptions.Count);
+            StyleConditions.UpdateDataSources(sender.TriggerOptions.Select(x => x.DataSource).ToArray());
+        }
+
         public override IEnumerable<IConfigPage> GetConfigPages()
         {
             yield return IconStyleConfig;
@@ -38,7 +80,6 @@ namespace DelvCD.UIElements
             yield return TriggerConfig;
 
             // ugly hack
-            StyleConditions.UpdateTriggerCount(TriggerConfig.TriggerOptions.Count);
             StyleConditions.UpdateDefaultStyle(IconStyleConfig);
 
             yield return StyleConditions;
@@ -82,8 +123,9 @@ namespace DelvCD.UIElements
                 return;
             }
 
-            bool triggered = TriggerConfig.IsTriggered(Preview, out DataSource[] datas, out int triggeredIndex);
-            DataSource data = datas[triggeredIndex];
+            bool triggered = TriggerConfig.IsTriggered(Preview, out int triggeredIndex);
+            DataSource data = TriggerConfig.TriggerOptions[triggeredIndex].DataSource;
+            DataSource[] datas = TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray();
             IconStyleConfig style = StyleConditions.GetStyle(datas, triggeredIndex) ?? IconStyleConfig;
 
             Vector2 localPos = pos + style.Position;

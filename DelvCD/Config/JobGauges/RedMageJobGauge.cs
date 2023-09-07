@@ -1,7 +1,7 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -14,6 +14,8 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.RDM;
+        private RedMageDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
@@ -30,20 +32,20 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             RDMGauge gauge = Singletons.Get<DalamudJobGauges>().Get<RDMGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.White_Mana = gauge.WhiteMana;
+            _dataSource.Black_Mana = gauge.BlackMana;
+            _dataSource.Mana_Stacks = gauge.ManaStacks;
 
-            bool triggered =
-                EvaluateCondition(0, gauge.WhiteMana) &&
-                EvaluateCondition(1, gauge.BlackMana) &&
-                EvaluateCondition(2, gauge.ManaStacks);
+            if (preview) { return true; }
 
-            return (triggered, data);
+            return
+                EvaluateCondition(0, _dataSource.White_Mana) &&
+                EvaluateCondition(1, _dataSource.Black_Mana) &&
+                EvaluateCondition(2, _dataSource.Mana_Stacks);
         }
     }
 }

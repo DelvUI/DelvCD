@@ -1,7 +1,7 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -14,6 +14,8 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.NIN;
+        private NinjaDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
@@ -28,19 +30,18 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             NINGauge gauge = Singletons.Get<DalamudJobGauges>().Get<NINGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Huton_Timer = gauge.HutonTimer / 1000f;
+            _dataSource.Ninki = gauge.Ninki;
 
-            bool triggered =
-                EvaluateCondition(0, gauge.HutonTimer) &&
-                EvaluateCondition(1, gauge.Ninki);
+            if (preview) { return true; }
 
-            return (triggered, data);
+            return
+                EvaluateCondition(0, _dataSource.Huton_Timer) &&
+                EvaluateCondition(1, _dataSource.Ninki);
         }
     }
 }

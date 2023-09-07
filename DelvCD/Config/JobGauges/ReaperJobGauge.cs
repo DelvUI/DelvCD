@@ -1,7 +1,7 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -14,6 +14,8 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.RPR;
+        private ReaperDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
@@ -34,22 +36,24 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             RPRGauge gauge = Singletons.Get<DalamudJobGauges>().Get<RPRGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Soul = gauge.Soul;
+            _dataSource.Shroud = gauge.Shroud;
+            _dataSource.Enshroud_Timer = gauge.EnshroudedTimeRemaining / 1000f;
+            _dataSource.Lemure_Shroud_Stacks = gauge.LemureShroud;
+            _dataSource.Void_Shroud_Stacks = gauge.VoidShroud;
 
-            bool triggered =
-                EvaluateCondition(0, gauge.Soul) &&
-                EvaluateCondition(0, gauge.Shroud) &&
-                EvaluateCondition(0, gauge.EnshroudedTimeRemaining) &&
-                EvaluateCondition(0, gauge.LemureShroud) &&
-                EvaluateCondition(0, gauge.VoidShroud);
+            if (preview) { return true; }
 
-            return (triggered, data);
+            return
+                EvaluateCondition(0, _dataSource.Soul) &&
+                EvaluateCondition(1, _dataSource.Shroud) &&
+                EvaluateCondition(2, _dataSource.Enshroud_Timer) &&
+                EvaluateCondition(3, _dataSource.Lemure_Shroud_Stacks) &&
+                EvaluateCondition(4, _dataSource.Void_Shroud_Stacks);
         }
     }
 }

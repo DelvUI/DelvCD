@@ -2,12 +2,12 @@
 {
     public class CooldownDataSource : DataSource
     {
+        public new static string DisplayName => "Cooldown and Status";
+
         public float Value;
         public float MaxValue;
         public int Stacks;
         public int MaxStacks;
-
-        public new static string GetFriendlyName() { return "Cooldowns and Status Triggers"; }
 
         public override float ProgressValue
         {
@@ -15,18 +15,23 @@
             set => Value = value;
         }
 
-        public override float ProgressMaxValue
+        public override float ProgressMaxValue => MaxValue;
+
+        public override float GetConditionValue(int index) => index switch
         {
-            get => MaxValue;
-            set => MaxValue = value;
-        }
+            0 => Value,
+            1 => Stacks,
+            2 => MaxStacks,
+            _ => 0
+        };
+
         public CooldownDataSource()
         {
-            SetConditionFields(
+            _conditionFieldNames = new() {
                 nameof(Value),
                 nameof(Stacks),
                 nameof(MaxStacks)
-            );
+            };
         }
     }
 }

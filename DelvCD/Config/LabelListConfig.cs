@@ -35,7 +35,7 @@ namespace DelvCD.Config
             valueLabel.LabelStyleConfig.FontID = Singletons.Get<FontsManager>().GetFontIndex(FontsManager.DefaultBigFontKey);
             valueLabel.StyleConditions.Conditions.Add(new StyleCondition<LabelStyleConfig>()
             {
-                Source = TriggerDataSource.Value,
+                Source = 0,
                 Op = TriggerDataOp.Equals,
                 Value = 0
             });
@@ -50,7 +50,7 @@ namespace DelvCD.Config
             stacksLabel.LabelStyleConfig.OutlineColor = new ConfigColor(1, 1, 1, 1);
             stacksLabel.StyleConditions.Conditions.Add(new StyleCondition<LabelStyleConfig>()
             {
-                Source = TriggerDataSource.MaxStacks,
+                Source = 2,
                 Op = TriggerDataOp.LessThanEq,
                 Value = 1
             });

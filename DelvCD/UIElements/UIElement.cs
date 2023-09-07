@@ -108,11 +108,6 @@ namespace DelvCD.UIElements
                 StartData = data;
                 StartTime = DateTime.UtcNow;
             }
-
-            if (StartData is not null && data.ProgressMaxValue == 0)
-            {
-                data.ProgressMaxValue = StartData.ProgressValue;
-            }
         }
     }
 }

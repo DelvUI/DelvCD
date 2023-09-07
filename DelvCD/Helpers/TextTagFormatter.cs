@@ -1,4 +1,5 @@
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -45,25 +46,24 @@ namespace DelvCD.Helpers
             Type[] types = new Type[]
             {
                 typeof(CooldownDataSource),
-                typeof(CharacterStateDataSource)
+                typeof(CharacterStateDataSource),
+                typeof(BlackMageDataSource)
             };
 
-            foreach (Type type in types)
+            for (int i = 0; i < types.Length; i++)
             {
+                Type type = types[i];
+                //string name = names[i];
+
                 Dictionary<string, FieldInfo> dict = type.GetFields().ToDictionary((x) => x.Name.ToLower());
                 _fieldsMap[type] = dict;
 
-                MethodInfo? method = type.GetMethod("GetFriendlyName");
-                if (method != null)
-                {
-                    object? name = method.Invoke(type, null);
-                    if (name is string str)
-                    {
-                        _textTagsHelp.Add(str + ":");
-                    }
-                }
+                //_textTagsHelp.Add(name);
                 _textTagsHelp.AddRange(dict.Keys.Select(x => $"[{x}]"));
                 _textTagsHelp.Add(" ");
+
+                _textTagsHelp.Remove("[id]");
+                _textTagsHelp.Remove("[icon]");
             }
         }
 
@@ -97,7 +97,7 @@ namespace DelvCD.Helpers
                     value = m.Groups[2].Value switch
                     {
                         ":k" => KiloFormat(f, _format, decimals, _rounding) ?? m.Value,
-                        ":t" => TimeFormat(f, _rounding),
+                        ":t" => TimeFormat(f, _rounding, decimals),
                         _ => FloatFormat(f, _format, decimals, _rounding)
                     };
                 }
@@ -131,11 +131,11 @@ namespace DelvCD.Helpers
             return temp.ToString($"{format}{decimals}", CultureInfo.InvariantCulture);
         }
 
-        private static string TimeFormat(float seconds, int rounding) => seconds switch
+        private static string TimeFormat(float seconds, int rounding, int decimals) => seconds switch
         {
             > 3600 => $"{(int)seconds / 3600:0}:{((int)seconds % 3600) / 60:00}:{(int)seconds % 60:00}",
             > 60 => $"{(int)seconds / 60:0}:{(int)seconds % 60:00}",
-            _ => FloatFormat(seconds, "F", 0, rounding)
+            _ => FloatFormat(seconds, "F", decimals, rounding)
         };
 
         private static string KiloFormat(float num, string format, int decimals, int rounding) => num switch

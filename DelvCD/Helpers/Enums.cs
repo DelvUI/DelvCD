@@ -38,19 +38,6 @@ namespace DelvCD.Helpers
         Xor
     }
 
-    public enum TriggerDataSource
-    {
-        Value,
-        Stacks,
-        MaxStacks,
-        HP,
-        MP,
-        CP,
-        GP,
-        Level,
-        Distance
-    }
-
     public enum TriggerDataOp
     {
         Equals,

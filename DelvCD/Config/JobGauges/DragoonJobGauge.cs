@@ -2,6 +2,7 @@
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -14,6 +15,8 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.DRG;
+        private DragoonDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
@@ -32,21 +35,22 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             DRGGauge gauge = Singletons.Get<DalamudJobGauges>().Get<DRGGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Life_Of_The_Dragon = gauge.IsLOTDActive;
+            _dataSource.Life_Of_The_Dragon_Timer = gauge.LOTDTimer / 1000f;
+            _dataSource.First_Broods_Gaze_Stacks = gauge.EyeCount;
+            _dataSource.Firstminds_Focus_Stacks = gauge.FirstmindsFocusCount;
 
-            bool triggered =
-                EvaluateCondition(0, gauge.IsLOTDActive) &&
-                EvaluateCondition(1, gauge.LOTDTimer) &&
-                EvaluateCondition(2, gauge.EyeCount) &&
-                EvaluateCondition(3, gauge.FirstmindsFocusCount);
+            if (preview) { return true; }
 
-            return (triggered, data);
+            return
+                EvaluateCondition(0, _dataSource.Life_Of_The_Dragon) &&
+                EvaluateCondition(1, _dataSource.Life_Of_The_Dragon_Timer) &&
+                EvaluateCondition(2, _dataSource.First_Broods_Gaze_Stacks) &&
+                EvaluateCondition(3, _dataSource.Firstminds_Focus_Stacks);
         }
     }
 }

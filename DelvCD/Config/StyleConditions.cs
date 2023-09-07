@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace DelvCD.Config
@@ -15,8 +16,7 @@ namespace DelvCD.Config
     public class StyleCondition<T> : IConfigurable where T : class?, IConfigPage, new()
     {
         public int TriggerDataSourceIndex = 0;
-        public TriggerDataSource Source = TriggerDataSource.Value;
-        public int DataSourceFieldIndex = 0;
+        public int Source = 0;
         public TriggerDataOp Op = TriggerDataOp.GreaterThan;
         public float Value = 0;
 
@@ -52,7 +52,7 @@ namespace DelvCD.Config
 
         public bool GetResult(DataSource data)
         {
-            float value = data.GetConditionValue(DataSourceFieldIndex);
+            float value = data.GetConditionValue(Source);
 
             return Op switch
             {
@@ -71,7 +71,8 @@ namespace DelvCD.Config
     {
         [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
 
-        [JsonIgnore] private static readonly string[] _sourceOptions = Enum.GetNames<TriggerDataSource>();
+        [JsonIgnore] private List<TriggerOptions> _triggers = new();
+        [JsonIgnore] private string[] _sourceOptions = new string[] { };
         [JsonIgnore] private static readonly string[] _operatorOptions = new string[] { "==", "!=", "<", ">", "<=", ">=" };
         [JsonIgnore] private static readonly string _text = $"Add Conditions below to specify alternate appearance configurations under certain conditions.";
         [JsonIgnore] private static readonly float _yOffset = ImGui.CalcTextSize(_text).Y;
@@ -81,6 +82,7 @@ namespace DelvCD.Config
         [JsonIgnore] private int _swapY = -1;
         [JsonIgnore] private int _triggerCount = 0;
         [JsonIgnore] private T? _defaultStyle;
+        [JsonIgnore] private HashSet<Type> _cachedDataSourceTypes = new();
 
         public string Name => "Conditions";
         public IConfigPage GetDefault() => new StyleConditions<T>();
@@ -94,13 +96,13 @@ namespace DelvCD.Config
                 return null;
             }
 
-            foreach (var condition in Conditions)
+            foreach (StyleCondition<T> condition in Conditions)
             {
                 int index = condition.TriggerDataSourceIndex == 0
                     ? triggeredIndex
                     : condition.TriggerDataSourceIndex - 1;
 
-                if (condition.GetResult(data[index]))
+                if (index < data.Length && condition.GetResult(data[index]))
                 {
                     return condition.Style;
                 }
@@ -132,6 +134,17 @@ namespace DelvCD.Config
             _triggerCount = count;
         }
 
+        public void UpdateDataSources(DataSource[] dataSources)
+        { 
+            HashSet<string> set = new();
+            foreach (DataSource dataSource in dataSources)
+            {
+                set.UnionWith(dataSource.ConditionFieldNames);
+            }
+
+            _sourceOptions = set.ToArray();
+        }
+
         public void UpdateDefaultStyle(T style)
         {
             _defaultStyle = style;
@@ -158,7 +171,7 @@ namespace DelvCD.Config
                     float actionsWidth = buttonSize.X * buttonCount + padX * (buttonCount - 1);
                     ImGui.TableSetupColumn("Condition", ImGuiTableColumnFlags.WidthFixed, 55 * _scale, 0);
                     ImGui.TableSetupColumn("Data Source", ImGuiTableColumnFlags.WidthFixed, 90 * _scale, 1);
-                    ImGui.TableSetupColumn("Data", ImGuiTableColumnFlags.WidthFixed, 90 * _scale, 2);
+                    ImGui.TableSetupColumn("Data", ImGuiTableColumnFlags.WidthStretch, 0, 2);
                     ImGui.TableSetupColumn("Operator", ImGuiTableColumnFlags.WidthFixed, 55 * _scale, 3);
                     ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch, 0, 4);
                     ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, actionsWidth, 5);
@@ -228,7 +241,7 @@ namespace DelvCD.Config
             {
                 ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                 ImGui.PushItemWidth(ImGui.GetColumnWidth());
-                ImGui.Combo("##SourceCombo", ref Unsafe.As<TriggerDataSource, int>(ref condition.Source), _sourceOptions, _sourceOptions.Length);
+                ImGui.Combo("##SourceCombo", ref condition.Source, _sourceOptions, _sourceOptions.Length);
                 ImGui.PopItemWidth();
             }
 

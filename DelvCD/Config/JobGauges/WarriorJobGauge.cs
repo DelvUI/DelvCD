@@ -1,8 +1,7 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Enums;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -15,6 +14,8 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.WAR;
+        private WarriorDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
@@ -22,17 +23,15 @@ namespace DelvCD.Config.JobGauges
             _types = new List<TriggerConditionType>() { TriggerConditionType.Numeric };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             WARGauge gauge = Singletons.Get<DalamudJobGauges>().Get<WARGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Wrath = gauge.BeastGauge;
 
-            bool triggered = EvaluateCondition(0, gauge.BeastGauge);
+            if (preview) { return true; }
 
-            return (triggered, data);
+            return EvaluateCondition(0, _dataSource.Wrath);
         }
     }
 }

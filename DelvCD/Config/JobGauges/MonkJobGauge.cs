@@ -1,8 +1,8 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Enums;
+﻿using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -15,6 +15,8 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.MNK;
+        private MonkDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
@@ -45,23 +47,26 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             MNKGauge gauge = Singletons.Get<DalamudJobGauges>().Get<MNKGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Chakra_Stacks = gauge.Chakra;
+            _dataSource.Masters_Gauge_Chakra_1 = _comboOptions[1][_values[1]];
+            _dataSource.Masters_Gauge_Chakra_2 = _comboOptions[2][_values[2]];
+            _dataSource.Masters_Gauge_Chakra_3 = _comboOptions[3][_values[3]];
+            _dataSource.Solar_Nadi = (gauge.Nadi & Nadi.SOLAR) != 0;
+            _dataSource.Lunar_Nadi = (gauge.Nadi & Nadi.LUNAR) != 0;
 
-            bool triggered =
-                EvaluateCondition(0, gauge.Chakra) &&
+            if (preview) { return true; }
+
+            return
+                EvaluateCondition(0, _dataSource.Chakra_Stacks) &&
                 EvaluateMastersGaugeChakraCondition(gauge, 0) &&
                 EvaluateMastersGaugeChakraCondition(gauge, 1) &&
                 EvaluateMastersGaugeChakraCondition(gauge, 2) &&
-                EvaluateCondition(4, (gauge.Nadi & Nadi.SOLAR) != 0) &&
-                EvaluateCondition(5, (gauge.Nadi & Nadi.LUNAR) != 0);
-
-            return (triggered, data);
+                EvaluateCondition(4, _dataSource.Solar_Nadi) &&
+                EvaluateCondition(5, _dataSource.Lunar_Nadi);
         }
 
         private bool EvaluateMastersGaugeChakraCondition(MNKGauge gauge, int chakra)

@@ -1,7 +1,7 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -14,15 +14,17 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.BLM;
+        private BlackMageDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
             _names = new List<string>() {
                 "Enochian",
-                "Enochian Timer (milliseconds)",
+                "Enochian Timer",
                 "Polyglot Stacks",
                 "Element",
-                "Element Timer (milliseconds)",
+                "Element Timer",
                 "Umbral Ice Stacks",
                 "Astral Fire Stacks",
                 "Umbral Hearts",
@@ -47,26 +49,32 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             BLMGauge gauge = Singletons.Get<DalamudJobGauges>().Get<BLMGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Enochian = gauge.IsEnochianActive;
+            _dataSource.Enochian_Timer = gauge.EnochianTimer / 1000f;
+            _dataSource.Polyglot_Stacks = gauge.PolyglotStacks;
+            _dataSource.Element = _comboOptions[3][_values[3]];
+            _dataSource.Element_Timer = gauge.ElementTimeRemaining / 1000f;
+            _dataSource.Umbral_Ice_Stacks = gauge.UmbralIceStacks;
+            _dataSource.Astral_Fire_Stacks = gauge.AstralFireStacks;
+            _dataSource.Umbral_Hearts = gauge.UmbralHearts;
+            _dataSource.Paradox = gauge.IsParadoxActive;
 
-            bool triggered =
-                EvaluateCondition(0, gauge.IsEnochianActive) &&
-                EvaluateCondition(1, gauge.EnochianTimer) &&
-                EvaluateCondition(2, gauge.PolyglotStacks) &&
+            if (preview) { return true; }
+
+            return
+                EvaluateCondition(0, _dataSource.Enochian) &&
+                EvaluateCondition(1, _dataSource.Enochian_Timer) &&
+                EvaluateCondition(2, _dataSource.Polyglot_Stacks) &&
                 EvaluateElementCondition(gauge) &&
-                EvaluateCondition(4, gauge.ElementTimeRemaining) &&
-                EvaluateCondition(5, gauge.UmbralIceStacks) &&
-                EvaluateCondition(6, gauge.AstralFireStacks) &&
-                EvaluateCondition(7, gauge.UmbralHearts) &&
-                EvaluateCondition(8, gauge.IsParadoxActive);
-
-            return (triggered, data);
+                EvaluateCondition(4, _dataSource.Element_Timer) &&
+                EvaluateCondition(5, _dataSource.Umbral_Ice_Stacks) &&
+                EvaluateCondition(6, _dataSource.Astral_Fire_Stacks) &&
+                EvaluateCondition(7, _dataSource.Umbral_Hearts) &&
+                EvaluateCondition(8, _dataSource.Paradox);
         }
 
         private bool EvaluateElementCondition(BLMGauge gauge)

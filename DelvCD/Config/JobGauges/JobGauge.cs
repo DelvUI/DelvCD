@@ -23,7 +23,7 @@ namespace DelvCD.Config.JobGauges
         public int ConditionCount => _names.Count;
         public abstract Job Job { get; }
 
-        public Type DataSourceType => typeof(CooldownDataSource);
+        public abstract DataSource DataSource { get; }
 
         protected List<int> _enabled;
         protected List<int> _values;
@@ -53,9 +53,9 @@ namespace DelvCD.Config.JobGauges
 
         protected abstract void InitializeConditions();
 
-        public abstract (bool, DataSource) IsTriggered(bool preview);
+        public abstract bool IsTriggered(bool preview);
 
-        protected bool EvaluateCondition(int index, int value)
+        protected bool EvaluateCondition(int index, float value)
         {
             if (index < 0 || index > ConditionCount) { return true; }
 

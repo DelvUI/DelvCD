@@ -3,7 +3,9 @@ using Dalamud.Logging;
 using DelvCD.Config;
 using DelvCD.UIElements;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
@@ -163,7 +165,7 @@ namespace DelvCD.Helpers
             return config ?? new DelvCDConfig();
         }
 
-        private static void MigrateStyleConditions(List<UIElement> elements)
+        public static void MigrateStyleConditions(List<UIElement> elements)
         {
             foreach (UIElement element in elements)
             {
@@ -175,14 +177,20 @@ namespace DelvCD.Helpers
                 {
                     foreach (StyleCondition<IconStyleConfig> condition in icon.StyleConditions.Conditions)
                     {
-                        condition.DataSourceFieldIndex = DataSourceFieldIndex(condition.Source);
+                        if (condition.Source > 2)
+                        {
+                            condition.Source -= 2;
+                        }
                     }
 
                     foreach (Label label in icon.LabelListConfig.Labels)
                     {
                         foreach (StyleCondition<LabelStyleConfig> condition in label.StyleConditions.Conditions)
                         {
-                            condition.DataSourceFieldIndex = DataSourceFieldIndex(condition.Source);
+                            if (condition.Source > 2)
+                            {
+                                condition.Source -= 2;
+                            }
                         }
                     }
                 }
@@ -190,28 +198,23 @@ namespace DelvCD.Helpers
                 {
                     foreach (StyleCondition<BarStyleConfig> condition in bar.StyleConditions.Conditions)
                     {
-                        condition.DataSourceFieldIndex = DataSourceFieldIndex(condition.Source);
+                        if (condition.Source > 2)
+                        {
+                            condition.Source -= 2;
+                        }
                     }
                 }
                 else if (element is Label label)
                 {
                     foreach (StyleCondition<LabelStyleConfig> condition in label.StyleConditions.Conditions)
                     {
-                        condition.DataSourceFieldIndex = DataSourceFieldIndex(condition.Source);
+                        if (condition.Source > 2)
+                        {
+                            condition.Source -= 2;
+                        }
                     }
                 }
             }
-        }
-
-        private static int DataSourceFieldIndex(TriggerDataSource source)
-        {
-            int index = (int)source;
-            if (index > 2)
-            {
-                index -= 2;
-            }
-
-            return index;
         }
 
         public static void SaveConfig()

@@ -7,43 +7,18 @@ namespace DelvCD.Helpers.DataSources
 {
     public abstract class DataSource
     {
+        public static string DisplayName => "";
+
         public uint Id;
         public uint Icon;
 
-        public static string GetFriendlyName() { return ""; }
         public abstract float ProgressValue { get; set; }
-        public abstract float ProgressMaxValue { get; set; }
+        public abstract float ProgressMaxValue { get; }
 
+        protected List<string> _conditionFieldNames = new();
+        public List<string> ConditionFieldNames => _conditionFieldNames;
 
-        protected List<FieldInfo> _conditionFields = new();
-        protected string[] _conditionFieldNames = new string[] { };
-
-        protected void SetConditionFields(params string[] fieldNames)
-        {
-            foreach (string name in fieldNames)
-            {
-                FieldInfo? field = GetType().GetField(name);
-                if (field != null)
-                {
-                    _conditionFields.Add(field);
-                }
-            }
-
-            _conditionFieldNames = _conditionFields.Select(x => x.Name).ToArray();
-        }
-
-        public string[] GetConditionList()
-        {
-            return _conditionFieldNames;
-        }
-
-        public float GetConditionValue(int index)
-        {
-            if (index >= _conditionFields.Count) { return 0; }
-
-            object? value = _conditionFields[index].GetValue(this);
-            return Convert.ToSingle(value);
-        }
+        public abstract float GetConditionValue(int index);
 
         public string GetFormattedString(string format, string numberFormat, int rounding)
         {

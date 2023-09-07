@@ -40,34 +40,33 @@ namespace DelvCD.Config
         public TriggerDataOp StackCountOp = TriggerDataOp.GreaterThan;
         public float StackCountValue;
 
-
         public override TriggerType Type => TriggerType.Status;
         public override TriggerSource Source => TriggerSource;
 
-        [JsonIgnore] public override Type DataSourceType => typeof(CooldownDataSource);
+        [JsonIgnore] private CooldownDataSource _dataSource = new();
+        [JsonIgnore] public override DataSource DataSource => _dataSource;
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             if (!TriggerData.Any())
             {
-                return (false, data);
+                return false;
             }
 
             if (preview)
             {
-                data.Value = 10;
-                data.Stacks = 2;
-                data.MaxStacks = 2;
-                data.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
+                _dataSource.Value = 10;
+                _dataSource.Stacks = 2;
+                _dataSource.MaxStacks = 2;
+                _dataSource.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
 
-                return (true, data);
+                return true;
             }
 
             PlayerCharacter? player = Singletons.Get<ClientState>().LocalPlayer;
             if (player is null)
             {
-                return (false, data);
+                return false;
             }
 
             GameObject? actor = Source switch
@@ -80,12 +79,12 @@ namespace DelvCD.Config
             };
             if (actor is null)
             {
-                return (false, data);
+                return false;
             }
 
-
             bool active = false;
-            data.Icon = TriggerData.First().Icon;
+            _dataSource.Icon = TriggerData.First().Icon;
+
             StatusHelpers helper = Singletons.Get<StatusHelpers>();
             foreach (TriggerData trigger in TriggerData)
             {
@@ -96,11 +95,11 @@ namespace DelvCD.Config
                         (status.SourceId == player.ObjectId || !OnlyMine))
                     {
                         active = true;
-                        data.Id = status.StatusId;
-                        data.Value = Math.Abs(status.RemainingTime);
-                        data.Stacks = status.StackCount;
-                        data.MaxStacks = trigger.MaxStacks;
-                        data.Icon = trigger.Icon;
+                        _dataSource.Id = status.StatusId;
+                        _dataSource.Value = Math.Abs(status.RemainingTime);
+                        _dataSource.Stacks = status.StackCount;
+                        _dataSource.MaxStacks = trigger.MaxStacks;
+                        _dataSource.Icon = trigger.Icon;
                         break;
                     }
                 }
@@ -109,13 +108,13 @@ namespace DelvCD.Config
             bool triggered = TriggerCondition switch
             {
                 0 => active &&
-                        (!Duration || Utils.GetResult(data.Value, DurationOp, DurationValue)) &&
-                        (!StackCount || Utils.GetResult(data.Stacks, StackCountOp, StackCountValue)),
+                        (!Duration || Utils.GetResult(_dataSource.Value, DurationOp, DurationValue)) &&
+                        (!StackCount || Utils.GetResult(_dataSource.Stacks, StackCountOp, StackCountValue)),
                 1 => !active,
                 _ => false
             };
 
-            return (triggered, data);
+            return triggered;
         }
 
         public override void DrawTriggerOptions(Vector2 size, float padX, float padY)

@@ -16,9 +16,10 @@ namespace DelvCD.Config
 
         public abstract TriggerType Type { get; }
         public abstract TriggerSource Source { get; }
-        public abstract (bool, DataSource) IsTriggered(bool preview);
+        public abstract bool IsTriggered(bool preview);
         public abstract void DrawTriggerOptions(Vector2 size, float padX, float padY);
 
-        [JsonIgnore] public abstract Type DataSourceType { get; }
+        [JsonIgnore] public abstract DataSource DataSource { get; }
+        [JsonIgnore] public Action? OnDataSourceChange { get; set; }
     }
 }

@@ -1,10 +1,9 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Enums;
+﻿using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
@@ -16,6 +15,8 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.AST;
+        private AstrologianDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
@@ -39,20 +40,22 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             ASTGauge gauge = Singletons.Get<DalamudJobGauges>().Get<ASTGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Card = _comboOptions[0][_values[0]];
+            _dataSource.Crown_Card = _comboOptions[1][_values[1]];
+            _dataSource.Astrosign_Solar = gauge.ContainsSeal(SealType.SUN);
+            _dataSource.Astrosign_Lunar = gauge.ContainsSeal(SealType.MOON);
+            _dataSource.Astrosign_Celestial = gauge.ContainsSeal(SealType.CELESTIAL);
 
-            bool triggered =
+            if (preview) { return true; }
+
+            return
                 EvaluateCondition(0, (int)gauge.DrawnCard) &&
                 EvaluateCrownCardCondition(gauge) &&
                 EvaluateAstrosignsCondition(gauge);
-
-            return (triggered, data);
         }
 
         private bool EvaluateCrownCardCondition(ASTGauge gauge)

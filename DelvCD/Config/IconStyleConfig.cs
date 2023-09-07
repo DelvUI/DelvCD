@@ -25,6 +25,7 @@ namespace DelvCD.Config
         public int BorderThickness = 1;
         public ConfigColor BorderColor = new ConfigColor(0, 0, 0, 1);
         public bool ShowProgressSwipe = true;
+        public int ProgressSourceIndex = 0;
         public float ProgressSwipeOpacity = 0.6f;
         public bool InvertSwipe = false;
         public bool ShowSwipeLines = false;

@@ -24,9 +24,10 @@ namespace DelvCD.Config
 
         public override TriggerType Type => TriggerType.JobGauge;
         public override TriggerSource Source => TriggerSource.Player;
-        [JsonIgnore] public override Type DataSourceType => _dataSource?.DataSourceType ?? typeof(CooldownDataSource);
 
-        [JsonIgnore] private JobGauge? _dataSource;
+        [JsonIgnore] private JobGauge? _jobGauge = new AstrologianJobGauge("");
+        [JsonIgnore] public override DataSource DataSource => _jobGauge?.DataSource ?? new CooldownDataSource();
+
 
         private int _jobIndex = 0;
         public int JobIndex
@@ -37,8 +38,10 @@ namespace DelvCD.Config
                 JobGauge? newDataSource = JobGauge.CreateDataSource(_typesArray[value], _rawData);
                 if (newDataSource != null)
                 {
-                    _dataSource = newDataSource;
+                    _jobGauge = newDataSource;
                     _jobIndex = value;
+
+                    OnDataSourceChange?.Invoke();
                 }
             }
         }
@@ -46,44 +49,42 @@ namespace DelvCD.Config
         private string _rawData = string.Empty;
         public string RawData
         {
-            get { return _dataSource != null ? _dataSource.RawData : _rawData; }
+            get { return _jobGauge != null ? _jobGauge.RawData : _rawData; }
             set
             {
                 _rawData = value;
 
-                if (_dataSource != null)
+                if (_jobGauge != null)
                 {
-                    _dataSource.RawData = _rawData;
+                    _jobGauge.RawData = _rawData;
                 }
             }
         }
 
         [JsonIgnore] private string[] _booleanOptions = new string[] { "Inactive", "Active" };
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
-
-            if (!TriggerData.Any() || _dataSource == null) {
-                return (false, data);
+            if (!TriggerData.Any() || _jobGauge == null) {
+                return false;
             }
 
             PlayerCharacter? player = Singletons.Get<ClientState>().LocalPlayer;
-            if (player == null || player.ClassJob.Id != (uint)_dataSource.Job)
+            if (player == null || player.ClassJob.Id != (uint)_jobGauge.Job)
             {
-                return (false, data);
+                return false;
             }
 
             try
             {
-                return _dataSource.IsTriggered(preview);
+                return _jobGauge.IsTriggered(preview);
             }
             catch (Exception e)
             {
                 PluginLog.Log(e.Message);
             }
 
-            return (false, data);
+            return false;
         }
 
         public override void DrawTriggerOptions(Vector2 size, float padX, float padY)
@@ -103,7 +104,7 @@ namespace DelvCD.Config
                 AddTriggerData(new TriggerData(_jobNamesArray[index], 0, 0));
             }
 
-            if (_dataSource == null) { return; }
+            if (_jobGauge == null) { return; }
 
             DrawHelpers.DrawSpacing(1);
             ImGui.Text("Trigger Conditions");
@@ -113,14 +114,14 @@ namespace DelvCD.Config
             float valueInputWidth = 45 * _scale;
             float padWidth = 0;
 
-            for (int i = 0; i < _dataSource.ConditionCount; i++)
+            for (int i = 0; i < _jobGauge.ConditionCount; i++)
             {
                 DrawHelpers.DrawNestIndicator(1);
 
-                bool enabled = _dataSource.ConditionEnabledforIndex(i);
-                if (ImGui.Checkbox(_dataSource.ConditionNameForIndex(i), ref enabled))
+                bool enabled = _jobGauge.ConditionEnabledforIndex(i);
+                if (ImGui.Checkbox(_jobGauge.ConditionNameForIndex(i), ref enabled))
                 {
-                    _dataSource.SetEnabledForIndex(i, enabled);
+                    _jobGauge.SetEnabledForIndex(i, enabled);
                 }
 
                 if (enabled)
@@ -130,24 +131,24 @@ namespace DelvCD.Config
                     ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                     ImGui.PushItemWidth(optionsWidth);
 
-                    TriggerConditionType conditionType = _dataSource.ConditionTypeForIndex(i);
+                    TriggerConditionType conditionType = _jobGauge.ConditionTypeForIndex(i);
                     if (conditionType == TriggerConditionType.Numeric)
                     {
-                        TriggerDataOp op = _dataSource.OperatorForIndex(i);
+                        TriggerDataOp op = _jobGauge.OperatorForIndex(i);
                         if (ImGui.Combo("##OpCombo" + i.ToString(), ref Unsafe.As<TriggerDataOp, int>(ref op), operatorOptions, operatorOptions.Length))
                         {
-                            _dataSource.SetOperatorForIndex(i, op);
+                            _jobGauge.SetOperatorForIndex(i, op);
                         }
                         ImGui.PopItemWidth();
                         ImGui.SameLine();
 
                         ImGui.PushItemWidth(valueInputWidth);
-                        string value = _dataSource.ValueForIndex(i).ToString();
+                        string value = _jobGauge.ValueForIndex(i).ToString();
                         if (ImGui.InputText("##Value" + i.ToString(), ref value, 10, ImGuiInputTextFlags.CharsDecimal))
                         {
                             if (int.TryParse(value, out int v))
                             {
-                                _dataSource.SetValueForIndex(i, v);
+                                _jobGauge.SetValueForIndex(i, v);
                             }
                         }
 
@@ -155,11 +156,11 @@ namespace DelvCD.Config
                     }
                     else
                     {
-                        int value = _dataSource.ValueForIndex(i);
-                        string[] options = conditionType == TriggerConditionType.Boolean ? _booleanOptions : _dataSource.ComboOptionsForIndex(i);
+                        int value = _jobGauge.ValueForIndex(i);
+                        string[] options = conditionType == TriggerConditionType.Boolean ? _booleanOptions : _jobGauge.ComboOptionsForIndex(i);
                         if (ImGui.Combo("##Combo" + i.ToString(), ref value, options, options.Length))
                         {
-                            _dataSource.SetValueForIndex(i, value);
+                            _jobGauge.SetValueForIndex(i, value);
                         }
 
                         ImGui.PopItemWidth();
@@ -175,9 +176,9 @@ namespace DelvCD.Config
             _triggerNameInput = string.Empty;
             _rawData = "";
 
-            if (_dataSource != null)
+            if (_jobGauge != null)
             {
-                _dataSource.RawData = "";
+                _jobGauge.RawData = "";
             }
         }
 

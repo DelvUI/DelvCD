@@ -1,7 +1,7 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -14,6 +14,8 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.SMN;
+        private SummonerDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         private const int NONE_INDEX = 0;
         private const int BAHAMUT_INDEX = 1;
@@ -60,27 +62,39 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             SMNGauge gauge = Singletons.Get<DalamudJobGauges>().Get<SMNGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Aetherflow_Stacks = gauge.AetherflowStacks;
 
-            bool triggered =
-                EvaluateCondition(0, gauge.AetherflowStacks) &&
-                EvaluateCondition(1, NextSummon(gauge)) &&
-                EvaluateCondition(2, ActiveSummon(gauge)) &&
-                EvaluateCondition(3, gauge.SummonTimerRemaining) &&
+            int nextSummon = NextSummon(gauge);
+            _dataSource.Next_Summon = _comboOptions[1][nextSummon];
+
+            int activeSummon = ActiveSummon(gauge);
+            _dataSource.Active_Summon = _comboOptions[2][activeSummon];
+
+            _dataSource.Summon_Timer = gauge.SummonTimerRemaining / 1000f;
+
+            int attunement = ActiveAttunement(gauge);
+            _dataSource.Active_Attunement = _comboOptions[7][attunement];
+
+            _dataSource.Attunement_Timer = gauge.AttunmentTimerRemaining / 1000f;
+            _dataSource.Attunement_Stacks = gauge.Attunement;
+
+            if (preview) { return true; }
+
+            return
+                EvaluateCondition(0, _dataSource.Aetherflow_Stacks) &&
+                EvaluateCondition(1, nextSummon) &&
+                EvaluateCondition(2, activeSummon) &&
+                EvaluateCondition(3, _dataSource.Summon_Timer) &&
                 EvaluateCondition(4, gauge.IsIfritReady) &&
                 EvaluateCondition(5, gauge.IsTitanReady) &&
                 EvaluateCondition(6, gauge.IsPhoenixReady) &&
-                EvaluateCondition(7, ActiveAttunement(gauge)) &&
-                EvaluateCondition(8, gauge.AttunmentTimerRemaining) &&
-                EvaluateCondition(9, gauge.Attunement);
-
-            return (triggered, data);
+                EvaluateCondition(7, attunement) &&
+                EvaluateCondition(8, _dataSource.Attunement_Timer) &&
+                EvaluateCondition(9, _dataSource.Attunement_Stacks);
         }
 
         private int NextSummon(SMNGauge gauge)

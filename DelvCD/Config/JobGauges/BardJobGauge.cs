@@ -1,8 +1,8 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Enums;
+﻿using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
 using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
@@ -15,13 +15,15 @@ namespace DelvCD.Config.JobGauges
         }
 
         public override Job Job => Job.BRD;
+        private BardDataSource _dataSource = new();
+        public override DataSource DataSource => _dataSource;
 
         protected override void InitializeConditions()
         {
             _names = new List<string>() {
                 "Active Song",
                 "Last Active Song",
-                "Song Time (milliseconds)",
+                "Song Time",
                 "Repertoire Stacks",
                 "Soul Voice",
                 "Coda"
@@ -45,23 +47,25 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             BRDGauge gauge = Singletons.Get<DalamudJobGauges>().Get<BRDGauge>();
 
-            data.Value = 0;
-            data.MaxValue = 100;
+            _dataSource.Active_Song = _comboOptions[0][_values[0]];
+            _dataSource.Last_Active_Song = _comboOptions[0][_values[0]];
+            _dataSource.Song_Timer = gauge.SongTimer / 1000f;
+            _dataSource.Repertoire_Stacks = gauge.Repertoire;
+            _dataSource.Soul_Voice = gauge.SoulVoice;
 
-            bool triggered =
+            if (preview) { return true; }
+
+            return
                 EvaluateCondition(0, (int)gauge.Song) &&
                 EvaluateCondition(1, (int)gauge.LastSong) &&
-                EvaluateCondition(2, gauge.SongTimer) &&
-                EvaluateCondition(3, gauge.Repertoire) &&
-                EvaluateCondition(4, gauge.SoulVoice) &&
+                EvaluateCondition(2, _dataSource.Song_Timer) &&
+                EvaluateCondition(3, _dataSource.Repertoire_Stacks) &&
+                EvaluateCondition(4, _dataSource.Soul_Voice) &&
                 EvaluateCodaCondition(gauge);
-
-            return (triggered, data);
         }
 
         private bool EvaluateCodaCondition(BRDGauge gauge)

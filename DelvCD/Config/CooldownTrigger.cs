@@ -52,25 +52,26 @@ namespace DelvCD.Config
 
         public override TriggerType Type => TriggerType.Cooldown;
         public override TriggerSource Source => TriggerSource.Player;
-        [JsonIgnore] public override Type DataSourceType => typeof(CooldownDataSource);
 
-        public override (bool, DataSource) IsTriggered(bool preview)
+        [JsonIgnore] private CooldownDataSource _dataSource = new();
+        [JsonIgnore] public override DataSource DataSource => _dataSource;
+
+        public override bool IsTriggered(bool preview)
         {
-            CooldownDataSource data = new CooldownDataSource();
             if (preview)
             {
-                data.Value = 10;
-                data.Stacks = 2;
-                data.MaxStacks = 2;
-                data.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
+                _dataSource.Value = 10;
+                _dataSource.Stacks = 2;
+                _dataSource.MaxStacks = 2;
+                _dataSource.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
 
-                return (true, data);
+                return true;
             }
 
             TriggerData? actionTrigger = TriggerData.FirstOrDefault(t => t.CombatType == CombatType);
             if (actionTrigger is null)
             {
-                return (false, data);
+                return false;
             }
 
             ActionHelpers helper = Singletons.Get<ActionHelpers>();
@@ -122,22 +123,20 @@ namespace DelvCD.Config
                 }
             }
 
-            data.Id = actionId;
-            data.Value = cooldown;
-            data.MaxValue = chargeTime;
-            data.Stacks = stacks;
-            data.MaxStacks = recastInfo.MaxCharges;
-            data.Icon = Adjust ? helper.GetIconIdForAction(actionId) : actionTrigger.Icon;
+            _dataSource.Id = actionId;
+            _dataSource.Value = cooldown;
+            _dataSource.MaxValue = chargeTime;
+            _dataSource.Stacks = stacks;
+            _dataSource.MaxStacks = recastInfo.MaxCharges;
+            _dataSource.Icon = Adjust ? helper.GetIconIdForAction(actionId) : actionTrigger.Icon;
 
-            bool triggered = 
+            return
                 (!Combo || (ComboValue == 0 ? comboActive : !comboActive)) &&
                 (!Usable || (UsableValue == 0 ? usable : !usable)) &&
                 (!RangeCheck || (RangeValue == 0 ? inRange : !inRange)) &&
                 (!LosCheck || (LosValue == 0 ? inLos : !inLos)) &&
-                (!Cooldown || Utils.GetResult(data.Value, CooldownOp, CooldownValue)) &&
-                (!ChargeCount || Utils.GetResult(data.Stacks, ChargeCountOp, ChargeCountValue));
-
-            return (triggered, data);
+                (!Cooldown || Utils.GetResult(_dataSource.Value, CooldownOp, CooldownValue)) &&
+                (!ChargeCount || Utils.GetResult(_dataSource.Stacks, ChargeCountOp, ChargeCountValue));
         }
 
         public override void DrawTriggerOptions(Vector2 size, float padX, float padY)
