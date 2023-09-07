@@ -2,7 +2,7 @@
 {
     public class WarriorDataSource : DataSource
     {
-        public new static string DisplayName => "Warrior";
+        public new static string GetDisplayName() => "Warrior";
 
         public int Wrath;
 

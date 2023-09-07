@@ -2,7 +2,7 @@
 {
     public class SageDataSource : DataSource
     {
-        public new static string DisplayName => "Sage";
+        public new static string GetDisplayName() => "Sage";
 
         public bool Eukrasia;
         public float Addersgall_Timer;

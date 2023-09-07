@@ -2,7 +2,7 @@
 {
     public class MachinistDataSource : DataSource
     {
-        public new static string DisplayName => "Machinist";
+        public new static string GetDisplayName() => "Machinist";
 
         public int Heat;
         public bool Overheat;

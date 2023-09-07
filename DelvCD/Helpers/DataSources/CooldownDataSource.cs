@@ -2,7 +2,7 @@
 {
     public class CooldownDataSource : DataSource
     {
-        public new static string DisplayName => "Cooldown and Status";
+        public new static string GetDisplayName() => "Cooldown and Status";
 
         public float Value;
         public float MaxValue;

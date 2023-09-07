@@ -2,7 +2,7 @@
 {
     public class DragoonDataSource : DataSource
     {
-        public new static string DisplayName => "Dragoon";
+        public new static string GetDisplayName() => "Dragoon";
 
         public bool Life_Of_The_Dragon;
         public float Life_Of_The_Dragon_Timer;

@@ -7,7 +7,7 @@ namespace DelvCD.Helpers.DataSources
 {
     public abstract class DataSource
     {
-        public static string DisplayName => "";
+        public static string GetDisplayName() => "";
 
         public uint Id;
         public uint Icon;

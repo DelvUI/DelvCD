@@ -2,7 +2,7 @@
 {
     public class SummonerDataSource : DataSource
     {
-        public new static string DisplayName => "Summoner";
+        public new static string GetDisplayName() => "Summoner";
 
         public int Aetherflow_Stacks;
         public string Next_Summon = string.Empty;

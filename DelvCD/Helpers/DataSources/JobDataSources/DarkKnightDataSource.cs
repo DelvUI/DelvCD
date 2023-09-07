@@ -2,7 +2,7 @@
 {
     public class DarkKnightDataSource : DataSource
     {
-        public new static string DisplayName => "Dark Knight";
+        public new static string GetDisplayName() => "Dark Knight";
 
         public int Blood;
         public float Darkside_Timer;

@@ -2,7 +2,7 @@
 {
     public class DancerDataSource : DataSource
     {
-        public new static string DisplayName => "Dancer";
+        public new static string GetDisplayName() => "Dancer";
 
         public int Feather_Stacks;
         public int Esprit;

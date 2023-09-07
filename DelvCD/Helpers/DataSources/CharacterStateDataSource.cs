@@ -5,7 +5,7 @@ namespace DelvCD.Helpers.DataSources
 {
     public class CharacterStateDataSource : DataSource
     {
-        public new static string DisplayName => "Character State";
+        public new static string GetDisplayName() => "Character State";
 
         public string Name = string.Empty;
         public LazyString<string?>? Name_First;

@@ -2,7 +2,7 @@
 {
     public class BardDataSource : DataSource
     {
-        public new static string DisplayName => "Bard";
+        public new static string GetDisplayName() => "Bard";
 
         public string Active_Song = string.Empty;
         public string Last_Active_Song = string.Empty;

@@ -2,7 +2,7 @@
 {
     public class NinjaDataSource : DataSource
     {
-        public new static string DisplayName => "Ninja";
+        public new static string GetDisplayName() => "Ninja";
 
         public float Huton_Timer;
         public int Ninki;

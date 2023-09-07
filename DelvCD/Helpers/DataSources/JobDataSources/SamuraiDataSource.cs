@@ -2,7 +2,7 @@
 {
     public class SamuraiDataSource : DataSource
     {
-        public new static string DisplayName => "Samurai";
+        public new static string GetDisplayName() => "Samurai";
 
         public bool Setsu;
         public bool Getsu;

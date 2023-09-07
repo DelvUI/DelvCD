@@ -2,7 +2,7 @@
 {
     public class PaladinDataSource : DataSource
     {
-        public new static string DisplayName => "Paladin";
+        public new static string GetDisplayName() => "Paladin";
 
         public int Oath;
 

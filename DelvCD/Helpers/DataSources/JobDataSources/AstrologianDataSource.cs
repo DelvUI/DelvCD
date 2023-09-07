@@ -4,7 +4,7 @@ namespace DelvCD.Helpers.DataSources.JobDataSources
 {
     public class AstrologianDataSource : DataSource
     {
-        public new static string DisplayName => "Astrologian";
+        public new static string GetDisplayName() => "Astrologian";
 
         public string Card = string.Empty;
         public string Crown_Card = string.Empty;

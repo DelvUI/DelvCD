@@ -2,7 +2,7 @@
 {
     public class GunbreakerDataSource : DataSource
     {
-        public new static string DisplayName => "Gunbreaker";
+        public new static string GetDisplayName() => "Gunbreaker";
 
         public int Cartridges;
 

@@ -2,7 +2,7 @@
 {
     public class RedMageDataSource : DataSource
     {
-        public new static string DisplayName => "Red Mage";
+        public new static string GetDisplayName() => "Red Mage";
 
         public int White_Mana;
         public int Black_Mana;

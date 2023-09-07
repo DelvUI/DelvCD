@@ -2,7 +2,7 @@
 {
     public class MonkDataSource : DataSource
     {
-        public new static string DisplayName => "Monk";
+        public new static string GetDisplayName() => "Monk";
 
         public int Chakra_Stacks;
         public string Masters_Gauge_Chakra_1 = string.Empty;

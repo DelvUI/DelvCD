@@ -14,7 +14,9 @@ namespace DelvCD.Helpers
         public static Regex TextTagRegex { get; } = new Regex(@"\[(\w*)(:\w)?\.?(\d+)?\]", RegexOptions.Compiled);
 
         private static Dictionary<Type, Dictionary<string, FieldInfo>> _fieldsMap = new();
-        private static List<string> _textTagsHelp = new List<string>();
+        
+        private static Dictionary<string, List<string>> _textTagsHelpData = new();
+        public static Dictionary<string, List<string>> TextTagsHelpData => _textTagsHelpData;
 
         private string _format;
         private Dictionary<string, FieldInfo> _fields;
@@ -47,29 +49,49 @@ namespace DelvCD.Helpers
             {
                 typeof(CooldownDataSource),
                 typeof(CharacterStateDataSource),
-                typeof(BlackMageDataSource)
+                typeof(BlackMageDataSource),
+                typeof(DancerDataSource),
+                typeof(DarkKnightDataSource),
+                typeof(DragoonDataSource),
+                typeof(GunbreakerDataSource),
+                typeof(MachinistDataSource),
+                typeof(MonkDataSource),
+                typeof(NinjaDataSource),
+                typeof(PaladinDataSource),
+                typeof(ReaperDataSource),
+                typeof(RedMageDataSource),
+                typeof(SageDataSource),
+                typeof(SamuraiDataSource),
+                typeof(ScholarDataSource),
+                typeof(SummonerDataSource),
+                typeof(WarriorDataSource),
+                typeof(WhiteMageDataSource)
             };
 
             for (int i = 0; i < types.Length; i++)
             {
                 Type type = types[i];
-                //string name = names[i];
 
                 Dictionary<string, FieldInfo> dict = type.GetFields().ToDictionary((x) => x.Name.ToLower());
                 _fieldsMap[type] = dict;
 
-                //_textTagsHelp.Add(name);
-                _textTagsHelp.AddRange(dict.Keys.Select(x => $"[{x}]"));
-                _textTagsHelp.Add(" ");
+                string name = type.Name;
+                MethodInfo? method = type.GetMethod("GetDisplayName");
+                if (method != null)
+                {
+                    object? obj = method.Invoke(type, null);
+                    if (obj is string str)
+                    {
+                        name = str;
+                    }
+                }
 
-                _textTagsHelp.Remove("[id]");
-                _textTagsHelp.Remove("[icon]");
+                List<string> list = dict.Keys.Select(x => $"[{x}]").ToList();
+                list.Remove("[id]");
+                list.Remove("[icon]");
+
+                _textTagsHelpData[name] = list;
             }
-        }
-
-        public static string[] TextTagsList()
-        {
-            return _textTagsHelp.ToArray();
         }
 
         public string Evaluate(Match m)

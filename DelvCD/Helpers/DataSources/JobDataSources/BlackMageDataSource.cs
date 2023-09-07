@@ -4,7 +4,7 @@ namespace DelvCD.Helpers.DataSources.JobDataSources
 {
     public class BlackMageDataSource : DataSource
     {
-        public new static string DisplayName => "Black Mage";
+        public new static string GetDisplayName() => "Black Mage";
 
         public bool Enochian;
         public float Enochian_Timer;

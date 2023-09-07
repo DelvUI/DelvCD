@@ -2,7 +2,7 @@
 {
     public class WhiteMageDataSource : DataSource
     {
-        public new static string DisplayName => "White Mage";
+        public new static string GetDisplayName() => "White Mage";
 
         public float Lily_Timer;
         public int Lily_Stacks;

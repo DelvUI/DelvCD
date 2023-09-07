@@ -2,7 +2,7 @@
 {
     public class ReaperDataSource : DataSource
     {
-        public new static string DisplayName => "Reaper";
+        public new static string GetDisplayName() => "Reaper";
 
         public int Soul;
         public int Shroud;

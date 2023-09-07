@@ -2,7 +2,7 @@
 {
     public class ScholarDataSource : DataSource
     {
-        public new static string DisplayName => "Scholar";
+        public new static string GetDisplayName() => "Scholar";
 
         public int Aetherflow_Stacks;      
         public int Fairie;
