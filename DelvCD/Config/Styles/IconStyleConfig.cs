@@ -24,6 +24,8 @@ namespace DelvCD.Config
         [JsonIgnore] private string[] _progressDataSourceOptions = new string[] { };
         [JsonIgnore] private string[] _progressDataSourceFieldOptions = new string[] { };
 
+        [JsonIgnore] public bool NeedsDataSourceCheck = false;
+
         public Vector2 Position = Vector2.Zero;
         public Vector2 Size = new Vector2(40, 40);
         public bool ShowBorder = true;
@@ -84,6 +86,27 @@ namespace DelvCD.Config
             _progressDataSourceFieldOptions = dataSources[ProgressDataSourceIndex].ProgressFieldNames.ToArray();
 
             ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length - 1);
+
+            if (NeedsDataSourceCheck)
+            {
+                int newIndex = 0;
+
+                for (int i = 0; i < dataSources.Length; i ++)
+                {
+                    if (dataSources[i] is CooldownDataSource cd)
+                    {
+                        newIndex = i;
+
+                        if (cd.Type == CooldownDataSourceType.Action)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                ProgressDataSourceIndex = newIndex;
+                _progressDataSourceFieldOptions = dataSources[newIndex].ProgressFieldNames.ToArray();
+            }
         }
 
         public void DrawConfig(IConfigurable parent, Vector2 size, float padX, float padY)

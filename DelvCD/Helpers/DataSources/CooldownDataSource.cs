@@ -1,5 +1,12 @@
 ﻿namespace DelvCD.Helpers.DataSources
 {
+    public enum CooldownDataSourceType
+    {
+        Action = 0,
+        Status = 1,
+        Item = 2
+    }
+
     public class CooldownDataSource : DataSource
     {
         public new static string GetDisplayName() => "Cooldown and Status";
@@ -9,6 +16,7 @@
         public int Stacks;
         public int MaxStacks;
 
+        public CooldownDataSourceType Type;
 
         public override float GetConditionValue(int index) => index switch
         {

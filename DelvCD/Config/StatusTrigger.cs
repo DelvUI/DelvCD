@@ -43,7 +43,7 @@ namespace DelvCD.Config
         public override TriggerType Type => TriggerType.Status;
         public override TriggerSource Source => TriggerSource;
 
-        [JsonIgnore] private CooldownDataSource _dataSource = new();
+        [JsonIgnore] private CooldownDataSource _dataSource = new() { Type = CooldownDataSourceType.Status };
         [JsonIgnore] public override DataSource DataSource => _dataSource;
 
         public override bool IsTriggered(bool preview)

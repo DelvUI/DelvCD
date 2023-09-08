@@ -1,11 +1,9 @@
-﻿using Dalamud.Logging;
-using DelvCD.Config;
+﻿using DelvCD.Config;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text.Json.Serialization;
@@ -201,7 +199,7 @@ namespace DelvCD.UIElements
                     // background
                     drawList.AddRectFilled(
                         localPos + bar.BackgroundPosition,
-                        localPos + bar.BackgroundPosition + bar.BackgroundSize, 
+                        localPos + bar.BackgroundPosition + bar.BackgroundSize,
                         ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector)
                     );
 
@@ -218,7 +216,7 @@ namespace DelvCD.UIElements
 
                     drawList.AddRectFilled(
                         localPos + bar.FillPosition,
-                        localPos + bar.FillPosition + bar.FillSize, 
+                        localPos + bar.FillPosition + bar.FillSize,
                         ImGui.ColorConvertFloat4ToU32(fillColor.Vector)
                     );
 
@@ -268,10 +266,10 @@ namespace DelvCD.UIElements
             bar.BackgroundPosition = pos;
             bar.BackgroundSize = size;
 
-            float fillPercent = max == 0 ? 1f : Math.Clamp(progress / max , 0f, 1f);
+            float fillPercent = max == 0 ? 1f : Math.Clamp(progress / max, 0f, 1f);
 
             bar.FillSize = direction == BarDirection.Left || direction == BarDirection.Right ?
-                new(size.X * fillPercent, size.Y) : 
+                new(size.X * fillPercent, size.Y) :
                 new(size.X, size.Y * fillPercent);
 
             bar.FillPosition = direction switch
@@ -306,8 +304,6 @@ namespace DelvCD.UIElements
                 new(size.X, chunkLength);
 
             float chunkProgressSize = max / count;
-            float remaining = progress;
-            //float chunkProgress = Math.Min(remaining, chunkProgressSize);
 
             Vector2 pos = Vector2.Zero;
             List<BarData> bars = new(count);
@@ -328,9 +324,6 @@ namespace DelvCD.UIElements
                 }
 
                 bars.Add(bar);
-
-                remaining = Math.Max(0, remaining - chunkProgressSize);
-                //chunkProgress = Math.Min(remaining, chunkProgressSize);
             }
 
             return bars;
