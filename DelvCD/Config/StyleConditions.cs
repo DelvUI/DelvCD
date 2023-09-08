@@ -83,7 +83,6 @@ namespace DelvCD.Config
         [JsonIgnore] private string[] _sourceOptions = new string[] { };
         [JsonIgnore] private static readonly string[] _operatorOptions = new string[] { "==", "!=", "<", ">", "<=", ">=" };
         [JsonIgnore] private static readonly string _text = $"Add Conditions below to specify alternate appearance configurations under certain conditions.";
-        [JsonIgnore] private static readonly float _yOffset = ImGui.CalcTextSize(_text).Y;
         [JsonIgnore] private static string[] _triggerOptions = new string[0];
         [JsonIgnore] private string _styleConditionValueInput = string.Empty;
         [JsonIgnore] private int _swapX = -1;
@@ -166,7 +165,7 @@ namespace DelvCD.Config
         public void DrawConfig(IConfigurable parent, Vector2 size, float padX, float padY)
         {
             ImGui.Text(_text);
-            size = size.AddY(-(_yOffset + padY));
+            size = size.AddY(-(15 * _scale + padY));
             if (ImGui.BeginChild("##StyleConditions", new Vector2(size.X, size.Y), true))
             {
                 ImGuiTableFlags tableFlags =
