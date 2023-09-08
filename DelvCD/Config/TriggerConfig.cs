@@ -201,6 +201,11 @@ namespace DelvCD.Config
                         };
                         TriggerOptions[_selectedIndex].Condition = oldCond;
 
+                        TriggerOptions[_selectedIndex].OnDataSourceChange = () =>
+                        {
+                            TriggerOptionsUpdateEvent?.Invoke(this);
+                        };
+
                         TriggerOptionsUpdateEvent?.Invoke(this);
                     }
 

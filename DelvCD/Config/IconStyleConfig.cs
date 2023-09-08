@@ -63,9 +63,9 @@ namespace DelvCD.Config
 
         public void UpdateDataSources(DataSource[] dataSources)
         {
-            _dataSources = dataSources;
+            _dataSources = dataSources.Where(x => x.ProgressFieldNames.Count > 0).ToArray();
 
-            if (dataSources.Length == 0)
+            if (_dataSources.Length == 0)
             {
                 _progressDataSourceOptions = new string[] { };
                 _progressDataSourceFieldOptions = new string[] { };
@@ -223,10 +223,11 @@ namespace DelvCD.Config
                         BorderColor.Vector = vector;
                     }
 
-                    ImGui.Checkbox("Show Progress Swipe", ref ShowProgressSwipe);
-                    if (ShowProgressSwipe)
+                    if (_dataSources.Length > 0)
                     {
-                        if (_dataSources.Length > 0)
+                        ImGui.NewLine();
+                        ImGui.Checkbox("Show Progress Swipe", ref ShowProgressSwipe);
+                        if (ShowProgressSwipe)
                         {
                             ImGui.PushItemWidth(100 * _scale);
                             DrawHelpers.DrawNestIndicator(1);
@@ -244,30 +245,30 @@ namespace DelvCD.Config
 
                             ImGui.SameLine();
                             ImGui.Checkbox("Invert Values", ref InvertValues);
-                        }
 
-                        DrawHelpers.DrawNestIndicator(1);
-                        ImGui.DragFloat("Swipe Opacity", ref ProgressSwipeOpacity, .01f, 0, 1);
-                        DrawHelpers.DrawNestIndicator(1);
-                        ImGui.Checkbox("Invert Swipe", ref InvertSwipe);
-                        DrawHelpers.DrawNestIndicator(1);
-                        ImGui.Checkbox("Show GCD Swipe When Inactive", ref GcdSwipe);
-                        if (GcdSwipe)
-                        {
-                            DrawHelpers.DrawNestIndicator(2);
-                            ImGui.Checkbox("Only show GCD swipe", ref GcdSwipeOnly);
-                        }
+                            DrawHelpers.DrawNestIndicator(1);
+                            ImGui.DragFloat("Swipe Opacity", ref ProgressSwipeOpacity, .01f, 0, 1);
+                            DrawHelpers.DrawNestIndicator(1);
+                            ImGui.Checkbox("Invert Swipe", ref InvertSwipe);
+                            DrawHelpers.DrawNestIndicator(1);
+                            ImGui.Checkbox("Show GCD Swipe When Inactive", ref GcdSwipe);
+                            if (GcdSwipe)
+                            {
+                                DrawHelpers.DrawNestIndicator(2);
+                                ImGui.Checkbox("Only show GCD swipe", ref GcdSwipeOnly);
+                            }
 
-                        DrawHelpers.DrawNestIndicator(1);
-                        ImGui.Checkbox("Show Swipe Lines", ref ShowSwipeLines);
-                        if (ShowSwipeLines)
-                        {
-                            DrawHelpers.DrawNestIndicator(2);
-                            Vector4 vector = ProgressLineColor.Vector;
-                            ImGui.ColorEdit4("Line Color", ref vector, ImGuiColorEditFlags.AlphaPreview | ImGuiColorEditFlags.AlphaBar);
-                            ProgressLineColor.Vector = vector;
-                            DrawHelpers.DrawNestIndicator(2);
-                            ImGui.DragInt("Thickness", ref ProgressLineThickness, 1, 1, 5);
+                            DrawHelpers.DrawNestIndicator(1);
+                            ImGui.Checkbox("Show Swipe Lines", ref ShowSwipeLines);
+                            if (ShowSwipeLines)
+                            {
+                                DrawHelpers.DrawNestIndicator(2);
+                                Vector4 vector = ProgressLineColor.Vector;
+                                ImGui.ColorEdit4("Line Color", ref vector, ImGuiColorEditFlags.AlphaPreview | ImGuiColorEditFlags.AlphaBar);
+                                ProgressLineColor.Vector = vector;
+                                DrawHelpers.DrawNestIndicator(2);
+                                ImGui.DragInt("Thickness", ref ProgressLineThickness, 1, 1, 5);
+                            }
                         }
                     }
                 }
