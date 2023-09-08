@@ -77,7 +77,6 @@ namespace DelvCD.UIElements
 
             if (StyleConditions != null)
             {
-                StyleConditions.UpdateTriggerCount(dataSources.Length);
                 StyleConditions.UpdateDataSources(dataSources);
             }
         }
@@ -110,7 +109,6 @@ namespace DelvCD.UIElements
                     TriggerConfig = newPage;
                     break;
                 case StyleConditions<IconStyleConfig> newPage:
-                    newPage.UpdateTriggerCount(0);
                     newPage.UpdateDefaultStyle(IconStyleConfig);
                     newPage.UpdateDataSources(TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray());
                     StyleConditions = newPage;
@@ -137,7 +135,7 @@ namespace DelvCD.UIElements
             bool triggered = TriggerConfig.IsTriggered(Preview, out int triggeredIndex);
             DataSource data = TriggerConfig.TriggerOptions[triggeredIndex].DataSource;
             DataSource[] datas = TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray();
-            IconStyleConfig style = StyleConditions.GetStyle(datas, triggeredIndex) ?? IconStyleConfig;
+            IconStyleConfig style = StyleConditions.GetStyle(datas) ?? IconStyleConfig;
 
             Vector2 localPos = pos + style.Position;
             Vector2 size = style.Size;

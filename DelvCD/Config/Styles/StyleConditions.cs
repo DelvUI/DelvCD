@@ -83,24 +83,24 @@ namespace DelvCD.Config
     {
         [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
 
-        [JsonIgnore] private List<TriggerOptions> _triggers = new();
-        [JsonIgnore] private string[] _sourceOptions = new string[] { };
+        [JsonIgnore] private Type[] _dataSourcesTypes = new Type[0];
+        [JsonIgnore] private string[] _triggerOptions = new string[0];
+        [JsonIgnore] private string[][] _sourceOptions = new string[][] { };
+
         [JsonIgnore] private static readonly string[] _operatorOptions = new string[] { "==", "!=", "<", ">", "<=", ">=" };
         [JsonIgnore] private static readonly string _text = $"Add Conditions below to specify alternate appearance configurations under certain conditions.";
-        [JsonIgnore] private static string[] _triggerOptions = new string[0];
+
         [JsonIgnore] private string _styleConditionValueInput = string.Empty;
         [JsonIgnore] private int _swapX = -1;
         [JsonIgnore] private int _swapY = -1;
-        [JsonIgnore] private int _triggerCount = 0;
         [JsonIgnore] private T? _defaultStyle;
-        [JsonIgnore] private HashSet<Type> _cachedDataSourceTypes = new();
 
         public string Name => "Conditions";
         public IConfigPage GetDefault() => new StyleConditions<T>();
 
         public List<StyleCondition<T>> Conditions { get; set; } = new List<StyleCondition<T>>();
 
-        public T? GetStyle(DataSource[]? data, int triggeredIndex)
+        public T? GetStyle(DataSource[]? data)
         {
             if (!Conditions.Any() || data is null)
             {
@@ -109,11 +109,7 @@ namespace DelvCD.Config
 
             foreach (StyleCondition<T> condition in Conditions)
             {
-                int index = condition.TriggerDataSourceIndex == 0
-                    ? triggeredIndex
-                    : condition.TriggerDataSourceIndex - 1;
-
-                if (index < data.Length && condition.GetResult(data[index]))
+                if (condition.TriggerDataSourceIndex < data.Length && condition.GetResult(data[condition.TriggerDataSourceIndex]))
                 {
                     return condition.Style;
                 }
@@ -122,38 +118,42 @@ namespace DelvCD.Config
             return null;
         }
 
-        public void UpdateTriggerCount(int count)
+        private bool CompareDataSources(DataSource[] dataSources)
         {
-            if (count < _triggerCount || count == 0)
+            Type[] types = dataSources.Select(x => x.GetType()).ToArray();
+
+            if (dataSources.Length != _dataSourcesTypes.Length)
             {
-                foreach (var condition in Conditions)
+                _dataSourcesTypes = types;
+                return false;
+            }
+            
+            for (int i = 0; i< dataSources.Length; i++)
+            {
+                if (types[i] != _dataSourcesTypes[i])
                 {
-                    condition.TriggerDataSourceIndex = Math.Clamp(condition.TriggerDataSourceIndex, 0, count);
+                    return false;
                 }
             }
 
-            if (count + 1 > _triggerOptions.Length)
-            {
-                _triggerOptions = new string[count + 1];
-                _triggerOptions[0] = "Dynamic";
-                for (int i = 1; i < _triggerOptions.Length; i++)
-                {
-                    _triggerOptions[i] = $"Trigger {i}";
-                }
-            }
-
-            _triggerCount = count;
+            return true;
         }
 
         public void UpdateDataSources(DataSource[] dataSources)
-        { 
-            HashSet<string> set = new();
-            foreach (DataSource dataSource in dataSources)
+        {
+            if (CompareDataSources(dataSources))
             {
-                set.UnionWith(dataSource.ConditionFieldNames);
+                return;
             }
 
-            _sourceOptions = set.ToArray();
+            _triggerOptions = new string[dataSources.Length];
+            _sourceOptions = new string[dataSources.Length][];
+
+            for (int i = 0; i < dataSources.Length; i++)
+            {
+                _triggerOptions[i] = $"Trigger {i + 1}";
+                _sourceOptions[i] = dataSources[i].ConditionFieldNames.ToArray();
+            }
 
             foreach (var condition in Conditions)
             {
@@ -249,7 +249,7 @@ namespace DelvCD.Config
             {
                 ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                 ImGui.PushItemWidth(ImGui.GetColumnWidth());
-                ImGui.Combo("##TriggerCombo", ref condition.TriggerDataSourceIndex, _triggerOptions, _triggerCount + 1);
+                ImGui.Combo("##TriggerCombo", ref condition.TriggerDataSourceIndex, _triggerOptions, _triggerOptions.Length);
                 ImGui.PopItemWidth();
             }
 
@@ -257,7 +257,7 @@ namespace DelvCD.Config
             {
                 ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                 ImGui.PushItemWidth(ImGui.GetColumnWidth());
-                ImGui.Combo("##SourceCombo", ref condition.Source, _sourceOptions, _sourceOptions.Length);
+                ImGui.Combo("##SourceCombo", ref condition.Source, _sourceOptions[condition.TriggerDataSourceIndex], _sourceOptions[condition.TriggerDataSourceIndex].Length);
                 ImGui.PopItemWidth();
             }
 

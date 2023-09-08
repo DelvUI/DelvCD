@@ -26,6 +26,7 @@ namespace DelvCD.UIElements
         [JsonIgnore] public string ID { get; }
 
         public string Name { get; set; }
+        public string Version => Plugin.Version;
 
         public UIElement(string name)
         {
