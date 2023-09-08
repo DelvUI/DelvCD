@@ -1,4 +1,5 @@
-﻿using DelvCD.Config;
+﻿using Dalamud.Logging;
+using DelvCD.Config;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
@@ -99,6 +100,7 @@ namespace DelvCD.UIElements
             switch (page)
             {
                 case IconStyleConfig newPage:
+                    newPage.UpdateDataSources(TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray());
                     IconStyleConfig = newPage;
                     break;
                 case LabelListConfig newPage:
@@ -110,6 +112,7 @@ namespace DelvCD.UIElements
                 case StyleConditions<IconStyleConfig> newPage:
                     newPage.UpdateTriggerCount(0);
                     newPage.UpdateDefaultStyle(IconStyleConfig);
+                    newPage.UpdateDataSources(TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray());
                     StyleConditions = newPage;
                     break;
                 case VisibilityConfig newPage:
@@ -197,6 +200,11 @@ namespace DelvCD.UIElements
                         float progressValue = datas[style.ProgressDataSourceIndex].GetProgressValue(style.ProgressDataSourceFieldIndex);
                         float progressMaxValue = datas[style.ProgressDataSourceIndex].GetMaxValue(style.ProgressDataSourceFieldIndex);
 
+                        if (style.InvertValues)
+                        {
+                            progressValue = progressMaxValue - progressValue;
+                        }
+
                         if (style.GcdSwipe && (progressValue == 0 || progressMaxValue == 0 || style.GcdSwipeOnly))
                         {
                             ActionHelpers.GetGCDInfo(out var recastInfo);
@@ -267,14 +275,21 @@ namespace DelvCD.UIElements
             
             bool invert = style.InvertSwipe;
             float percent = (invert ? 0 : 1) - (startValue - triggeredValue) / startValue;
+            uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
+
+            if (percent == 1)
+            {
+                drawList.AddRectFilled(pos, pos + size, progressAlpha);
+                return;
+            }
 
             float radius = (float)Math.Sqrt(Math.Pow(Math.Max(size.X, size.Y), 2) * 2) / 2f;
-            float startAngle = -(float)Math.PI / 2;
+            float startAngle = (-(float)Math.PI / 2) + 0.03f;
             float endAngle = startAngle - 2f * (float)Math.PI * percent;
 
             ImGui.PushClipRect(pos, pos + size, false);
             drawList.PathArcTo(pos + size / 2, radius / 2, startAngle, endAngle, (int)(100f * Math.Abs(percent)));
-            uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
+            
             drawList.PathStroke(progressAlpha, ImDrawFlags.None, radius);
             if (style.ShowSwipeLines)
             {

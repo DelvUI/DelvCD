@@ -33,6 +33,7 @@ namespace DelvCD.Config
         public bool ShowProgressSwipe = true;
         public int ProgressDataSourceIndex = 0;
         public int ProgressDataSourceFieldIndex = 0;
+        public bool InvertValues = false;
         public float ProgressSwipeOpacity = 0.6f;
         public bool InvertSwipe = false;
         public bool ShowSwipeLines = false;
@@ -240,6 +241,9 @@ namespace DelvCD.Config
                             ImGui.PushItemWidth(200 * _scale);
                             ImGui.Combo("##DataSourceFieldCombo", ref ProgressDataSourceFieldIndex, _progressDataSourceFieldOptions, _progressDataSourceFieldOptions.Length);
                             ImGui.PopItemWidth();
+
+                            ImGui.SameLine();
+                            ImGui.Checkbox("Invert Values", ref InvertValues);
                         }
 
                         DrawHelpers.DrawNestIndicator(1);
