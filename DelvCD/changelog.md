@@ -3,6 +3,9 @@
   * These allow you to use data from your job gauges to make conditions.
   * They only work when playing on the corresponding job.
 
+- Icon's progress swipe animation now requires to specify which data from a trigger it will use to track progress.
+- When adding conditions to an element, the data options will be dynamically populated according to the triggers in that element.
+
 # Version 0.3.0.0
 - Fixed config windows not adjusting to Dalamud's Global Font Scale.
 
