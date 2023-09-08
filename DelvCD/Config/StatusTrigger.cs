@@ -82,6 +82,7 @@ namespace DelvCD.Config
                 return false;
             }
 
+            bool wasInactive = _dataSource.Value == 0;
             bool active = false;
             _dataSource.Icon = TriggerData.First().Icon;
 
@@ -100,9 +101,20 @@ namespace DelvCD.Config
                         _dataSource.Stacks = status.StackCount;
                         _dataSource.MaxStacks = trigger.MaxStacks;
                         _dataSource.Icon = trigger.Icon;
+
+                        if (wasInactive)
+                        {
+                            _dataSource.MaxValue = _dataSource.Value;
+                        }
+
                         break;
                     }
                 }
+            }
+
+            if (!active)
+            {
+                _dataSource.Value = 0;
             }
 
             bool triggered = TriggerCondition switch
