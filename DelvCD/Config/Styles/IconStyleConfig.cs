@@ -16,7 +16,6 @@ namespace DelvCD.Config
 
         [JsonIgnore] public string Name => "Icon";
 
-        [JsonIgnore] private string _labelInput = string.Empty;
         [JsonIgnore] private string _iconSearchInput = string.Empty;
         [JsonIgnore] private List<TriggerData> _iconSearchResults = new List<TriggerData>();
         [JsonIgnore] private Vector2 _screenSize = ImGui.GetMainViewport().Size;

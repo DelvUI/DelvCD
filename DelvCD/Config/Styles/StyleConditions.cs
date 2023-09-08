@@ -72,6 +72,10 @@ namespace DelvCD.Config
             {
                 iconStyle.UpdateDataSources(dataSources);
             }
+            else if (Style is BarStyleConfig barStyle)
+            {
+                barStyle.UpdateDataSources(dataSources);
+            }
         }
     }
 
