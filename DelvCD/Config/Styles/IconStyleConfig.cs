@@ -16,7 +16,6 @@ namespace DelvCD.Config
 
         [JsonIgnore] public string Name => "Icon";
 
-        [JsonIgnore] private string _labelInput = string.Empty;
         [JsonIgnore] private string _iconSearchInput = string.Empty;
         [JsonIgnore] private List<TriggerData> _iconSearchResults = new List<TriggerData>();
         [JsonIgnore] private Vector2 _screenSize = ImGui.GetMainViewport().Size;
@@ -24,6 +23,8 @@ namespace DelvCD.Config
         [JsonIgnore] private DataSource[] _dataSources = new DataSource[] { };
         [JsonIgnore] private string[] _progressDataSourceOptions = new string[] { };
         [JsonIgnore] private string[] _progressDataSourceFieldOptions = new string[] { };
+
+        [JsonIgnore] public bool NeedsDataSourceCheck = false;
 
         public Vector2 Position = Vector2.Zero;
         public Vector2 Size = new Vector2(40, 40);
@@ -74,7 +75,7 @@ namespace DelvCD.Config
                 return;
             }
 
-            ProgressDataSourceIndex = Math.Clamp(ProgressDataSourceIndex, 0, dataSources.Length);
+            ProgressDataSourceIndex = Math.Clamp(ProgressDataSourceIndex, 0, dataSources.Length - 1);
 
             _progressDataSourceOptions = new string[dataSources.Length];
             for (int i = 0; i < dataSources.Length; i++)
@@ -84,7 +85,28 @@ namespace DelvCD.Config
             
             _progressDataSourceFieldOptions = dataSources[ProgressDataSourceIndex].ProgressFieldNames.ToArray();
 
-            ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length);
+            ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length - 1);
+
+            if (NeedsDataSourceCheck)
+            {
+                int newIndex = 0;
+
+                for (int i = 0; i < dataSources.Length; i ++)
+                {
+                    if (dataSources[i] is CooldownDataSource cd)
+                    {
+                        newIndex = i;
+
+                        if (cd.Type == CooldownDataSourceType.Action)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                ProgressDataSourceIndex = newIndex;
+                _progressDataSourceFieldOptions = dataSources[newIndex].ProgressFieldNames.ToArray();
+            }
         }
 
         public void DrawConfig(IConfigurable parent, Vector2 size, float padX, float padY)

@@ -72,6 +72,10 @@ namespace DelvCD.Config
             {
                 iconStyle.UpdateDataSources(dataSources);
             }
+            else if (Style is BarStyleConfig barStyle)
+            {
+                barStyle.UpdateDataSources(dataSources);
+            }
         }
     }
 
@@ -243,6 +247,8 @@ namespace DelvCD.Config
 
             if (ImGui.TableSetColumnIndex(1))
             {
+                condition.TriggerDataSourceIndex = Math.Clamp(condition.TriggerDataSourceIndex, 0, _triggerOptions.Length - 1);
+
                 ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                 ImGui.PushItemWidth(ImGui.GetColumnWidth());
                 ImGui.Combo("##TriggerCombo", ref condition.TriggerDataSourceIndex, _triggerOptions, _triggerOptions.Length);
@@ -251,6 +257,8 @@ namespace DelvCD.Config
 
             if (ImGui.TableSetColumnIndex(2))
             {
+                condition.Source = Math.Clamp(condition.Source, 0, _sourceOptions[condition.TriggerDataSourceIndex].Length - 1);
+
                 ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                 ImGui.PushItemWidth(ImGui.GetColumnWidth());
                 ImGui.Combo("##SourceCombo", ref condition.Source, _sourceOptions[condition.TriggerDataSourceIndex], _sourceOptions[condition.TriggerDataSourceIndex].Length);

@@ -35,8 +35,7 @@ namespace DelvCD
             ImGuiWindowFlags.AlwaysAutoResize |
             ImGuiWindowFlags.NoBackground |
             ImGuiWindowFlags.NoInputs |
-            ImGuiWindowFlags.NoBringToFrontOnFocus |
-            ImGuiWindowFlags.NoSavedSettings;
+            ImGuiWindowFlags.NoBringToFrontOnFocus;
 
         public PluginManager(
             ClientState clientState,

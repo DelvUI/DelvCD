@@ -178,7 +178,7 @@ namespace DelvCD.Config
                 {
                     ElementType.Group => new Group(name),
                     ElementType.Icon => Icon.GetDefaultUIElementIcon(name),
-                    ElementType.Bar => new Bar(name),
+                    ElementType.Bar => Bar.GetDefaultUIElementBar(name),
                     _ => null
                 };
 

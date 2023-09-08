@@ -55,6 +55,14 @@ namespace DelvCD.Helpers
         Combo
     }
 
+    public enum BarDirection
+    {
+        Right,
+        Left,
+        Up,
+        Down,
+    }
+
     public enum Job
     {
         UKN = 0,

@@ -191,13 +191,16 @@ namespace DelvCD.Helpers
             }
             else if (element is Icon icon)
             {
+                icon.IconStyleConfig.NeedsDataSourceCheck = true;
+
                 foreach (StyleCondition<IconStyleConfig> condition in icon.StyleConditions.Conditions)
                 {
+                    condition.Style.NeedsDataSourceCheck = true;
                     condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
 
-                    if (condition.Source > 2)
+                    if (condition.Source >= 3)
                     {
-                        condition.Source -= 2;
+                        condition.Source -= 3;
                     }
                 }
 
@@ -207,9 +210,9 @@ namespace DelvCD.Helpers
                     {
                         condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
 
-                        if (condition.Source > 2)
+                        if (condition.Source >= 3)
                         {
-                            condition.Source -= 2;
+                            condition.Source -= 3;
                         }
                     }
                 }
@@ -220,9 +223,9 @@ namespace DelvCD.Helpers
                 {
                     condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
 
-                    if (condition.Source > 2)
+                    if (condition.Source >= 3)
                     {
-                        condition.Source -= 2;
+                        condition.Source -= 3;
                     }
                 }
             }
@@ -232,9 +235,9 @@ namespace DelvCD.Helpers
                 {
                     condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
 
-                    if (condition.Source > 2)
+                    if (condition.Source >= 3)
                     {
-                        condition.Source -= 2;
+                        condition.Source -= 3;
                     }
                 }
             }

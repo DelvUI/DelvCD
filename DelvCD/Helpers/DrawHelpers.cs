@@ -271,5 +271,23 @@ namespace DelvCD.Helpers
 
             drawList.AddRectFilled(start, start + last, colors[1]);
         }
+
+        public static void DrawGlow(Vector2 pos, Vector2 size, int thickness, int segments, float speed, ConfigColor col1, ConfigColor col2, ImDrawListPtr drawList)
+        {
+            speed = Math.Abs(speed);
+            int mod = speed == 0 ? 1 : (int)(250 / speed);
+            float prog = (float)(DateTimeOffset.Now.ToUnixTimeMilliseconds() % mod) / mod;
+
+            float offset = thickness / 2 + thickness % 2;
+            Vector2 c1 = new Vector2(pos.X, pos.Y);
+            Vector2 c2 = new Vector2(pos.X + size.X, pos.Y);
+            Vector2 c3 = new Vector2(pos.X + size.X, pos.Y + size.Y);
+            Vector2 c4 = new Vector2(pos.X, pos.Y + size.Y);
+
+            DrawSegmentedLineHorizontal(drawList, c1, size.X, thickness, prog, segments, col1, col2);
+            DrawSegmentedLineVertical(drawList, c2.AddX(-thickness), thickness, size.Y, prog, segments, col1, col2);
+            DrawSegmentedLineHorizontal(drawList, c3.AddY(-thickness), -size.X, thickness, prog, segments, col1, col2);
+            DrawSegmentedLineVertical(drawList, c4, thickness, -size.Y, prog, segments, col1, col2);
+        }
     }
 }
