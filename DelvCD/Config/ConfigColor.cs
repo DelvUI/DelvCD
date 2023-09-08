@@ -18,7 +18,7 @@ namespace DelvCD.Config
                 _colorMapRatios = colorMapRatios;
             }
 
-            this.Vector = vector;
+            Vector = vector;
         }
 
         public ConfigColor(float r, float g, float b, float a, float[]? colorMapRatios = null) : this(new Vector4(r, g, b, a), colorMapRatios)

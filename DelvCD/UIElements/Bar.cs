@@ -1,5 +1,6 @@
 ﻿using DelvCD.Config;
 using DelvCD.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -19,11 +20,11 @@ namespace DelvCD.UIElements
 
         public Bar(string name) : base(name)
         {
-            this.Name = name;
-            this.BarStyleConfig = new BarStyleConfig();
-            this.TriggerConfig = new TriggerConfig();
-            this.StyleConditions = new StyleConditions<BarStyleConfig>();
-            this.VisibilityConfig = new VisibilityConfig();
+            Name = name;
+            BarStyleConfig = new BarStyleConfig();
+            TriggerConfig = new TriggerConfig();
+            StyleConditions = new StyleConditions<BarStyleConfig>();
+            VisibilityConfig = new VisibilityConfig();
         }
 
         public override void ImportPage(IConfigPage page)
@@ -31,23 +32,23 @@ namespace DelvCD.UIElements
             switch (page)
             {
                 case BarStyleConfig newPage:
-                    this.BarStyleConfig = newPage;
+                    BarStyleConfig = newPage;
                     break;
                 case TriggerConfig newPage:
-                    this.TriggerConfig = newPage;
+                    TriggerConfig = newPage;
                     break;
                 case StyleConditions<BarStyleConfig> newPage:
-                    this.StyleConditions = newPage;
+                    StyleConditions = newPage;
                     break;
                 case VisibilityConfig newPage:
-                    this.VisibilityConfig = newPage;
+                    VisibilityConfig = newPage;
                     break;
             }
         }
 
         public override IEnumerable<IConfigPage> GetConfigPages()
         {
-            yield return this.BarStyleConfig;
+            yield return BarStyleConfig;
             // yield return this.TriggerConfig;
             // yield return this.VisibilityConfig;
         }

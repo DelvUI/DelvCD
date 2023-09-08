@@ -4,6 +4,7 @@ using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using System;
 using System.Numerics;
@@ -29,7 +30,10 @@ namespace DelvCD.Config
         public TriggerSource TriggerSource = TriggerSource.Player;
 
         public override TriggerType Type => TriggerType.CharacterState;
-        public override TriggerSource Source => this.TriggerSource;
+        public override TriggerSource Source => TriggerSource;
+
+        [JsonIgnore] private CharacterStateDataSource _dataSource = new();
+        [JsonIgnore] public override DataSource DataSource => _dataSource;
 
         public bool Level = false;
         public TriggerDataOp LevelOp = TriggerDataOp.GreaterThan;
@@ -58,16 +62,25 @@ namespace DelvCD.Config
         public bool PetCheck;
         public int PetValue;
 
-        public override bool IsTriggered(bool preview, out DataSource data)
+        public override bool IsTriggered(bool preview)
         {
-            data = new DataSource();
-
             if (preview)
             {
+                _dataSource.Hp = 50000;
+                _dataSource.MaxHp = 100000;
+                _dataSource.Mp = 5000;
+                _dataSource.MaxMp = 10000;
+                _dataSource.Cp = 50;
+                _dataSource.MaxCp = 100;
+                _dataSource.Gp = 50;
+                _dataSource.MaxGp = 100;
+                _dataSource.Level = 90;
+                _dataSource.Distance = 10;
+                _dataSource.HasPet = false;
                 return true;
             }
 
-            GameObject? actor = this.TriggerSource switch
+            GameObject? actor = TriggerSource switch
             {
                 TriggerSource.Player => Singletons.Get<ClientState>().LocalPlayer,
                 TriggerSource.Target => Utils.FindTarget(),
@@ -78,42 +91,42 @@ namespace DelvCD.Config
 
             if (actor is not null)
             {
-                data.Name = actor.Name.ToString();
+                _dataSource.Name = actor.Name.ToString();
             }
 
             if (actor is Character chara)
             {
-                data.Hp = chara.CurrentHp;
-                data.MaxHp = chara.MaxHp;
-                data.Mp = chara.CurrentMp;
-                data.MaxMp = chara.MaxMp;
-                data.Cp = chara.CurrentCp;
-                data.MaxCp = chara.MaxCp;
-                data.Gp = chara.CurrentGp;
-                data.MaxGp = chara.MaxGp;
-                data.Level = chara.Level;
-                data.Distance = chara.YalmDistanceX;
-                data.HasPet = this.TriggerSource == TriggerSource.Player &&
+                _dataSource.Hp = chara.CurrentHp;
+                _dataSource.MaxHp = chara.MaxHp;
+                _dataSource.Mp = chara.CurrentMp;
+                _dataSource.MaxMp = chara.MaxMp;
+                _dataSource.Cp = chara.CurrentCp;
+                _dataSource.MaxCp = chara.MaxCp;
+                _dataSource.Gp = chara.CurrentGp;
+                _dataSource.MaxGp = chara.MaxGp;
+                _dataSource.Level = chara.Level;
+                _dataSource.Distance = chara.YalmDistanceX;
+                _dataSource.HasPet = TriggerSource == TriggerSource.Player &&
                     Singletons.Get<BuddyList>().PetBuddy != null;
 
                 unsafe
                 {
-                    data.Job = (Job)((CharacterStruct*)chara.Address)->CharacterData.ClassJob;
+                    _dataSource.Job = (Job)((CharacterStruct*)chara.Address)->CharacterData.ClassJob;
                 }
             }
 
-            return preview ||
-                (!this.Hp || Utils.GetResult(data.Hp, this.HpOp, this.MaxHp ? data.MaxHp : this.HpValue)) &&
-                (!this.Mp || Utils.GetResult(data.Mp, this.MpOp, this.MaxMp ? data.MaxMp : this.MpValue)) &&
-                (!this.Cp || Utils.GetResult(data.Cp, this.CpOp, this.MaxCp ? data.MaxCp : this.CpValue)) &&
-                (!this.Gp || Utils.GetResult(data.Gp, this.GpOp, this.MaxGp ? data.MaxGp : this.GpValue)) &&
-                (!this.Level || Utils.GetResult(data.Level, this.LevelOp, this.LevelValue)) &&
-                (!this.PetCheck || (this.PetValue == 0 ? data.HasPet : !data.HasPet));
+            return
+                (!Hp || Utils.GetResult(_dataSource.Hp, HpOp, MaxHp ? _dataSource.MaxHp : HpValue)) &&
+                (!Mp || Utils.GetResult(_dataSource.Mp, MpOp, MaxMp ? _dataSource.MaxMp : MpValue)) &&
+                (!Cp || Utils.GetResult(_dataSource.Cp, CpOp, MaxCp ? _dataSource.MaxCp : CpValue)) &&
+                (!Gp || Utils.GetResult(_dataSource.Gp, GpOp, MaxGp ? _dataSource.MaxGp : GpValue)) &&
+                (!Level || Utils.GetResult(_dataSource.Level, LevelOp, LevelValue)) &&
+                (!PetCheck || (PetValue == 0 ? _dataSource.HasPet : !_dataSource.HasPet));
         }
 
         public override void DrawTriggerOptions(Vector2 size, float padX, float padY)
         {
-            ImGui.Combo("Trigger Source", ref Unsafe.As<TriggerSource, int>(ref this.TriggerSource), _sourceOptions, _sourceOptions.Length);
+            ImGui.Combo("Trigger Source", ref Unsafe.As<TriggerSource, int>(ref TriggerSource), _sourceOptions, _sourceOptions.Length);
             DrawHelpers.DrawSpacing(1);
 
             ImGui.Text("Trigger Conditions");
@@ -124,20 +137,20 @@ namespace DelvCD.Config
             float padWidth = 0;
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("Level", ref this.Level);
-            if (this.Level)
+            ImGui.Checkbox("Level", ref Level);
+            if (Level)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(opComboWidth);
-                ImGui.Combo("##LevelOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.LevelOp), operatorOptions, operatorOptions.Length);
+                ImGui.Combo("##LevelOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref LevelOp), operatorOptions, operatorOptions.Length);
                 ImGui.PopItemWidth();
                 ImGui.SameLine();
 
                 if (string.IsNullOrEmpty(_levelValueInput))
                 {
-                    _levelValueInput = this.LevelValue.ToString();
+                    _levelValueInput = LevelValue.ToString();
                 }
 
                 ImGui.PushItemWidth(valueInputWidth);
@@ -145,174 +158,174 @@ namespace DelvCD.Config
                 {
                     if (float.TryParse(_levelValueInput, out float value))
                     {
-                        this.LevelValue = value;
+                        LevelValue = value;
                     }
 
-                    _levelValueInput = this.LevelValue.ToString();
+                    _levelValueInput = LevelValue.ToString();
                 }
 
                 ImGui.PopItemWidth();
             }
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("HP", ref this.Hp);
-            if (this.Hp)
+            ImGui.Checkbox("HP", ref Hp);
+            if (Hp)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(opComboWidth);
-                ImGui.Combo("##HpOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.HpOp), operatorOptions, operatorOptions.Length);
+                ImGui.Combo("##HpOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref HpOp), operatorOptions, operatorOptions.Length);
                 ImGui.PopItemWidth();
                 ImGui.SameLine();
 
                 if (string.IsNullOrEmpty(_hpValueInput))
                 {
-                    _hpValueInput = this.HpValue.ToString();
+                    _hpValueInput = HpValue.ToString();
                 }
 
-                if (!this.MaxHp)
+                if (!MaxHp)
                 {
                     ImGui.PushItemWidth(valueInputWidth);
                     if (ImGui.InputText("##HpValue", ref _hpValueInput, 10, ImGuiInputTextFlags.CharsDecimal))
                     {
                         if (float.TryParse(_hpValueInput, out float value))
                         {
-                            this.HpValue = value;
+                            HpValue = value;
                         }
 
-                        _hpValueInput = this.HpValue.ToString();
+                        _hpValueInput = HpValue.ToString();
                     }
 
                     ImGui.PopItemWidth();
                     ImGui.SameLine();
                 }
 
-                ImGui.Checkbox("Max HP", ref this.MaxHp);
+                ImGui.Checkbox("Max HP", ref MaxHp);
             }
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("MP", ref this.Mp);
-            if (this.Mp)
+            ImGui.Checkbox("MP", ref Mp);
+            if (Mp)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(opComboWidth);
-                ImGui.Combo("##MpOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.MpOp), operatorOptions, operatorOptions.Length);
+                ImGui.Combo("##MpOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref MpOp), operatorOptions, operatorOptions.Length);
                 ImGui.PopItemWidth();
                 ImGui.SameLine();
 
                 if (string.IsNullOrEmpty(_mpValueInput))
                 {
-                    _mpValueInput = this.MpValue.ToString();
+                    _mpValueInput = MpValue.ToString();
                 }
 
-                if (!this.MaxMp)
+                if (!MaxMp)
                 {
                     ImGui.PushItemWidth(valueInputWidth);
                     if (ImGui.InputText("##MpValue", ref _mpValueInput, 10, ImGuiInputTextFlags.CharsDecimal))
                     {
                         if (float.TryParse(_mpValueInput, out float value))
                         {
-                            this.MpValue = value;
+                            MpValue = value;
                         }
 
-                        _mpValueInput = this.MpValue.ToString();
+                        _mpValueInput = MpValue.ToString();
                     }
 
                     ImGui.PopItemWidth();
                     ImGui.SameLine();
                 }
 
-                ImGui.Checkbox("Max MP", ref this.MaxMp);
+                ImGui.Checkbox("Max MP", ref MaxMp);
             }
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("CP", ref this.Cp);
-            if (this.Cp)
+            ImGui.Checkbox("CP", ref Cp);
+            if (Cp)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(opComboWidth);
-                ImGui.Combo("##CpOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.CpOp), operatorOptions, operatorOptions.Length);
+                ImGui.Combo("##CpOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref CpOp), operatorOptions, operatorOptions.Length);
                 ImGui.PopItemWidth();
                 ImGui.SameLine();
 
                 if (string.IsNullOrEmpty(_cpValueInput))
                 {
-                    _cpValueInput = this.CpValue.ToString();
+                    _cpValueInput = CpValue.ToString();
                 }
 
-                if (!this.MaxCp)
+                if (!MaxCp)
                 {
                     ImGui.PushItemWidth(valueInputWidth);
                     if (ImGui.InputText("##CpValue", ref _cpValueInput, 10, ImGuiInputTextFlags.CharsDecimal))
                     {
                         if (float.TryParse(_cpValueInput, out float value))
                         {
-                            this.CpValue = value;
+                            CpValue = value;
                         }
 
-                        _cpValueInput = this.CpValue.ToString();
+                        _cpValueInput = CpValue.ToString();
                     }
 
                     ImGui.PopItemWidth();
                     ImGui.SameLine();
                 }
 
-                ImGui.Checkbox("Max CP", ref this.MaxCp);
+                ImGui.Checkbox("Max CP", ref MaxCp);
             }
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("GP", ref this.Gp);
-            if (this.Gp)
+            ImGui.Checkbox("GP", ref Gp);
+            if (Gp)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(opComboWidth);
-                ImGui.Combo("##GpOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.GpOp), operatorOptions, operatorOptions.Length);
+                ImGui.Combo("##GpOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref GpOp), operatorOptions, operatorOptions.Length);
                 ImGui.PopItemWidth();
                 ImGui.SameLine();
 
                 if (string.IsNullOrEmpty(_gpValueInput))
                 {
-                    _gpValueInput = this.GpValue.ToString();
+                    _gpValueInput = GpValue.ToString();
                 }
 
-                if (!this.MaxGp)
+                if (!MaxGp)
                 {
                     ImGui.PushItemWidth(valueInputWidth);
                     if (ImGui.InputText("##GpValue", ref _gpValueInput, 10, ImGuiInputTextFlags.CharsDecimal))
                     {
                         if (float.TryParse(_gpValueInput, out float value))
                         {
-                            this.GpValue = value;
+                            GpValue = value;
                         }
 
-                        _gpValueInput = this.GpValue.ToString();
+                        _gpValueInput = GpValue.ToString();
                     }
 
                     ImGui.PopItemWidth();
                     ImGui.SameLine();
                 }
 
-                ImGui.Checkbox("Max GP", ref this.MaxGp);
+                ImGui.Checkbox("Max GP", ref MaxGp);
             }
 
-            if (this.TriggerSource == TriggerSource.Player)
+            if (TriggerSource == TriggerSource.Player)
             {
                 DrawHelpers.DrawNestIndicator(1);
-                ImGui.Checkbox("Pet", ref this.PetCheck);
-                if (this.PetCheck)
+                ImGui.Checkbox("Pet", ref PetCheck);
+                if (PetCheck)
                 {
                     ImGui.SameLine();
                     padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                     ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                     ImGui.PushItemWidth(optionsWidth);
-                    ImGui.Combo("##PetCombo", ref this.PetValue, _petOptions, _petOptions.Length);
+                    ImGui.Combo("##PetCombo", ref PetValue, _petOptions, _petOptions.Length);
                     ImGui.PopItemWidth();
                 }
             }

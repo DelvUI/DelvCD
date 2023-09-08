@@ -1,8 +1,10 @@
 ﻿using DelvCD.Config;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace DelvCD.UIElements
@@ -24,17 +26,17 @@ namespace DelvCD.UIElements
 
         public Label(string name, string textFormat = "") : base(name)
         {
-            this.Name = name;
-            this.LabelStyleConfig = new LabelStyleConfig(textFormat);
-            this.StyleConditions = new StyleConditions<LabelStyleConfig>();
-            this.VisibilityConfig = new VisibilityConfig();
+            Name = name;
+            LabelStyleConfig = new LabelStyleConfig(textFormat);
+            StyleConditions = new StyleConditions<LabelStyleConfig>();
+            VisibilityConfig = new VisibilityConfig();
         }
 
         public override IEnumerable<IConfigPage> GetConfigPages()
         {
-            yield return this.LabelStyleConfig;
-            yield return this.StyleConditions;
-            yield return this.VisibilityConfig;
+            yield return LabelStyleConfig;
+            yield return StyleConditions;
+            yield return VisibilityConfig;
         }
 
         public override void ImportPage(IConfigPage page)
@@ -42,20 +44,20 @@ namespace DelvCD.UIElements
             switch (page)
             {
                 case LabelStyleConfig newPage:
-                    this.LabelStyleConfig = newPage;
+                    LabelStyleConfig = newPage;
                     break;
                 case StyleConditions<LabelStyleConfig> newPage:
-                    this.StyleConditions = newPage;
+                    StyleConditions = newPage;
                     break;
                 case VisibilityConfig newPage:
-                    this.VisibilityConfig = newPage;
+                    VisibilityConfig = newPage;
                     break;
             }
         }
 
         public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
-            if (!this.VisibilityConfig.IsVisible(parentVisible) && !this.Preview)
+            if (!VisibilityConfig.IsVisible(parentVisible) && !Preview)
             {
                 return;
             }
@@ -63,7 +65,7 @@ namespace DelvCD.UIElements
             Vector2 size = parentSize.HasValue ? parentSize.Value : ImGui.GetMainViewport().Size;
             pos = parentSize.HasValue ? pos : Vector2.Zero;
 
-            LabelStyleConfig style = this.StyleConditions.GetStyle(_data, _dataIndex) ?? this.LabelStyleConfig;
+            LabelStyleConfig style = StyleConditions.GetStyle(_data, _dataIndex) ?? LabelStyleConfig;
 
             string text = _data is not null && _dataIndex < _data.Length && _data[_dataIndex] is not null
                 ? _data[_dataIndex].GetFormattedString(style.TextFormat, "N", style.Rounding)
@@ -88,7 +90,9 @@ namespace DelvCD.UIElements
         {
             _data = data;
             _dataIndex = index;
-            this.StyleConditions.UpdateTriggerCount(data.Length);
+
+            StyleConditions.UpdateTriggerCount(data.Length);
+            StyleConditions.UpdateDataSources(data);
         }
     }
 }

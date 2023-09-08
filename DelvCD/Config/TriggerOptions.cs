@@ -1,5 +1,7 @@
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -14,7 +16,10 @@ namespace DelvCD.Config
 
         public abstract TriggerType Type { get; }
         public abstract TriggerSource Source { get; }
-        public abstract bool IsTriggered(bool preview, out DataSource data);
+        public abstract bool IsTriggered(bool preview);
         public abstract void DrawTriggerOptions(Vector2 size, float padX, float padY);
+
+        [JsonIgnore] public abstract DataSource DataSource { get; }
+        [JsonIgnore] public Action? OnDataSourceChange { get; set; }
     }
 }

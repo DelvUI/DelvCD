@@ -4,6 +4,7 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using System;
 using System.Linq;
@@ -39,24 +40,26 @@ namespace DelvCD.Config
         public TriggerDataOp StackCountOp = TriggerDataOp.GreaterThan;
         public float StackCountValue;
 
-
         public override TriggerType Type => TriggerType.Status;
-        public override TriggerSource Source => this.TriggerSource;
+        public override TriggerSource Source => TriggerSource;
 
-        public override bool IsTriggered(bool preview, out DataSource data)
+        [JsonIgnore] private CooldownDataSource _dataSource = new();
+        [JsonIgnore] public override DataSource DataSource => _dataSource;
+
+        public override bool IsTriggered(bool preview)
         {
-            data = new DataSource();
-            if (!this.TriggerData.Any())
+            if (!TriggerData.Any())
             {
                 return false;
             }
 
             if (preview)
             {
-                data.Value = 10;
-                data.Stacks = 2;
-                data.MaxStacks = 2;
-                data.Icon = this.TriggerData.FirstOrDefault()?.Icon ?? 0;
+                _dataSource.Value = 10;
+                _dataSource.Stacks = 2;
+                _dataSource.MaxStacks = 2;
+                _dataSource.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
+
                 return true;
             }
 
@@ -66,7 +69,7 @@ namespace DelvCD.Config
                 return false;
             }
 
-            GameObject? actor = this.Source switch
+            GameObject? actor = Source switch
             {
                 TriggerSource.Player => player,
                 TriggerSource.Target => Utils.FindTarget(),
@@ -79,64 +82,63 @@ namespace DelvCD.Config
                 return false;
             }
 
-
             bool active = false;
-            data.Icon = TriggerData.First().Icon;
+            _dataSource.Icon = TriggerData.First().Icon;
+
             StatusHelpers helper = Singletons.Get<StatusHelpers>();
-            foreach (TriggerData trigger in this.TriggerData)
+            foreach (TriggerData trigger in TriggerData)
             {
-                var statusList = helper.GetStatusList(this.Source, trigger.Id);
+                var statusList = helper.GetStatusList(Source, trigger.Id);
                 foreach (var status in statusList)
                 {
                     if (status is not null &&
-                        (status.SourceId == player.ObjectId || !this.OnlyMine))
+                        (status.SourceId == player.ObjectId || !OnlyMine))
                     {
                         active = true;
-                        data.Id = status.StatusId;
-                        data.Value = Math.Abs(status.RemainingTime);
-                        data.Stacks = status.StackCount;
-                        data.MaxStacks = trigger.MaxStacks;
-                        data.Icon = trigger.Icon;
+                        _dataSource.Id = status.StatusId;
+                        _dataSource.Value = Math.Abs(status.RemainingTime);
+                        _dataSource.Stacks = status.StackCount;
+                        _dataSource.MaxStacks = trigger.MaxStacks;
+                        _dataSource.Icon = trigger.Icon;
                         break;
                     }
                 }
             }
 
-            switch (this.TriggerCondition)
+            bool triggered = TriggerCondition switch
             {
-                case 0:
-                    return active &&
-                        (!this.Duration || Utils.GetResult(data.Value, this.DurationOp, this.DurationValue)) &&
-                        (!this.StackCount || Utils.GetResult(data.Stacks, this.StackCountOp, this.StackCountValue));
-                case 1:
-                    return !active;
-                default:
-                    return false;
-            }
+                0 => active &&
+                        (!Duration || Utils.GetResult(_dataSource.Value, DurationOp, DurationValue)) &&
+                        (!StackCount || Utils.GetResult(_dataSource.Stacks, StackCountOp, StackCountValue)),
+                1 => !active,
+                _ => false
+            };
+
+            return triggered;
         }
 
         public override void DrawTriggerOptions(Vector2 size, float padX, float padY)
         {
-            ImGui.Combo("Trigger Source", ref Unsafe.As<TriggerSource, int>(ref this.TriggerSource), _sourceOptions, _sourceOptions.Length);
+            ImGui.Combo("Trigger Source", ref Unsafe.As<TriggerSource, int>(ref TriggerSource), _sourceOptions, _sourceOptions.Length);
 
             if (string.IsNullOrEmpty(_triggerNameInput))
             {
-                _triggerNameInput = this.TriggerName;
+                _triggerNameInput = TriggerName;
             }
 
             if (ImGui.InputTextWithHint("Status", "Status Name or ID", ref _triggerNameInput, 32, ImGuiInputTextFlags.EnterReturnsTrue))
             {
-                this.TriggerData.Clear();
+                TriggerData.Clear();
                 if (!string.IsNullOrEmpty(_triggerNameInput))
                 {
                     StatusHelpers.FindStatusEntries(_triggerNameInput).ForEach(t => AddTriggerData(t));
                 }
             }
 
-            ImGui.Checkbox("Only Mine", ref this.OnlyMine);
+            ImGui.Checkbox("Only Mine", ref OnlyMine);
             DrawHelpers.DrawSpacing(1);
-            ImGui.Combo("Trigger Condition", ref this.TriggerCondition, _triggerConditions, _triggerConditions.Length);
-            if (this.TriggerCondition == 0)
+            ImGui.Combo("Trigger Condition", ref TriggerCondition, _triggerConditions, _triggerConditions.Length);
+            if (TriggerCondition == 0)
             {
                 string[] operatorOptions = TriggerOptions.OperatorOptions;
                 float optionsWidth = 100 * _scale + padX;
@@ -144,20 +146,20 @@ namespace DelvCD.Config
                 float valueInputWidth = 45 * _scale;
                 float padWidth = 0;
 
-                ImGui.Checkbox("Duration Remaining", ref this.Duration);
-                if (this.Duration)
+                ImGui.Checkbox("Duration Remaining", ref Duration);
+                if (Duration)
                 {
                     ImGui.SameLine();
                     padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                     ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                     ImGui.PushItemWidth(opComboWidth);
-                    ImGui.Combo("##DurationOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.DurationOp), operatorOptions, operatorOptions.Length);
+                    ImGui.Combo("##DurationOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref DurationOp), operatorOptions, operatorOptions.Length);
                     ImGui.PopItemWidth();
                     ImGui.SameLine();
 
                     if (string.IsNullOrEmpty(_durationValueInput))
                     {
-                        _durationValueInput = this.DurationValue.ToString();
+                        _durationValueInput = DurationValue.ToString();
                     }
 
                     ImGui.PushItemWidth(valueInputWidth);
@@ -165,29 +167,29 @@ namespace DelvCD.Config
                     {
                         if (float.TryParse(_durationValueInput, out float value))
                         {
-                            this.DurationValue = value;
+                            DurationValue = value;
                         }
 
-                        _durationValueInput = this.DurationValue.ToString();
+                        _durationValueInput = DurationValue.ToString();
                     }
 
                     ImGui.PopItemWidth();
                 }
 
-                ImGui.Checkbox("Stack Count", ref this.StackCount);
-                if (this.StackCount)
+                ImGui.Checkbox("Stack Count", ref StackCount);
+                if (StackCount)
                 {
                     ImGui.SameLine();
                     padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                     ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                     ImGui.PushItemWidth(opComboWidth);
-                    ImGui.Combo("##StackCountOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.StackCountOp), operatorOptions, operatorOptions.Length);
+                    ImGui.Combo("##StackCountOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref StackCountOp), operatorOptions, operatorOptions.Length);
                     ImGui.PopItemWidth();
                     ImGui.SameLine();
 
                     if (string.IsNullOrEmpty(_stackCountValueInput))
                     {
-                        _stackCountValueInput = this.StackCountValue.ToString();
+                        _stackCountValueInput = StackCountValue.ToString();
                     }
 
                     ImGui.PushItemWidth(valueInputWidth);
@@ -195,10 +197,10 @@ namespace DelvCD.Config
                     {
                         if (float.TryParse(_stackCountValueInput, out float value))
                         {
-                            this.StackCountValue = value;
+                            StackCountValue = value;
                         }
 
-                        _stackCountValueInput = this.StackCountValue.ToString();
+                        _stackCountValueInput = StackCountValue.ToString();
                     }
 
                     ImGui.PopItemWidth();
@@ -208,9 +210,9 @@ namespace DelvCD.Config
 
         private void AddTriggerData(TriggerData triggerData)
         {
-            this.TriggerName = triggerData.Name.ToString();
-            _triggerNameInput = this.TriggerName;
-            this.TriggerData.Add(triggerData);
+            TriggerName = triggerData.Name.ToString();
+            _triggerNameInput = TriggerName;
+            TriggerData.Add(triggerData);
         }
     }
 }

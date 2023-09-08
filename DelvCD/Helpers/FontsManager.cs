@@ -90,7 +90,7 @@ namespace DelvCD.Helpers
 
                 try
                 {
-                    ImVector? ranges = this.GetCharacterRanges(font, io);
+                    ImVector? ranges = GetCharacterRanges(font, io);
 
                     ImFontPtr imFont = !ranges.HasValue
                         ? io.Fonts.AddFontFromFileTTF(fontPath, font.Size)
@@ -288,7 +288,7 @@ namespace DelvCD.Helpers
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 

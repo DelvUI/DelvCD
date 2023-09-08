@@ -1,11 +1,14 @@
 using Dalamud.Interface;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
+using DelvCD.UIElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace DelvCD.Config
@@ -13,7 +16,7 @@ namespace DelvCD.Config
     public class StyleCondition<T> : IConfigurable where T : class?, IConfigPage, new()
     {
         public int TriggerDataSourceIndex = 0;
-        public TriggerDataSource Source = TriggerDataSource.Value;
+        public int Source = 0;
         public TriggerDataOp Op = TriggerDataOp.GreaterThan;
         public float Value = 0;
 
@@ -21,46 +24,54 @@ namespace DelvCD.Config
 
         public string Name
         {
-            get => this.Style.Name;
+            get => Style.Name;
             set { }
         }
 
-        public override string ToString() => $"Condition [{this.Name}]";
+        public override string ToString() => $"Condition [{Name}]";
 
         public StyleCondition() { }
 
         public StyleCondition(T? defaultStyle)
         {
-            this.Style = ConfigHelpers.SerializedClone<T>(defaultStyle) ?? new T();
+            Style = ConfigHelpers.SerializedClone<T>(defaultStyle) ?? new T();
         }
 
         public IEnumerable<IConfigPage> GetConfigPages()
         {
-            yield return this.Style;
+            yield return Style;
         }
 
         public void ImportPage(IConfigPage page)
         {
             if (page is T t)
             {
-                this.Style = t;
+                Style = t;
             }
         }
 
         public bool GetResult(DataSource data)
         {
-            float value = data.GetDataForSourceType(this.Source);
+            float value = data.GetConditionValue(Source);
 
-            return this.Op switch
+            return Op switch
             {
-                TriggerDataOp.Equals => value == this.Value,
-                TriggerDataOp.NotEquals => value != this.Value,
-                TriggerDataOp.LessThan => value < this.Value,
-                TriggerDataOp.GreaterThan => value > this.Value,
-                TriggerDataOp.LessThanEq => value <= this.Value,
-                TriggerDataOp.GreaterThanEq => value >= this.Value,
+                TriggerDataOp.Equals => value == Value,
+                TriggerDataOp.NotEquals => value != Value,
+                TriggerDataOp.LessThan => value < Value,
+                TriggerDataOp.GreaterThan => value > Value,
+                TriggerDataOp.LessThanEq => value <= Value,
+                TriggerDataOp.GreaterThanEq => value >= Value,
                 _ => false
             } || Singletons.Get<PluginManager>().IsConfigurableOpen(this);
+        }
+
+        public void UpdateDataSources(DataSource[] dataSources)
+        {
+            if (Style is IconStyleConfig iconStyle)
+            {
+                iconStyle.UpdateDataSources(dataSources);
+            }
         }
     }
 
@@ -68,7 +79,8 @@ namespace DelvCD.Config
     {
         [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
 
-        [JsonIgnore] private static readonly string[] _sourceOptions = Enum.GetNames<TriggerDataSource>();
+        [JsonIgnore] private List<TriggerOptions> _triggers = new();
+        [JsonIgnore] private string[] _sourceOptions = new string[] { };
         [JsonIgnore] private static readonly string[] _operatorOptions = new string[] { "==", "!=", "<", ">", "<=", ">=" };
         [JsonIgnore] private static readonly string _text = $"Add Conditions below to specify alternate appearance configurations under certain conditions.";
         [JsonIgnore] private static readonly float _yOffset = ImGui.CalcTextSize(_text).Y;
@@ -78,6 +90,7 @@ namespace DelvCD.Config
         [JsonIgnore] private int _swapY = -1;
         [JsonIgnore] private int _triggerCount = 0;
         [JsonIgnore] private T? _defaultStyle;
+        [JsonIgnore] private HashSet<Type> _cachedDataSourceTypes = new();
 
         public string Name => "Conditions";
         public IConfigPage GetDefault() => new StyleConditions<T>();
@@ -86,18 +99,18 @@ namespace DelvCD.Config
 
         public T? GetStyle(DataSource[]? data, int triggeredIndex)
         {
-            if (!this.Conditions.Any() || data is null)
+            if (!Conditions.Any() || data is null)
             {
                 return null;
             }
 
-            foreach (var condition in this.Conditions)
+            foreach (StyleCondition<T> condition in Conditions)
             {
                 int index = condition.TriggerDataSourceIndex == 0
                     ? triggeredIndex
                     : condition.TriggerDataSourceIndex - 1;
 
-                if (condition.GetResult(data[index]))
+                if (index < data.Length && condition.GetResult(data[index]))
                 {
                     return condition.Style;
                 }
@@ -110,7 +123,7 @@ namespace DelvCD.Config
         {
             if (count < _triggerCount || count == 0)
             {
-                foreach (var condition in this.Conditions)
+                foreach (var condition in Conditions)
                 {
                     condition.TriggerDataSourceIndex = Math.Clamp(condition.TriggerDataSourceIndex, 0, count);
                 }
@@ -127,6 +140,22 @@ namespace DelvCD.Config
             }
 
             _triggerCount = count;
+        }
+
+        public void UpdateDataSources(DataSource[] dataSources)
+        { 
+            HashSet<string> set = new();
+            foreach (DataSource dataSource in dataSources)
+            {
+                set.UnionWith(dataSource.ConditionFieldNames);
+            }
+
+            _sourceOptions = set.ToArray();
+
+            foreach (var condition in Conditions)
+            {
+                condition.UpdateDataSources(dataSources);
+            }
         }
 
         public void UpdateDefaultStyle(T style)
@@ -151,11 +180,11 @@ namespace DelvCD.Config
                 if (ImGui.BeginTable("##Conditions_Table", 6, tableFlags, new Vector2(size.X - padX * 2, size.Y - ImGui.GetCursorPosY() - padY * 2)))
                 {
                     Vector2 buttonSize = new(30 * _scale, 0);
-                    int buttonCount = this.Conditions.Count > 1 ? 4 : 2;
+                    int buttonCount = Conditions.Count > 1 ? 4 : 2;
                     float actionsWidth = buttonSize.X * buttonCount + padX * (buttonCount - 1);
                     ImGui.TableSetupColumn("Condition", ImGuiTableColumnFlags.WidthFixed, 55 * _scale, 0);
                     ImGui.TableSetupColumn("Data Source", ImGuiTableColumnFlags.WidthFixed, 90 * _scale, 1);
-                    ImGui.TableSetupColumn("Data", ImGuiTableColumnFlags.WidthFixed, 90 * _scale, 2);
+                    ImGui.TableSetupColumn("Data", ImGuiTableColumnFlags.WidthStretch, 0, 2);
                     ImGui.TableSetupColumn("Operator", ImGuiTableColumnFlags.WidthFixed, 55 * _scale, 3);
                     ImGui.TableSetupColumn("Value", ImGuiTableColumnFlags.WidthStretch, 0, 4);
                     ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, actionsWidth, 5);
@@ -163,28 +192,28 @@ namespace DelvCD.Config
                     ImGui.TableSetupScrollFreeze(0, 1);
                     ImGui.TableHeadersRow();
 
-                    for (int i = 0; i < this.Conditions.Count; i++)
+                    for (int i = 0; i < Conditions.Count; i++)
                     {
                         ImGui.PushID(i.ToString());
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
-                        this.DrawStyleConditionRow(i);
+                        DrawStyleConditionRow(i);
                     }
 
-                    ImGui.PushID(this.Conditions.Count.ToString());
+                    ImGui.PushID(Conditions.Count.ToString());
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
                     ImGui.TableSetColumnIndex(5);
-                    DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => this.Conditions.Add(new StyleCondition<T>(_defaultStyle)), "New Condition", buttonSize);
+                    DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => Conditions.Add(new StyleCondition<T>(_defaultStyle)), "New Condition", buttonSize);
                 }
 
                 ImGui.EndTable();
 
-                if (_swapX < this.Conditions.Count && _swapX >= 0 &&
-                    _swapY < this.Conditions.Count && _swapY >= 0)
+                if (_swapX < Conditions.Count && _swapX >= 0 &&
+                    _swapY < Conditions.Count && _swapY >= 0)
                 {
-                    var temp = this.Conditions[_swapX];
-                    this.Conditions[_swapX] = this.Conditions[_swapY];
-                    this.Conditions[_swapY] = temp;
+                    var temp = Conditions[_swapX];
+                    Conditions[_swapX] = Conditions[_swapY];
+                    Conditions[_swapY] = temp;
 
                     _swapX = -1;
                     _swapY = -1;
@@ -197,7 +226,7 @@ namespace DelvCD.Config
 
         private void DrawStyleConditionRow(int i)
         {
-            StyleCondition<T> condition = this.Conditions[i];
+            StyleCondition<T> condition = Conditions[i];
 
             if (ImGui.TableSetColumnIndex(0))
             {
@@ -225,7 +254,7 @@ namespace DelvCD.Config
             {
                 ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                 ImGui.PushItemWidth(ImGui.GetColumnWidth());
-                ImGui.Combo("##SourceCombo", ref Unsafe.As<TriggerDataSource, int>(ref condition.Source), _sourceOptions, _sourceOptions.Length);
+                ImGui.Combo("##SourceCombo", ref condition.Source, _sourceOptions, _sourceOptions.Length);
                 ImGui.PopItemWidth();
             }
 
@@ -258,7 +287,7 @@ namespace DelvCD.Config
                 Vector2 buttonSize = new(30 * _scale, 0);
                 DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Pen, () => Singletons.Get<PluginManager>().Edit(condition), "Edit Style", buttonSize);
 
-                if (this.Conditions.Count > 1)
+                if (Conditions.Count > 1)
                 {
                     ImGui.SameLine();
                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.ArrowUp, () => Swap(i, i - 1), "Move Up", buttonSize);
@@ -268,7 +297,7 @@ namespace DelvCD.Config
                 }
 
                 ImGui.SameLine();
-                DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Trash, () => this.Conditions.Remove(condition), "Remove Condition", buttonSize);
+                DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Trash, () => Conditions.Remove(condition), "Remove Condition", buttonSize);
             }
         }
 

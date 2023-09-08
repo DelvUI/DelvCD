@@ -80,10 +80,9 @@ namespace DelvCD.Helpers
             };
         }
 
-        public static string GetTagsTooltip(string[] textTags)
+        public static string GetTagsTooltip()
         {
-            return $"Available Text Tags:\n\n{string.Join("\n", textTags)}\n\n" +
-                    "Append the characters ':k' to a numeric tag to kilo-format it.\n" +
+            return $"Append the characters ':k' to a numeric tag to kilo-format it.\n" +
                     "Append the characters ':t' to a numeric tag to time-format it.\n" +
                     "Append a '.' and a number to limit the number of characters,\n" +
                     "or the number of decimals when used with numeric values.\n\nExamples:\n" +

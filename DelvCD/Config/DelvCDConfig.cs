@@ -29,15 +29,15 @@ namespace DelvCD.Config
 
         public DelvCDConfig()
         {
-            this.ElementList = new ElementListConfig();
-            this.GroupConfig = new GroupConfig();
-            this.VisibilityConfig = new VisibilityConfig();
-            this.FontConfig = new FontConfig();
+            ElementList = new ElementListConfig();
+            GroupConfig = new GroupConfig();
+            VisibilityConfig = new VisibilityConfig();
+            FontConfig = new FontConfig();
         }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -49,15 +49,15 @@ namespace DelvCD.Config
             }
         }
 
-        public override string ToString() => this.Name;
+        public override string ToString() => Name;
 
         public IEnumerable<IConfigPage> GetConfigPages()
         {
-            yield return this.ElementList;
-            yield return this.GroupConfig;
-            yield return this.VisibilityConfig;
-            yield return this.FontConfig;
-            yield return this.AboutPage;
+            yield return ElementList;
+            yield return GroupConfig;
+            yield return VisibilityConfig;
+            yield return FontConfig;
+            yield return AboutPage;
         }
 
         public void ImportPage(IConfigPage page)

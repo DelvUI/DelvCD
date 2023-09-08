@@ -44,112 +44,112 @@ namespace DelvCD.Config
 
         public bool IsVisible(bool parentVisible)
         {
-            if (this.AlwaysHide)
+            if (AlwaysHide)
             {
                 return false;
             }
 
-            if (this.HideInPvP && CharacterState.IsInPvP())
+            if (HideInPvP && CharacterState.IsInPvP())
             {
                 return false;
             }
 
-            if (this.HideOutsidePvP && !CharacterState.IsInPvP())
+            if (HideOutsidePvP && !CharacterState.IsInPvP())
             {
                 return false;
             }
 
-            if (this.HideInCombat && CharacterState.IsInCombat())
+            if (HideInCombat && CharacterState.IsInCombat())
             {
                 return false;
             }
 
-            if (this.HideOutsideCombat && !CharacterState.IsInCombat())
+            if (HideOutsideCombat && !CharacterState.IsInCombat())
             {
                 return false;
             }
 
-            if (this.HideOutsideDuty && !CharacterState.IsInDuty())
+            if (HideOutsideDuty && !CharacterState.IsInDuty())
             {
                 return false;
             }
 
-            if (this.HideWhilePerforming && CharacterState.IsPerforming())
+            if (HideWhilePerforming && CharacterState.IsPerforming())
             {
                 return false;
             }
 
-            if (this.HideInGoldenSaucer && CharacterState.IsInGoldenSaucer())
+            if (HideInGoldenSaucer && CharacterState.IsInGoldenSaucer())
             {
                 return false;
             }
 
-            if (this.HideWhenSheathed && !CharacterState.IsWeaponDrawn()
-                && (!this.IgnoreInCombat || (this.IgnoreInCombat && !CharacterState.IsInCombat()))
-                && (!this.IgnoreInDuty) || (this.IgnoreInDuty && !CharacterState.IsInDuty()))
+            if (HideWhenSheathed && !CharacterState.IsWeaponDrawn()
+                && (!IgnoreInCombat || (IgnoreInCombat && !CharacterState.IsInCombat()))
+                && (!IgnoreInDuty) || (IgnoreInDuty && !CharacterState.IsInDuty()))
             {
                 return false;
             }
 
-            if (this.HideIfLevel &&
-                Utils.GetResult(CharacterState.GetCharacterLevel(), this.HideIfLevelOp, this.HideIfLevelValue))
+            if (HideIfLevel &&
+                Utils.GetResult(CharacterState.GetCharacterLevel(), HideIfLevelOp, HideIfLevelValue))
             {
                 return false;
             }
 
-            return parentVisible && CharacterState.IsJobType(CharacterState.GetCharacterJob(), this.ShowForJobTypes, this.CustomJobList);
+            return parentVisible && CharacterState.IsJobType(CharacterState.GetCharacterJob(), ShowForJobTypes, CustomJobList);
         }
 
         public void DrawConfig(IConfigurable parent, Vector2 size, float padX, float padY)
         {
             if (ImGui.BeginChild("##VisibilityConfig", new Vector2(size.X, size.Y), true))
             {
-                ImGui.Checkbox("Always Hide", ref this.AlwaysHide);
-                ImGui.Checkbox("Hide In PvP", ref this.HideInPvP);
-                ImGui.Checkbox("Hide Outside PvP", ref this.HideOutsidePvP);
-                ImGui.Checkbox("Hide In Combat", ref this.HideInCombat);
-                ImGui.Checkbox("Hide Outside Combat", ref this.HideOutsideCombat);
-                ImGui.Checkbox("Hide Outside Duty", ref this.HideOutsideDuty);
-                ImGui.Checkbox("Hide While Performing", ref this.HideWhilePerforming);
-                ImGui.Checkbox("Hide In Golden Saucer", ref this.HideInGoldenSaucer);
-                ImGui.Checkbox("Hide While Weapon Sheathed", ref this.HideWhenSheathed);
-                if (this.HideWhenSheathed)
+                ImGui.Checkbox("Always Hide", ref AlwaysHide);
+                ImGui.Checkbox("Hide In PvP", ref HideInPvP);
+                ImGui.Checkbox("Hide Outside PvP", ref HideOutsidePvP);
+                ImGui.Checkbox("Hide In Combat", ref HideInCombat);
+                ImGui.Checkbox("Hide Outside Combat", ref HideOutsideCombat);
+                ImGui.Checkbox("Hide Outside Duty", ref HideOutsideDuty);
+                ImGui.Checkbox("Hide While Performing", ref HideWhilePerforming);
+                ImGui.Checkbox("Hide In Golden Saucer", ref HideInGoldenSaucer);
+                ImGui.Checkbox("Hide While Weapon Sheathed", ref HideWhenSheathed);
+                if (HideWhenSheathed)
                 {
                     DrawHelpers.DrawNestIndicator(1);
-                    ImGui.Checkbox("Ignore Sheathed status in Combat", ref this.IgnoreInCombat);
+                    ImGui.Checkbox("Ignore Sheathed status in Combat", ref IgnoreInCombat);
                     if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Show when weapon is sheathed during combat."); }
 
                     DrawHelpers.DrawNestIndicator(1);
-                    ImGui.Checkbox("Ignore Sheathed status in Duty", ref this.IgnoreInDuty);
+                    ImGui.Checkbox("Ignore Sheathed status in Duty", ref IgnoreInDuty);
                     if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Show when weapon is sheathed in a duty."); }
                 }
-                else { this.IgnoreInCombat = false; this.IgnoreInDuty = false; }
+                else { IgnoreInCombat = false; IgnoreInDuty = false; }
 
                 DrawHelpers.DrawSpacing();
-                ImGui.Checkbox("Hide if Level", ref this.HideIfLevel);
-                if (this.HideIfLevel)
+                ImGui.Checkbox("Hide if Level", ref HideIfLevel);
+                if (HideIfLevel)
                 {
                     ImGui.SameLine();
                     string[] options = TriggerOptions.OperatorOptions;
                     ImGui.PushItemWidth(55 * _scale);
-                    ImGui.Combo("##HideIfLevelOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.HideIfLevelOp), options, options.Length);
+                    ImGui.Combo("##HideIfLevelOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref HideIfLevelOp), options, options.Length);
                     ImGui.PopItemWidth();
 
                     ImGui.SameLine();
                     ImGui.PushItemWidth(45 * _scale);
-                    ImGui.InputInt(string.Empty, ref this.HideIfLevelValue, 0, 0);
+                    ImGui.InputInt(string.Empty, ref HideIfLevelValue, 0, 0);
                     ImGui.PopItemWidth();
                 }
 
                 DrawHelpers.DrawSpacing();
                 string[] jobTypeOptions = Enum.GetNames(typeof(JobType));
-                ImGui.Combo("Show for Jobs", ref Unsafe.As<JobType, int>(ref this.ShowForJobTypes), jobTypeOptions, jobTypeOptions.Length);
+                ImGui.Combo("Show for Jobs", ref Unsafe.As<JobType, int>(ref ShowForJobTypes), jobTypeOptions, jobTypeOptions.Length);
 
-                if (this.ShowForJobTypes == JobType.Custom)
+                if (ShowForJobTypes == JobType.Custom)
                 {
                     if (string.IsNullOrEmpty(_customJobInput))
                     {
-                        _customJobInput = this.CustomJobString.ToUpper();
+                        _customJobInput = CustomJobString.ToUpper();
                     }
 
                     if (ImGui.InputTextWithHint("Custom Job List", "Comma Separated List (ex: WAR, SAM, BLM)", ref _customJobInput, 100, ImGuiInputTextFlags.EnterReturnsTrue))
@@ -171,15 +171,15 @@ namespace DelvCD.Config
                         }
 
                         _customJobInput = _customJobInput.ToUpper();
-                        this.CustomJobString = _customJobInput;
-                        this.CustomJobList = jobList;
+                        CustomJobString = _customJobInput;
+                        CustomJobList = jobList;
                     }
                 }
 
                 if (parent is DelvCDConfig)
                 {
                     DrawHelpers.DrawSpacing();
-                    ImGui.Checkbox("Enable Window Clipping", ref this.Clip);
+                    ImGui.Checkbox("Enable Window Clipping", ref Clip);
                 }
 
                 ImGui.EndChild();

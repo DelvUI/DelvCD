@@ -14,26 +14,26 @@ namespace DelvCD.Helpers
         {
             get
             {
-                if (this.WasGenerated)
+                if (WasGenerated)
                 {
-                    return this._value;
+                    return _value;
                 }
 
-                this._value = this._generator.Invoke(this._getInput.Invoke());
-                this.WasGenerated = true;
-                return this._value;
+                _value = _generator.Invoke(_getInput.Invoke());
+                WasGenerated = true;
+                return _value;
             }
         }
 
         public LazyString(Func<T> getInput, Func<T, string> generator)
         {
-            this._getInput = getInput;
-            this._generator = generator;
+            _getInput = getInput;
+            _generator = generator;
         }
 
         public override string? ToString()
         {
-            return this.Value;
+            return Value;
         }
     }
 

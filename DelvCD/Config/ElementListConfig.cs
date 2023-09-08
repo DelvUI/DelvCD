@@ -28,15 +28,15 @@ namespace DelvCD.Config
 
         public ElementListConfig()
         {
-            this.UIElements = new List<UIElement>();
+            UIElements = new List<UIElement>();
         }
 
         public IConfigPage GetDefault() => new ElementListConfig();
 
         public void DrawConfig(IConfigurable parent, Vector2 size, float padX, float padY)
         {
-            this.DrawCreateMenu(size, padX);
-            this.DrawUIElementTable(size.AddY(-padY), padX);
+            DrawCreateMenu(size, padX);
+            DrawUIElementTable(size.AddY(-padY), padX);
         }
 
         private void DrawCreateMenu(Vector2 size, float padX)
@@ -79,7 +79,7 @@ namespace DelvCD.Config
             if (ImGui.BeginTable("##UIElements_Table", 4, flags, new Vector2(size.X, size.Y - MenuBarHeight)))
             {
                 Vector2 buttonSize = new Vector2(30 * _scale, 0);
-                int buttonCount = this.UIElements.Count > 1 ? 5 : 3;
+                int buttonCount = UIElements.Count > 1 ? 5 : 3;
                 float actionsWidth = buttonSize.X * buttonCount + padX * (buttonCount - 1);
                 float previewWidth = buttonSize.X;
                 float typeWidth = 75 * _scale;
@@ -92,9 +92,9 @@ namespace DelvCD.Config
                 ImGui.TableSetupScrollFreeze(0, 1);
                 ImGui.TableHeadersRow();
 
-                for (int i = 0; i < this.UIElements.Count; i++)
+                for (int i = 0; i < UIElements.Count; i++)
                 {
-                    UIElement element = this.UIElements[i];
+                    UIElement element = UIElements[i];
 
                     if (!string.IsNullOrEmpty(_input) &&
                         !element.Name.Contains(_input, StringComparison.OrdinalIgnoreCase))
@@ -132,7 +132,7 @@ namespace DelvCD.Config
                         ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
                         DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Pen, () => EditUIElement(element), "Edit", buttonSize);
 
-                        if (this.UIElements.Count > 1)
+                        if (UIElements.Count > 1)
                         {
                             ImGui.SameLine();
                             DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.ArrowUp, () => Swap(i, i - 1), "Move Up", buttonSize);
@@ -152,12 +152,12 @@ namespace DelvCD.Config
                 ImGui.EndTable();
             }
 
-            if (_swapX < this.UIElements.Count && _swapX >= 0 &&
-                _swapY < this.UIElements.Count && _swapY >= 0)
+            if (_swapX < UIElements.Count && _swapX >= 0 &&
+                _swapY < UIElements.Count && _swapY >= 0)
             {
-                UIElement temp = this.UIElements[_swapX];
-                this.UIElements[_swapX] = this.UIElements[_swapY];
-                this.UIElements[_swapY] = temp;
+                UIElement temp = UIElements[_swapX];
+                UIElements[_swapX] = UIElements[_swapY];
+                UIElements[_swapY] = temp;
 
                 _swapX = -1;
                 _swapY = -1;
@@ -184,7 +184,7 @@ namespace DelvCD.Config
 
                 if (newElement is not null)
                 {
-                    this.UIElements.Add(newElement);
+                    UIElements.Add(newElement);
                 }
             }
 
@@ -198,7 +198,7 @@ namespace DelvCD.Config
 
         private void DeleteUIElement(UIElement element)
         {
-            this.UIElements.Remove(element);
+            UIElements.Remove(element);
         }
 
         private void ImportUIElement()
@@ -217,7 +217,7 @@ namespace DelvCD.Config
             UIElement? newElement = ConfigHelpers.GetFromImportString<UIElement>(importString);
             if (newElement is not null)
             {
-                this.UIElements.Add(newElement);
+                UIElements.Add(newElement);
             }
             else
             {

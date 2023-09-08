@@ -48,7 +48,7 @@ namespace DelvCD.Helpers
                 _textureCache.Remove(key);
             }
 
-            TextureWrap? newTexture = this.LoadTexture(iconId + stackCount, hdIcon, greyScale, opacity);
+            TextureWrap? newTexture = LoadTexture(iconId + stackCount, hdIcon, greyScale, opacity);
             if (newTexture == null)
             {
                 return null;
@@ -69,7 +69,7 @@ namespace DelvCD.Helpers
 
                 if (!string.IsNullOrEmpty(resolvedPath) && !resolvedPath.Equals(path))
                 {
-                    return this.LoadPenumbraTexture(resolvedPath);
+                    return LoadPenumbraTexture(resolvedPath);
                 }
             }
             catch
@@ -213,7 +213,7 @@ namespace DelvCD.Helpers
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 

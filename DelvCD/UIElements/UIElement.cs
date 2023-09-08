@@ -1,5 +1,6 @@
 ﻿using DelvCD.Config;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -28,8 +29,8 @@ namespace DelvCD.UIElements
 
         public UIElement(string name)
         {
-            this.Name = name;
-            this.ID = $"DelvCD_{GetType().Name}_{Guid.NewGuid()}";
+            Name = name;
+            ID = $"DelvCD_{GetType().Name}_{Guid.NewGuid()}";
         }
 
         public abstract ElementType Type { get; }
@@ -40,39 +41,29 @@ namespace DelvCD.UIElements
 
         public abstract void ImportPage(IConfigPage page);
 
-        public override string? ToString() => $"{this.Type} [{this.Name}]";
+        public override string? ToString() => $"{Type} [{Name}]";
 
         public virtual void StopPreview()
         {
-            this.Preview = false;
+            Preview = false;
         }
 
         protected DataSource UpdatePreviewData(DataSource data)
         {
-            if (this.StartTime.HasValue && this.StartData is not null)
+            if (StartTime.HasValue && StartData is not null)
             {
-                float secondSinceStart = (float)(DateTime.UtcNow - this.StartTime.Value).TotalSeconds;
-                float resetValue = Math.Min(this.StartData.Value, this.StartData.Value);
+                float secondSinceStart = (float)(DateTime.UtcNow - StartTime.Value).TotalSeconds;
+                float resetValue = StartData.PreviewMaxValue;
                 float newValue = resetValue - secondSinceStart;
 
                 if (newValue < 0)
                 {
-                    this.StartTime = DateTime.UtcNow;
+                    StartTime = DateTime.UtcNow;
                     newValue = resetValue;
                 }
 
-                return new DataSource()
-                {
-                    Value = newValue,
-                    MaxValue = data.MaxValue,
-                    Stacks = data.Stacks,
-                    MaxStacks = data.MaxStacks,
-                    Hp = data.Hp,
-                    Mp = data.Mp,
-                    Cp = data.Cp,
-                    Gp = data.Gp,
-                    Icon = data.Icon
-                };
+                data.PreviewValue = newValue;
+                return data;
             }
 
             return data;
@@ -81,46 +72,41 @@ namespace DelvCD.UIElements
         // Dont ask
         protected void UpdateDragData(Vector2 pos, Vector2 size)
         {
-            this.Hovered = ImGui.IsMouseHoveringRect(pos, pos + size);
-            this.Dragging = this.LastFrameWasDragging && ImGui.IsMouseDown(ImGuiMouseButton.Left);
-            this.SetPosition = (this.Preview && !this.LastFrameWasPreview || !this.Hovered) && !this.Dragging;
-            this.LastFrameWasDragging = this.Hovered || this.Dragging;
+            Hovered = ImGui.IsMouseHoveringRect(pos, pos + size);
+            Dragging = LastFrameWasDragging && ImGui.IsMouseDown(ImGuiMouseButton.Left);
+            SetPosition = (Preview && !LastFrameWasPreview || !Hovered) && !Dragging;
+            LastFrameWasDragging = Hovered || Dragging;
         }
 
         protected void UpdateStartData(DataSource data)
         {
-            if (this.LastFrameWasPreview && !this.Preview)
+            if (LastFrameWasPreview && !Preview)
             {
-                this.StartData = this.OldStartData;
-                this.StartTime = this.OldStartTime;
+                StartData = OldStartData;
+                StartTime = OldStartTime;
             }
 
-            if (!this.LastFrameWasPreview && this.Preview)
+            if (!LastFrameWasPreview && Preview)
             {
-                this.OldStartData = this.StartData;
-                this.OldStartTime = this.StartTime;
-                this.StartData = null;
-                this.StartTime = null;
+                OldStartData = StartData;
+                OldStartTime = StartTime;
+                StartData = null;
+                StartTime = null;
             }
 
-            if (this.StartData is not null &&
-                data.Value > this.StartData.Value)
+            if (StartData is not null &&
+                data.PreviewValue > StartData.PreviewValue)
             {
-                this.StartData = data;
-                this.StartTime = DateTime.UtcNow;
+                StartData = data;
+                StartTime = DateTime.UtcNow;
             }
 
-            if (this.StartData is null ||
-                !this.StartTime.HasValue ||
-                this.StartData.Id != data.Id)
+            if (StartData is null ||
+                !StartTime.HasValue ||
+                StartData.Id != data.Id)
             {
-                this.StartData = data;
-                this.StartTime = DateTime.UtcNow;
-            }
-
-            if (this.StartData is not null && data.MaxValue == 0)
-            {
-                data.MaxValue = this.StartData.Value;
+                StartData = data;
+                StartTime = DateTime.UtcNow;
             }
         }
     }

@@ -20,12 +20,12 @@ namespace DelvCD.Config
 
         public LabelListConfig()
         {
-            this.Labels = new List<Label>();
+            Labels = new List<Label>();
         }
 
         public LabelListConfig(params Label[] labels)
         {
-            this.Labels = new List<Label>(labels);
+            Labels = new List<Label>(labels);
         }
 
         public IConfigPage GetDefault()
@@ -35,7 +35,7 @@ namespace DelvCD.Config
             valueLabel.LabelStyleConfig.FontID = Singletons.Get<FontsManager>().GetFontIndex(FontsManager.DefaultBigFontKey);
             valueLabel.StyleConditions.Conditions.Add(new StyleCondition<LabelStyleConfig>()
             {
-                Source = TriggerDataSource.Value,
+                Source = 0,
                 Op = TriggerDataOp.Equals,
                 Value = 0
             });
@@ -50,7 +50,7 @@ namespace DelvCD.Config
             stacksLabel.LabelStyleConfig.OutlineColor = new ConfigColor(1, 1, 1, 1);
             stacksLabel.StyleConditions.Conditions.Add(new StyleCondition<LabelStyleConfig>()
             {
-                Source = TriggerDataSource.MaxStacks,
+                Source = 2,
                 Op = TriggerDataOp.LessThanEq,
                 Value = 1
             });
@@ -60,7 +60,7 @@ namespace DelvCD.Config
 
         public void DrawConfig(IConfigurable parent, Vector2 size, float padX, float padY)
         {
-            this.DrawLabelTable(size, padX);
+            DrawLabelTable(size, padX);
         }
 
         private void DrawLabelTable(Vector2 size, float padX)
@@ -85,12 +85,12 @@ namespace DelvCD.Config
                 ImGui.TableHeadersRow();
 
                 int i = 0;
-                for (; i < this.Labels.Count; i++)
+                for (; i < Labels.Count; i++)
                 {
                     ImGui.PushID(i.ToString());
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
-                    Label label = this.Labels[i];
+                    Label label = Labels[i];
 
                     if (ImGui.TableSetColumnIndex(0))
                     {
@@ -138,7 +138,7 @@ namespace DelvCD.Config
         {
             if (!string.IsNullOrEmpty(name))
             {
-                this.Labels.Add(new Label(name));
+                Labels.Add(new Label(name));
             }
 
             _labelInput = string.Empty;
@@ -161,7 +161,7 @@ namespace DelvCD.Config
 
             if (newElement is Label label)
             {
-                this.Labels.Add(label);
+                Labels.Add(label);
             }
             else
             {
@@ -183,7 +183,7 @@ namespace DelvCD.Config
 
         private void DeleteLabel(Label label)
         {
-            this.Labels.Remove(label);
+            Labels.Remove(label);
         }
     }
 }

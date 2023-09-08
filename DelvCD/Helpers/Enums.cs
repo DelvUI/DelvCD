@@ -19,7 +19,8 @@ namespace DelvCD.Helpers
         Status,
         Cooldown,
         CharacterState,
-        ItemCooldown
+        ItemCooldown,
+        JobGauge
     }
 
     public enum TriggerSource
@@ -37,19 +38,6 @@ namespace DelvCD.Helpers
         Xor
     }
 
-    public enum TriggerDataSource
-    {
-        Value,
-        Stacks,
-        MaxStacks,
-        HP,
-        MP,
-        CP,
-        GP,
-        Level,
-        Distance
-    }
-
     public enum TriggerDataOp
     {
         Equals,
@@ -58,6 +46,13 @@ namespace DelvCD.Helpers
         GreaterThan,
         LessThanEq,
         GreaterThanEq
+    }
+
+    public enum TriggerConditionType
+    {
+        Numeric,
+        Boolean,
+        Combo
     }
 
     public enum Job

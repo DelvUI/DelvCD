@@ -1,10 +1,13 @@
-﻿using DelvCD.Config;
+﻿using Dalamud.Logging;
+using DelvCD.Config;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace DelvCD.UIElements
 {
@@ -14,34 +17,82 @@ namespace DelvCD.UIElements
 
         public IconStyleConfig IconStyleConfig { get; set; }
         public LabelListConfig LabelListConfig { get; set; }
-        public TriggerConfig TriggerConfig { get; set; }
-        public StyleConditions<IconStyleConfig> StyleConditions { get; set; }
         public VisibilityConfig VisibilityConfig { get; set; }
+
+
+        [JsonIgnore] private TriggerConfig _triggerConfig = null!;
+        public TriggerConfig TriggerConfig
+        {
+            get => _triggerConfig;
+            set
+            {
+                if (_triggerConfig != null)
+                {
+                    _triggerConfig.TriggerOptionsUpdateEvent -= OnTriggerOptionsChanged;
+                }
+
+                _triggerConfig = value;
+                _triggerConfig.TriggerOptionsUpdateEvent += OnTriggerOptionsChanged;
+
+                OnTriggerOptionsChanged(TriggerConfig);
+            }
+        }
+
+        
+        [JsonIgnore] private StyleConditions<IconStyleConfig> _styleConditions = null!;
+        public StyleConditions<IconStyleConfig> StyleConditions
+        {
+            get => _styleConditions;
+            set
+            {
+                _styleConditions = value;
+
+                if (TriggerConfig != null)
+                {
+                    OnTriggerOptionsChanged(TriggerConfig);
+                }
+            }
+        }
 
         // Constructor for deserialization
         public Icon() : this(string.Empty) { }
 
         public Icon(string name) : base(name)
         {
-            this.IconStyleConfig = new IconStyleConfig();
-            this.LabelListConfig = new LabelListConfig();
-            this.TriggerConfig = new TriggerConfig();
-            this.StyleConditions = new StyleConditions<IconStyleConfig>();
-            this.VisibilityConfig = new VisibilityConfig();
+            IconStyleConfig = new IconStyleConfig();
+            LabelListConfig = new LabelListConfig();
+            TriggerConfig = new TriggerConfig();
+            StyleConditions = new StyleConditions<IconStyleConfig>();
+            VisibilityConfig = new VisibilityConfig();
+        }
+
+        private void OnTriggerOptionsChanged(TriggerConfig sender)
+        {
+            DataSource[] dataSources = sender.TriggerOptions.Select(x => x.DataSource).ToArray();
+
+            if (IconStyleConfig != null)
+            {
+                IconStyleConfig.UpdateDataSources(dataSources);
+            }
+
+            if (StyleConditions != null)
+            {
+                StyleConditions.UpdateTriggerCount(dataSources.Length);
+                StyleConditions.UpdateDataSources(dataSources);
+            }
         }
 
         public override IEnumerable<IConfigPage> GetConfigPages()
         {
-            yield return this.IconStyleConfig;
-            yield return this.LabelListConfig;
-            yield return this.TriggerConfig;
+            yield return IconStyleConfig;
+            yield return LabelListConfig;
+            yield return TriggerConfig;
 
             // ugly hack
-            this.StyleConditions.UpdateTriggerCount(this.TriggerConfig.TriggerOptions.Count);
-            this.StyleConditions.UpdateDefaultStyle(this.IconStyleConfig);
+            StyleConditions.UpdateDefaultStyle(IconStyleConfig);
 
-            yield return this.StyleConditions;
-            yield return this.VisibilityConfig;
+            yield return StyleConditions;
+            yield return VisibilityConfig;
         }
 
         public override void ImportPage(IConfigPage page)
@@ -49,41 +100,44 @@ namespace DelvCD.UIElements
             switch (page)
             {
                 case IconStyleConfig newPage:
-                    this.IconStyleConfig = newPage;
+                    newPage.UpdateDataSources(TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray());
+                    IconStyleConfig = newPage;
                     break;
                 case LabelListConfig newPage:
-                    this.LabelListConfig = newPage;
+                    LabelListConfig = newPage;
                     break;
                 case TriggerConfig newPage:
-                    this.TriggerConfig = newPage;
+                    TriggerConfig = newPage;
                     break;
                 case StyleConditions<IconStyleConfig> newPage:
                     newPage.UpdateTriggerCount(0);
-                    newPage.UpdateDefaultStyle(this.IconStyleConfig);
-                    this.StyleConditions = newPage;
+                    newPage.UpdateDefaultStyle(IconStyleConfig);
+                    newPage.UpdateDataSources(TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray());
+                    StyleConditions = newPage;
                     break;
                 case VisibilityConfig newPage:
-                    this.VisibilityConfig = newPage;
+                    VisibilityConfig = newPage;
                     break;
             }
         }
 
         public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
-            if (!this.TriggerConfig.TriggerOptions.Any())
+            if (!TriggerConfig.TriggerOptions.Any())
             {
                 return;
             }
 
-            bool visible = this.VisibilityConfig.IsVisible(parentVisible);
-            if (!visible && !this.Preview)
+            bool visible = VisibilityConfig.IsVisible(parentVisible);
+            if (!visible && !Preview)
             {
                 return;
             }
 
-            bool triggered = this.TriggerConfig.IsTriggered(this.Preview, out DataSource[] datas, out int triggeredIndex);
-            DataSource data = datas[triggeredIndex];
-            IconStyleConfig style = this.StyleConditions.GetStyle(datas, triggeredIndex) ?? this.IconStyleConfig;
+            bool triggered = TriggerConfig.IsTriggered(Preview, out int triggeredIndex);
+            DataSource data = TriggerConfig.TriggerOptions[triggeredIndex].DataSource;
+            DataSource[] datas = TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray();
+            IconStyleConfig style = StyleConditions.GetStyle(datas, triggeredIndex) ?? IconStyleConfig;
 
             Vector2 localPos = pos + style.Position;
             Vector2 size = style.Size;
@@ -92,20 +146,22 @@ namespace DelvCD.UIElements
             {
                 ClipRect? clipRect = Singletons.Get<ClipRectsHelper>().GetClipRectForArea(localPos, size);
                 if (clipRect.HasValue)
+                {
                     return;
+                }
             }
 
-            if (triggered || this.Preview)
+            if (triggered || Preview)
             {
-                this.UpdateStartData(data);
-                this.UpdateDragData(localPos, size);
+                UpdateStartData(data);
+                UpdateDragData(localPos, size);
 
-                DrawHelpers.DrawInWindow($"##{this.ID}", localPos, size, this.Preview, this.SetPosition, (drawList) =>
+                DrawHelpers.DrawInWindow($"##{ID}", localPos, size, Preview, SetPosition, (drawList) =>
                 {
-                    if (this.Preview)
+                    if (Preview)
                     {
-                        data = this.UpdatePreviewData(data);
-                        if (this.LastFrameWasDragging)
+                        data = UpdatePreviewData(data);
+                        if (LastFrameWasDragging)
                         {
                             localPos = ImGui.GetWindowPos();
                             style.Position = localPos - pos;
@@ -139,16 +195,24 @@ namespace DelvCD.UIElements
                         }
                     }
 
-                    if (style.ShowProgressSwipe)
+                    if (style.ShowProgressSwipe && datas.Length > style.ProgressDataSourceIndex)
                     {
-                        if (style.GcdSwipe && (data.Value == 0 || data.MaxValue == 0 || style.GcdSwipeOnly))
+                        float progressValue = datas[style.ProgressDataSourceIndex].GetProgressValue(style.ProgressDataSourceFieldIndex);
+                        float progressMaxValue = datas[style.ProgressDataSourceIndex].GetMaxValue(style.ProgressDataSourceFieldIndex);
+
+                        if (style.InvertValues)
+                        {
+                            progressValue = progressMaxValue - progressValue;
+                        }
+
+                        if (style.GcdSwipe && (progressValue == 0 || progressMaxValue == 0 || style.GcdSwipeOnly))
                         {
                             ActionHelpers.GetGCDInfo(out var recastInfo);
                             DrawProgressSwipe(style, localPos, size, recastInfo.RecastTime - recastInfo.RecastTimeElapsed, recastInfo.RecastTime, alpha, drawList);
                         }
                         else
                         {
-                            DrawProgressSwipe(style, localPos, size, data.Value, data.MaxValue, alpha, drawList);
+                            DrawProgressSwipe(style, localPos, size, progressValue, progressMaxValue, alpha, drawList);
                         }
                     }
 
@@ -164,25 +228,25 @@ namespace DelvCD.UIElements
 
                     if (style.Glow)
                     {
-                        this.DrawIconGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                        DrawIconGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
                     }
                 });
             }
             else
             {
-                this.StartData = null;
-                this.StartTime = null;
+                StartData = null;
+                StartTime = null;
             }
 
-            foreach (Label label in this.LabelListConfig.Labels)
+            foreach (Label label in LabelListConfig.Labels)
             {
-                if (!this.Preview && this.LastFrameWasPreview)
+                if (!Preview && LastFrameWasPreview)
                 {
                     label.Preview = false;
                 }
                 else
                 {
-                    label.Preview |= this.Preview;
+                    label.Preview |= Preview;
                 }
 
                 if (triggered || label.Preview)
@@ -192,7 +256,7 @@ namespace DelvCD.UIElements
                 }
             }
 
-            this.LastFrameWasPreview = this.Preview;
+            LastFrameWasPreview = Preview;
         }
 
         private static void DrawProgressSwipe(
@@ -204,35 +268,44 @@ namespace DelvCD.UIElements
             float alpha,
             ImDrawListPtr drawList)
         {
-            if (startValue > 0 && triggeredValue != 0)
+            if (startValue <= 0 || triggeredValue == 0 || startValue < triggeredValue)
             {
-                bool invert = style.InvertSwipe;
-                float percent = (invert ? 0 : 1) - (startValue - triggeredValue) / startValue;
-
-                float radius = (float)Math.Sqrt(Math.Pow(Math.Max(size.X, size.Y), 2) * 2) / 2f;
-                float startAngle = -(float)Math.PI / 2;
-                float endAngle = startAngle - 2f * (float)Math.PI * percent;
-
-                ImGui.PushClipRect(pos, pos + size, false);
-                drawList.PathArcTo(pos + size / 2, radius / 2, startAngle, endAngle, (int)(100f * Math.Abs(percent)));
-                uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
-                drawList.PathStroke(progressAlpha, ImDrawFlags.None, radius);
-                if (style.ShowSwipeLines)
-                {
-                    Vector2 vec = new Vector2((float)Math.Cos(endAngle), (float)Math.Sin(endAngle));
-                    Vector2 start = pos + size / 2;
-                    Vector2 end = start + vec * radius;
-                    float thickness = style.ProgressLineThickness;
-                    Vector4 swipeLineColor = style.ProgressLineColor.Vector.AddTransparency(alpha);
-                    uint color = ImGui.ColorConvertFloat4ToU32(swipeLineColor);
-
-                    drawList.AddLine(start, end, color, thickness);
-                    drawList.AddLine(start, new(pos.X + size.X / 2, pos.Y), color, thickness);
-                    drawList.AddCircleFilled(start + new Vector2(thickness / 4, thickness / 4), thickness / 2, color);
-                }
-
-                ImGui.PopClipRect();
+                return;
             }
+            
+            bool invert = style.InvertSwipe;
+            float percent = (invert ? 0 : 1) - (startValue - triggeredValue) / startValue;
+            uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
+
+            if (percent == 1)
+            {
+                drawList.AddRectFilled(pos, pos + size, progressAlpha);
+                return;
+            }
+
+            float radius = (float)Math.Sqrt(Math.Pow(Math.Max(size.X, size.Y), 2) * 2) / 2f;
+            float startAngle = (-(float)Math.PI / 2) + 0.03f;
+            float endAngle = startAngle - 2f * (float)Math.PI * percent;
+
+            ImGui.PushClipRect(pos, pos + size, false);
+            drawList.PathArcTo(pos + size / 2, radius / 2, startAngle, endAngle, (int)(100f * Math.Abs(percent)));
+            
+            drawList.PathStroke(progressAlpha, ImDrawFlags.None, radius);
+            if (style.ShowSwipeLines)
+            {
+                Vector2 vec = new Vector2((float)Math.Cos(endAngle), (float)Math.Sin(endAngle));
+                Vector2 start = pos + size / 2;
+                Vector2 end = start + vec * radius;
+                float thickness = style.ProgressLineThickness;
+                Vector4 swipeLineColor = style.ProgressLineColor.Vector.AddTransparency(alpha);
+                uint color = ImGui.ColorConvertFloat4ToU32(swipeLineColor);
+
+                drawList.AddLine(start, end, color, thickness);
+                drawList.AddLine(start, new(pos.X + size.X / 2, pos.Y), color, thickness);
+                drawList.AddCircleFilled(start + new Vector2(thickness / 4, thickness / 4), thickness / 2, color);
+            }
+
+            ImGui.PopClipRect();
         }
 
         private void DrawIconGlow(Vector2 pos, Vector2 size, int thickness, int segments, float speed, ConfigColor col1, ConfigColor col2, ImDrawListPtr drawList)
@@ -256,11 +329,11 @@ namespace DelvCD.UIElements
 
         public void Resize(Vector2 size, bool conditions)
         {
-            this.IconStyleConfig.Size = size;
+            IconStyleConfig.Size = size;
 
             if (conditions)
             {
-                foreach (var condition in this.StyleConditions.Conditions)
+                foreach (var condition in StyleConditions.Conditions)
                 {
                     condition.Style.Size = size;
                 }
@@ -269,12 +342,12 @@ namespace DelvCD.UIElements
 
         public void ScaleResolution(Vector2 scaleFactor, bool positionOnly)
         {
-            this.IconStyleConfig.Position *= scaleFactor;
+            IconStyleConfig.Position *= scaleFactor;
 
             if (!positionOnly)
-                this.IconStyleConfig.Size *= scaleFactor;
+                IconStyleConfig.Size *= scaleFactor;
 
-            foreach (var condition in this.StyleConditions.Conditions)
+            foreach (var condition in StyleConditions.Conditions)
             {
                 condition.Style.Position *= scaleFactor;
 

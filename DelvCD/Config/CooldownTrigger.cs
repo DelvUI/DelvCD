@@ -1,6 +1,7 @@
 using Dalamud.Game.ClientState;
 using Dalamud.Interface;
 using DelvCD.Helpers;
+using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using System;
 using System.Linq;
@@ -52,26 +53,29 @@ namespace DelvCD.Config
         public override TriggerType Type => TriggerType.Cooldown;
         public override TriggerSource Source => TriggerSource.Player;
 
-        public override bool IsTriggered(bool preview, out DataSource data)
+        [JsonIgnore] private CooldownDataSource _dataSource = new();
+        [JsonIgnore] public override DataSource DataSource => _dataSource;
+
+        public override bool IsTriggered(bool preview)
         {
-            data = new DataSource();
             if (preview)
             {
-                data.Value = 10;
-                data.Stacks = 2;
-                data.MaxStacks = 2;
-                data.Icon = this.TriggerData.FirstOrDefault()?.Icon ?? 0;
+                _dataSource.Value = 10;
+                _dataSource.Stacks = 2;
+                _dataSource.MaxStacks = 2;
+                _dataSource.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
+
                 return true;
             }
 
-            TriggerData? actionTrigger = this.TriggerData.FirstOrDefault(t => t.CombatType == this.CombatType);
+            TriggerData? actionTrigger = TriggerData.FirstOrDefault(t => t.CombatType == CombatType);
             if (actionTrigger is null)
             {
                 return false;
             }
 
             ActionHelpers helper = Singletons.Get<ActionHelpers>();
-            uint actionId = this.Adjust ? helper.GetAdjustedActionId(actionTrigger.Id) : actionTrigger.Id;
+            uint actionId = Adjust ? helper.GetAdjustedActionId(actionTrigger.Id) : actionTrigger.Id;
             helper.GetAdjustedRecastInfo(actionId, out RecastInfo recastInfo);
 
             int stacks = recastInfo.RecastTime == 0f
@@ -91,22 +95,22 @@ namespace DelvCD.Config
             bool inRange = false;
             bool inLos = false;
 
-            if (this.Usable)
+            if (Usable)
             {
                 usable = helper.CanUseAction(actionId);
             }
 
-            if (this.RangeCheck)
+            if (RangeCheck)
             {
                 inRange = helper.GetActionInRange(actionId, Singletons.Get<ClientState>().LocalPlayer, Utils.FindTarget());
             }
 
-            if (this.LosCheck)
+            if (LosCheck)
             {
                 inLos = helper.IsTargetInLos(Singletons.Get<ClientState>().LocalPlayer, Utils.FindTarget());
             }
 
-            if (this.Combo && actionTrigger.ComboId.Length > 0)
+            if (Combo && actionTrigger.ComboId.Length > 0)
             {
                 uint lastAction = helper.GetLastUsedActionId();
                 foreach (uint id in actionTrigger.ComboId)
@@ -119,33 +123,33 @@ namespace DelvCD.Config
                 }
             }
 
-            data.Id = actionId;
-            data.Value = cooldown;
-            data.MaxValue = chargeTime;
-            data.Stacks = stacks;
-            data.MaxStacks = recastInfo.MaxCharges;
-            data.Icon = this.Adjust ? helper.GetIconIdForAction(actionId) : actionTrigger.Icon;
+            _dataSource.Id = actionId;
+            _dataSource.Value = cooldown;
+            _dataSource.MaxValue = chargeTime;
+            _dataSource.Stacks = stacks;
+            _dataSource.MaxStacks = recastInfo.MaxCharges;
+            _dataSource.Icon = Adjust ? helper.GetIconIdForAction(actionId) : actionTrigger.Icon;
 
             return
-                (!this.Combo || (this.ComboValue == 0 ? comboActive : !comboActive)) &&
-                (!this.Usable || (this.UsableValue == 0 ? usable : !usable)) &&
-                (!this.RangeCheck || (this.RangeValue == 0 ? inRange : !inRange)) &&
-                (!this.LosCheck || (this.LosValue == 0 ? inLos : !inLos)) &&
-                (!this.Cooldown || Utils.GetResult(data.Value, this.CooldownOp, this.CooldownValue)) &&
-                (!this.ChargeCount || Utils.GetResult(data.Stacks, this.ChargeCountOp, this.ChargeCountValue));
+                (!Combo || (ComboValue == 0 ? comboActive : !comboActive)) &&
+                (!Usable || (UsableValue == 0 ? usable : !usable)) &&
+                (!RangeCheck || (RangeValue == 0 ? inRange : !inRange)) &&
+                (!LosCheck || (LosValue == 0 ? inLos : !inLos)) &&
+                (!Cooldown || Utils.GetResult(_dataSource.Value, CooldownOp, CooldownValue)) &&
+                (!ChargeCount || Utils.GetResult(_dataSource.Stacks, ChargeCountOp, ChargeCountValue));
         }
 
         public override void DrawTriggerOptions(Vector2 size, float padX, float padY)
         {
             if (string.IsNullOrEmpty(_triggerNameInput))
             {
-                _triggerNameInput = this.TriggerName;
+                _triggerNameInput = TriggerName;
             }
 
-            ImGui.Combo("Combat Type", ref Unsafe.As<CombatType, int>(ref this.CombatType), _combatTypeOptions, _combatTypeOptions.Length);
+            ImGui.Combo("Combat Type", ref Unsafe.As<CombatType, int>(ref CombatType), _combatTypeOptions, _combatTypeOptions.Length);
             if (ImGui.InputTextWithHint("Action", "Action Name or ID", ref _triggerNameInput, 32, ImGuiInputTextFlags.EnterReturnsTrue))
             {
-                this.TriggerData.Clear();
+                TriggerData.Clear();
                 if (!string.IsNullOrEmpty(_triggerNameInput))
                 {
                     foreach (var triggerData in ActionHelpers.FindActionEntries(_triggerNameInput))
@@ -155,7 +159,7 @@ namespace DelvCD.Config
                 }
             }
 
-            ImGui.Checkbox("Use Adjusted Action", ref this.Adjust);
+            ImGui.Checkbox("Use Adjusted Action", ref Adjust);
             if (ImGui.IsItemHovered())
             {
                 ImGui.SetTooltip("Enable to dynamically track abilities that upgrade or change during combat.\n" +
@@ -173,20 +177,20 @@ namespace DelvCD.Config
             float padWidth = 0;
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("Cooldown", ref this.Cooldown);
-            if (this.Cooldown)
+            ImGui.Checkbox("Cooldown", ref Cooldown);
+            if (Cooldown)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(opComboWidth);
-                ImGui.Combo("##CooldownOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.CooldownOp), operatorOptions, operatorOptions.Length);
+                ImGui.Combo("##CooldownOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref CooldownOp), operatorOptions, operatorOptions.Length);
                 ImGui.PopItemWidth();
                 ImGui.SameLine();
 
                 if (string.IsNullOrEmpty(_cooldownValueInput))
                 {
-                    _cooldownValueInput = this.CooldownValue.ToString();
+                    _cooldownValueInput = CooldownValue.ToString();
                 }
 
                 ImGui.PushItemWidth(valueInputWidth);
@@ -194,30 +198,30 @@ namespace DelvCD.Config
                 {
                     if (float.TryParse(_cooldownValueInput, out float value))
                     {
-                        this.CooldownValue = value;
+                        CooldownValue = value;
                     }
 
-                    _cooldownValueInput = this.CooldownValue.ToString();
+                    _cooldownValueInput = CooldownValue.ToString();
                 }
 
                 ImGui.PopItemWidth();
             }
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("Charge Count", ref this.ChargeCount);
-            if (this.ChargeCount)
+            ImGui.Checkbox("Charge Count", ref ChargeCount);
+            if (ChargeCount)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(opComboWidth);
-                ImGui.Combo("##ChargeCountOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref this.ChargeCountOp), operatorOptions, operatorOptions.Length);
+                ImGui.Combo("##ChargeCountOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref ChargeCountOp), operatorOptions, operatorOptions.Length);
                 ImGui.PopItemWidth();
                 ImGui.SameLine();
 
                 if (string.IsNullOrEmpty(_chargeCountValueInput))
                 {
-                    _chargeCountValueInput = this.ChargeCountValue.ToString();
+                    _chargeCountValueInput = ChargeCountValue.ToString();
                 }
 
                 ImGui.PushItemWidth(valueInputWidth);
@@ -225,81 +229,81 @@ namespace DelvCD.Config
                 {
                     if (float.TryParse(_chargeCountValueInput, out float value))
                     {
-                        this.ChargeCountValue = value;
+                        ChargeCountValue = value;
                     }
 
-                    _chargeCountValueInput = this.ChargeCountValue.ToString();
+                    _chargeCountValueInput = ChargeCountValue.ToString();
                 }
 
                 ImGui.PopItemWidth();
             }
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("Combo Ready", ref this.Combo);
-            if (this.Combo)
+            ImGui.Checkbox("Combo Ready", ref Combo);
+            if (Combo)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(optionsWidth);
-                ImGui.Combo("##ComboCombo", ref this.ComboValue, _comboOptions, _comboOptions.Length);
+                ImGui.Combo("##ComboCombo", ref ComboValue, _comboOptions, _comboOptions.Length);
                 ImGui.PopItemWidth();
             }
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("Action Usable", ref this.Usable);
+            ImGui.Checkbox("Action Usable", ref Usable);
             if (ImGui.IsItemHovered())
             {
                 ImGui.SetTooltip("Usable means resource/proc requirements to use the Action are met.");
             }
 
-            if (this.Usable)
+            if (Usable)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(optionsWidth);
-                ImGui.Combo("##UsableCombo", ref this.UsableValue, _usableOptions, _usableOptions.Length);
+                ImGui.Combo("##UsableCombo", ref UsableValue, _usableOptions, _usableOptions.Length);
                 ImGui.PopItemWidth();
             }
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("Target Range Check", ref this.RangeCheck);
-            if (this.RangeCheck)
+            ImGui.Checkbox("Target Range Check", ref RangeCheck);
+            if (RangeCheck)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(optionsWidth);
-                ImGui.Combo("##RangeCombo", ref this.RangeValue, _rangeOptions, _rangeOptions.Length);
+                ImGui.Combo("##RangeCombo", ref RangeValue, _rangeOptions, _rangeOptions.Length);
                 ImGui.PopItemWidth();
             }
 
             DrawHelpers.DrawNestIndicator(1);
-            ImGui.Checkbox("Target LoS Check", ref this.LosCheck);
-            if (this.LosCheck)
+            ImGui.Checkbox("Target LoS Check", ref LosCheck);
+            if (LosCheck)
             {
                 ImGui.SameLine();
                 padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(optionsWidth);
-                ImGui.Combo("##LosCombo", ref this.LosValue, _losOptions, _losOptions.Length);
+                ImGui.Combo("##LosCombo", ref LosValue, _losOptions, _losOptions.Length);
                 ImGui.PopItemWidth();
             }
         }
 
         private void ResetTrigger()
         {
-            this.TriggerData.Clear();
-            this.TriggerName = string.Empty;
-            this._triggerNameInput = string.Empty;
+            TriggerData.Clear();
+            TriggerName = string.Empty;
+            _triggerNameInput = string.Empty;
         }
 
         private void AddTriggerData(TriggerData triggerData)
         {
-            this.TriggerName = triggerData.Name.ToString();
-            this.TriggerData.Add(triggerData);
-            _triggerNameInput = this.TriggerName;
+            TriggerName = triggerData.Name.ToString();
+            TriggerData.Add(triggerData);
+            _triggerNameInput = TriggerName;
         }
     }
 }
