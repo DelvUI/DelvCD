@@ -5,6 +5,7 @@ using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text.Json.Serialization;
@@ -19,6 +20,7 @@ namespace DelvCD.UIElements
         public LabelListConfig LabelListConfig { get; set; }
         public VisibilityConfig VisibilityConfig { get; set; }
 
+        [JsonIgnore] private TriggerDataOp[] _thresholdOperators = new TriggerDataOp[] { TriggerDataOp.LessThan, TriggerDataOp.GreaterThan, TriggerDataOp.LessThanEq, TriggerDataOp.GreaterThanEq };
 
         [JsonIgnore] private TriggerConfig _triggerConfig = null!;
         public TriggerConfig TriggerConfig
@@ -77,7 +79,6 @@ namespace DelvCD.UIElements
 
             if (StyleConditions != null)
             {
-                StyleConditions.UpdateTriggerCount(dataSources.Length);
                 StyleConditions.UpdateDataSources(dataSources);
             }
         }
@@ -110,7 +111,6 @@ namespace DelvCD.UIElements
                     TriggerConfig = newPage;
                     break;
                 case StyleConditions<BarStyleConfig> newPage:
-                    newPage.UpdateTriggerCount(0);
                     newPage.UpdateDefaultStyle(BarStyleConfig);
                     newPage.UpdateDataSources(TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray());
                     StyleConditions = newPage;
@@ -123,159 +123,217 @@ namespace DelvCD.UIElements
 
         public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
-            //if (!TriggerConfig.TriggerOptions.Any())
-            //{
-            //    return;
-            //}
+            if (!TriggerConfig.TriggerOptions.Any())
+            {
+                return;
+            }
 
-            //bool visible = VisibilityConfig.IsVisible(parentVisible);
-            //if (!visible && !Preview)
-            //{
-            //    return;
-            //}
+            bool visible = VisibilityConfig.IsVisible(parentVisible);
+            if (!visible && !Preview)
+            {
+                return;
+            }
 
-            //bool triggered = TriggerConfig.IsTriggered(Preview, out int triggeredIndex);
-            //DataSource data = TriggerConfig.TriggerOptions[triggeredIndex].DataSource;
-            //DataSource[] datas = TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray();
-            //BarStyleConfig style = StyleConditions.GetStyle(datas, triggeredIndex) ?? BarStyleConfig;
+            bool triggered = TriggerConfig.IsTriggered(Preview, out int triggeredIndex);
+            DataSource data = TriggerConfig.TriggerOptions[triggeredIndex].DataSource;
+            DataSource[] datas = TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray();
+            BarStyleConfig style = StyleConditions.GetStyle(datas) ?? BarStyleConfig;
 
-            //Vector2 localPos = pos + style.Position;
-            //Vector2 size = style.Size;
+            Vector2 localPos = pos + style.Position;
+            Vector2 size = style.Size;
 
-            //if (Singletons.Get<PluginManager>().ShouldClip())
-            //{
-            //    ClipRect? clipRect = Singletons.Get<ClipRectsHelper>().GetClipRectForArea(localPos, size);
-            //    if (clipRect.HasValue)
-            //    {
-            //        return;
-            //    }
-            //}
+            if (Singletons.Get<PluginManager>().ShouldClip())
+            {
+                ClipRect? clipRect = Singletons.Get<ClipRectsHelper>().GetClipRectForArea(localPos, size);
+                if (clipRect.HasValue)
+                {
+                    return;
+                }
+            }
 
-            //if (triggered || Preview)
-            //{
-            //    UpdateStartData(data);
-            //    UpdateDragData(localPos, size);
+            LastFrameWasPreview = Preview;
 
-            //    DrawHelpers.DrawInWindow($"##{ID}", localPos, size, Preview, SetPosition, (drawList) =>
-            //    {
-            //        if (Preview)
-            //        {
-            //            data = UpdatePreviewData(data);
-            //            if (LastFrameWasDragging)
-            //            {
-            //                localPos = ImGui.GetWindowPos();
-            //                style.Position = localPos - pos;
-            //            }
-            //        }
+            if (!triggered && !Preview)
+            {
+                StartData = null;
+                StartTime = null;
+                return;
+            }
 
-            //        if (style.IconOption == 2)
-            //        {
-            //            return;
-            //        }
+            UpdateStartData(data);
+            UpdateDragData(localPos, size);
 
-            //        bool desaturate = style.DesaturateIcon;
-            //        float alpha = style.Opacity;
+            float realValue = datas[style.ProgressDataSourceIndex].GetProgressValue(style.ProgressDataSourceFieldIndex);
+            float progressMaxValue = datas[style.ProgressDataSourceIndex].GetMaxValue(style.ProgressDataSourceFieldIndex);
 
-            //        if (style.IconOption == 3)
-            //        {
-            //            drawList.AddRectFilled(localPos, localPos + size, style.IconColor.Base);
-            //        }
-            //        else
-            //        {
-            //            uint icon = style.IconOption switch
-            //            {
-            //                0 => data.Icon,
-            //                1 => style.CustomIcon,
-            //                _ => 0
-            //            };
+            float progressValue = Math.Min(realValue, progressMaxValue);
 
-            //            if (icon > 0)
-            //            {
-            //                DrawHelpers.DrawIcon(icon, localPos, size, style.CropIcon, 0, desaturate, alpha, drawList);
-            //            }
-            //        }
+            if (style.InvertValues && progressValue != 0)
+            {
+                progressValue = progressMaxValue - progressValue;
+            }
 
-            //        if (style.ShowProgressSwipe && datas.Length > style.ProgressDataSourceIndex)
-            //        {
-            //            float progressValue = datas[style.ProgressDataSourceIndex].GetProgressValue(style.ProgressDataSourceFieldIndex);
-            //            float progressMaxValue = datas[style.ProgressDataSourceIndex].GetMaxValue(style.ProgressDataSourceFieldIndex);
+            DrawHelpers.DrawInWindow($"##{ID}", localPos, size, Preview, SetPosition, (drawList) =>
+            {
+                if (Preview)
+                {
+                    data = UpdatePreviewData(data);
+                    if (LastFrameWasDragging)
+                    {
+                        localPos = ImGui.GetWindowPos();
+                        style.Position = localPos - pos;
+                    }
+                }
 
-            //            if (style.InvertValues)
-            //            {
-            //                progressValue = progressMaxValue - progressValue;
-            //            }
+                List<BarData> bars;
+                if (!style.Chunked)
+                {
+                    bars = new List<BarData>() { CalculateBar(size, progressValue, progressMaxValue, style.Direction) };
+                }
+                else
+                {
+                    int chunkCount = style.ChunkedStacksFromTrigger ? (int)progressMaxValue : style.ChunkCount;
+                    bars = CalculateChunkedBars(size, progressValue, progressMaxValue, chunkCount, style.ChunkPadding, style.Direction, style.IncompleteChunkColor);
+                }
 
-            //            if (style.GcdSwipe && (progressValue == 0 || progressMaxValue == 0 || style.GcdSwipeOnly))
-            //            {
-            //                ActionHelpers.GetGCDInfo(out var recastInfo);
-            //                DrawProgressSwipe(style, localPos, size, recastInfo.RecastTime - recastInfo.RecastTimeElapsed, recastInfo.RecastTime, alpha, drawList);
-            //            }
-            //            else
-            //            {
-            //                DrawProgressSwipe(style, localPos, size, progressValue, progressMaxValue, alpha, drawList);
-            //            }
-            //        }
+                foreach (BarData bar in bars)
+                {
+                    // background
+                    drawList.AddRectFilled(
+                        localPos + bar.BackgroundPosition,
+                        localPos + bar.BackgroundPosition + bar.BackgroundSize, 
+                        ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector)
+                    );
 
-            //        if (style.ShowBorder)
-            //        {
-            //            for (int i = 0; i < style.BorderThickness; i++)
-            //            {
-            //                Vector2 offset = new Vector2(i, i);
-            //                Vector4 color = style.BorderColor.Vector.AddTransparency(alpha);
-            //                drawList.AddRect(localPos + offset, localPos + size - offset, ImGui.ColorConvertFloat4ToU32(color));
-            //            }
-            //        }
+                    // fill
+                    ConfigColor fillColor = bar.FillColor ?? style.FillColor;
+                    if (bar.FillColor == null && style.Threshold)
+                    {
+                        TriggerDataOp op = _thresholdOperators[style.ThresholdOpIndex];
+                        if (Utils.GetResult(realValue, op, style.ThresholdValue))
+                        {
+                            fillColor = style.ThresholdColor;
+                        }
+                    }
 
-            //        if (style.Glow)
-            //        {
-            //            DrawIconGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
-            //        }
-            //    });
-            //}
-            //else
-            //{
-            //    StartData = null;
-            //    StartTime = null;
-            //}
+                    drawList.AddRectFilled(
+                        localPos + bar.FillPosition,
+                        localPos + bar.FillPosition + bar.FillSize, 
+                        ImGui.ColorConvertFloat4ToU32(fillColor.Vector)
+                    );
 
-            //foreach (Label label in LabelListConfig.Labels)
-            //{
-            //    if (!Preview && LastFrameWasPreview)
-            //    {
-            //        label.Preview = false;
-            //    }
-            //    else
-            //    {
-            //        label.Preview |= Preview;
-            //    }
+                    if (style.ShowBorder)
+                    {
+                        drawList.AddRect(
+                            localPos + bar.BackgroundPosition,
+                            localPos + bar.BackgroundPosition + bar.BackgroundSize,
+                            ImGui.ColorConvertFloat4ToU32(style.BorderColor.Vector)
+                        );
+                    }
 
-            //    if (triggered || label.Preview)
-            //    {
-            //        label.SetData(datas, triggeredIndex);
-            //        label.Draw(localPos, size, visible);
-            //    }
-            //}
+                    if (style.Glow)
+                    {
+                        DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                    }
+                }
+            });
 
-            //LastFrameWasPreview = Preview;
+            foreach (Label label in LabelListConfig.Labels)
+            {
+                if (!Preview && LastFrameWasPreview)
+                {
+                    label.Preview = false;
+                }
+                else
+                {
+                    label.Preview |= Preview;
+                }
+
+                if (triggered || label.Preview)
+                {
+                    label.SetData(datas, triggeredIndex);
+                    label.Draw(localPos, size, visible);
+                }
+            }
         }
 
-        private void DrawIconGlow(Vector2 pos, Vector2 size, int thickness, int segments, float speed, ConfigColor col1, ConfigColor col2, ImDrawListPtr drawList)
+        private BarData CalculateBar(Vector2 size, float progress, float max, BarDirection direction)
         {
-            speed = Math.Abs(speed);
-            int mod = speed == 0 ? 1 : (int)(250 / speed);
-            float prog = (float)(DateTimeOffset.Now.ToUnixTimeMilliseconds() % mod) / mod;
+            return CalculateBar(Vector2.Zero, size, progress, max, direction);
+        }
 
-            float offset = thickness / 2 + thickness % 2;
-            Vector2 pad = new Vector2(offset);
-            Vector2 c1 = new Vector2(pos.X, pos.Y);
-            Vector2 c2 = new Vector2(pos.X + size.X, pos.Y);
-            Vector2 c3 = new Vector2(pos.X + size.X, pos.Y + size.Y);
-            Vector2 c4 = new Vector2(pos.X, pos.Y + size.Y);
+        private BarData CalculateBar(Vector2 pos, Vector2 size, float progress, float max, BarDirection direction)
+        {
+            BarData bar = new();
+            bar.BackgroundPosition = pos;
+            bar.BackgroundSize = size;
 
-            DrawHelpers.DrawSegmentedLineHorizontal(drawList, c1, size.X, thickness, prog, segments, col1, col2);
-            DrawHelpers.DrawSegmentedLineVertical(drawList, c2.AddX(-thickness), thickness, size.Y, prog, segments, col1, col2);
-            DrawHelpers.DrawSegmentedLineHorizontal(drawList, c3.AddY(-thickness), -size.X, thickness, prog, segments, col1, col2);
-            DrawHelpers.DrawSegmentedLineVertical(drawList, c4, thickness, -size.Y, prog, segments, col1, col2);
+            float fillPercent = max == 0 ? 1f : Math.Clamp(progress / max , 0f, 1f);
+
+            bar.FillSize = direction == BarDirection.Left || direction == BarDirection.Right ?
+                new(size.X * fillPercent, size.Y) : 
+                new(size.X, size.Y * fillPercent);
+
+            bar.FillPosition = direction switch
+            {
+                BarDirection.Right => pos,
+                BarDirection.Left => new(pos.X + size.X - bar.FillSize.X, pos.Y),
+                BarDirection.Up => new Vector2(pos.X, pos.Y + size.Y - bar.FillSize.Y),
+                BarDirection.Down => pos,
+                _ => Vector2.Zero,
+            };
+
+            return bar;
+        }
+
+        private List<BarData> CalculateChunkedBars(Vector2 size, float progress, float max, int count, int padding, BarDirection direction, ConfigColor incompleteColor)
+        {
+            if (count == 1)
+            {
+                return new List<BarData>() { CalculateBar(size, progress, 1, direction) };
+            }
+
+            bool horizontal = direction == BarDirection.Right || direction == BarDirection.Left;
+            bool reversed = direction == BarDirection.Left || direction == BarDirection.Up;
+
+            int paddingCount = count - 1;
+            int chunkLength = horizontal ?
+                (int)((size.X - (paddingCount * padding)) / count) :
+                (int)((size.Y - (paddingCount * padding)) / count);
+
+            Vector2 chunkSize = horizontal ?
+                new(chunkLength, size.Y) :
+                new(size.X, chunkLength);
+
+            float chunkProgressSize = max / count;
+            float remaining = progress;
+            //float chunkProgress = Math.Min(remaining, chunkProgressSize);
+
+            Vector2 pos = Vector2.Zero;
+            List<BarData> bars = new(count);
+
+            for (int i = 0; i < count; i++)
+            {
+                int index = reversed ? count - i - 1 : i;
+                float chunkProgress = Math.Min(progress - (chunkProgressSize * index), chunkProgressSize);
+                BarData bar = CalculateBar(pos, chunkSize, chunkProgress, chunkProgressSize, direction);
+
+                pos = horizontal ?
+                    new Vector2(pos.X + padding + chunkLength, pos.Y) :
+                    new Vector2(pos.X, pos.Y + padding + chunkLength);
+
+                if (chunkProgress < chunkProgressSize)
+                {
+                    bar.FillColor = incompleteColor;
+                }
+
+                bars.Add(bar);
+
+                remaining = Math.Max(0, remaining - chunkProgressSize);
+                //chunkProgress = Math.Min(remaining, chunkProgressSize);
+            }
+
+            return bars;
         }
 
         public void Resize(Vector2 size, bool conditions)
@@ -317,5 +375,16 @@ namespace DelvCD.UIElements
             newBar.ImportPage(newBar.LabelListConfig.GetDefault());
             return newBar;
         }
+    }
+
+    internal struct BarData
+    {
+        public Vector2 BackgroundPosition;
+        public Vector2 BackgroundSize;
+
+        public Vector2 FillPosition;
+        public Vector2 FillSize;
+
+        public ConfigColor? FillColor;
     }
 }

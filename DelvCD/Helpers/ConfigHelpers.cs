@@ -195,9 +195,9 @@ namespace DelvCD.Helpers
                 {
                     condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
 
-                    if (condition.Source > 2)
+                    if (condition.Source >= 3)
                     {
-                        condition.Source -= 2;
+                        condition.Source -= 3;
                     }
                 }
 
@@ -207,9 +207,9 @@ namespace DelvCD.Helpers
                     {
                         condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
 
-                        if (condition.Source > 2)
+                        if (condition.Source >= 3)
                         {
-                            condition.Source -= 2;
+                            condition.Source -= 3;
                         }
                     }
                 }
@@ -220,9 +220,9 @@ namespace DelvCD.Helpers
                 {
                     condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
 
-                    if (condition.Source > 2)
+                    if (condition.Source >= 3)
                     {
-                        condition.Source -= 2;
+                        condition.Source -= 3;
                     }
                 }
             }
@@ -232,9 +232,9 @@ namespace DelvCD.Helpers
                 {
                     condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
 
-                    if (condition.Source > 2)
+                    if (condition.Source >= 3)
                     {
-                        condition.Source -= 2;
+                        condition.Source -= 3;
                     }
                 }
             }

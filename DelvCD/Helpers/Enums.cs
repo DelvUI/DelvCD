@@ -60,7 +60,7 @@ namespace DelvCD.Helpers
         Right,
         Left,
         Up,
-        Down
+        Down,
     }
 
     public enum Job

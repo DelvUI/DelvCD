@@ -73,7 +73,7 @@ namespace DelvCD.Config
                 return;
             }
 
-            ProgressDataSourceIndex = Math.Clamp(ProgressDataSourceIndex, 0, dataSources.Length);
+            ProgressDataSourceIndex = Math.Clamp(ProgressDataSourceIndex, 0, dataSources.Length - 1);
 
             _progressDataSourceOptions = new string[dataSources.Length];
             for (int i = 0; i < dataSources.Length; i++)
@@ -83,7 +83,7 @@ namespace DelvCD.Config
             
             _progressDataSourceFieldOptions = dataSources[ProgressDataSourceIndex].ProgressFieldNames.ToArray();
 
-            ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length);
+            ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length - 1);
         }
 
         public void DrawConfig(IConfigurable parent, Vector2 size, float padX, float padY)

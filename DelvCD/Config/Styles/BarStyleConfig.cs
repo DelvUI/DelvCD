@@ -17,12 +17,9 @@ namespace DelvCD.Config
 
         [JsonIgnore] public string Name => "Bar";
 
-        [JsonIgnore] private string _iconSearchInput = string.Empty;
-        [JsonIgnore] private List<TriggerData> _iconSearchResults = new List<TriggerData>();
         [JsonIgnore] private Vector2 _screenSize = ImGui.GetMainViewport().Size;
 
         [JsonIgnore] private string[] _directionOptions = Enum.GetNames<BarDirection>();
-        [JsonIgnore] private TriggerDataOp[] _thresholdOperators = new TriggerDataOp[] { TriggerDataOp.LessThan, TriggerDataOp.GreaterThan, TriggerDataOp.LessThanEq, TriggerDataOp.GreaterThanEq };
         [JsonIgnore] private string[] _thresholdOpOptions = new string[] { "<", ">", "<=", ">=" };
 
         [JsonIgnore] private DataSource[] _dataSources = new DataSource[] { };
@@ -31,6 +28,7 @@ namespace DelvCD.Config
 
         public int ProgressDataSourceIndex = 0;
         public int ProgressDataSourceFieldIndex = 0;
+        public bool InvertValues = false;
 
         public Vector2 Position = Vector2.Zero;
         public Vector2 Size = new Vector2(200, 20);
@@ -44,8 +42,8 @@ namespace DelvCD.Config
 
         public bool Chunked = false;
         public bool ChunkedStacksFromTrigger = true;
-        public int ChunkSize = 1;
         public int ChunkCount = 5;
+        public int ChunkPadding = 2;
         public ConfigColor IncompleteChunkColor = new ConfigColor(0.6f, 0.6f, 0.6f, 1);
 
         public bool Threshold = false;
@@ -108,6 +106,9 @@ namespace DelvCD.Config
                     ImGui.PushItemWidth(200 * _scale);
                     ImGui.Combo("##DataSourceFieldCombo", ref ProgressDataSourceFieldIndex, _progressDataSourceFieldOptions, _progressDataSourceFieldOptions.Length);
                     ImGui.PopItemWidth();
+
+                    ImGui.SameLine();
+                    ImGui.Checkbox("Invert Values", ref InvertValues);
                 }
                 else
                 {
@@ -160,6 +161,11 @@ namespace DelvCD.Config
                         ChunkedStacksFromTrigger = true;
                     }
 
+                    if (ImGui.IsItemHovered())
+                    {
+                        ImGui.SetTooltip("Assumes the trigger data to be stacks and each chunk will represent one stack.");
+                    }
+
                     ImGui.SameLine();
                     if (ImGui.RadioButton("Custom", !ChunkedStacksFromTrigger))
                     {
@@ -169,11 +175,11 @@ namespace DelvCD.Config
                     if (!ChunkedStacksFromTrigger)
                     {
                         DrawHelpers.DrawNestIndicator(1);
-                        ImGui.DragInt("Chunk Size", ref ChunkSize, 0.1f, 1, 1000);
-
-                        DrawHelpers.DrawNestIndicator(1);
                         ImGui.DragInt("Chunk Count", ref ChunkCount, 0.1f, 1, 200);
                     }
+
+                    DrawHelpers.DrawNestIndicator(1);
+                    ImGui.DragInt("Chunk Padding", ref ChunkPadding, 0.1f, 0, 50);
 
                     DrawHelpers.DrawNestIndicator(1);
                     vector = IncompleteChunkColor.Vector;
@@ -190,7 +196,7 @@ namespace DelvCD.Config
                 {
                     DrawHelpers.DrawNestIndicator(1);
                     ImGui.PushItemWidth(100 * _scale);
-                    ImGui.Combo("##OpCombo", ref ThresholdOpIndex, _thresholdOpOptions, _thresholdOperators.Length);
+                    ImGui.Combo("##OpCombo", ref ThresholdOpIndex, _thresholdOpOptions, _thresholdOpOptions.Length);
                     ImGui.PopItemWidth();
 
                     ImGui.SameLine();

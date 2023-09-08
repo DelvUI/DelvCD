@@ -149,92 +149,91 @@ namespace DelvCD.UIElements
                 }
             }
 
-            if (triggered || Preview)
-            {
-                UpdateStartData(data);
-                UpdateDragData(localPos, size);
-
-                DrawHelpers.DrawInWindow($"##{ID}", localPos, size, Preview, SetPosition, (drawList) =>
-                {
-                    if (Preview)
-                    {
-                        data = UpdatePreviewData(data);
-                        if (LastFrameWasDragging)
-                        {
-                            localPos = ImGui.GetWindowPos();
-                            style.Position = localPos - pos;
-                        }
-                    }
-
-                    if (style.IconOption == 2)
-                    {
-                        return;
-                    }
-
-                    bool desaturate = style.DesaturateIcon;
-                    float alpha = style.Opacity;
-
-                    if (style.IconOption == 3)
-                    {
-                        drawList.AddRectFilled(localPos, localPos + size, style.IconColor.Base);
-                    }
-                    else
-                    {
-                        uint icon = style.IconOption switch
-                        {
-                            0 => data.Icon,
-                            1 => style.CustomIcon,
-                            _ => 0
-                        };
-
-                        if (icon > 0)
-                        {
-                            DrawHelpers.DrawIcon(icon, localPos, size, style.CropIcon, 0, desaturate, alpha, drawList);
-                        }
-                    }
-
-                    if (style.ShowProgressSwipe && datas.Length > style.ProgressDataSourceIndex)
-                    {
-                        float progressValue = datas[style.ProgressDataSourceIndex].GetProgressValue(style.ProgressDataSourceFieldIndex);
-                        float progressMaxValue = datas[style.ProgressDataSourceIndex].GetMaxValue(style.ProgressDataSourceFieldIndex);
-
-                        if (style.InvertValues)
-                        {
-                            progressValue = progressMaxValue - progressValue;
-                        }
-
-                        if (style.GcdSwipe && (progressValue == 0 || progressMaxValue == 0 || style.GcdSwipeOnly))
-                        {
-                            ActionHelpers.GetGCDInfo(out var recastInfo);
-                            DrawProgressSwipe(style, localPos, size, recastInfo.RecastTime - recastInfo.RecastTimeElapsed, recastInfo.RecastTime, alpha, drawList);
-                        }
-                        else
-                        {
-                            DrawProgressSwipe(style, localPos, size, progressValue, progressMaxValue, alpha, drawList);
-                        }
-                    }
-
-                    if (style.ShowBorder)
-                    {
-                        for (int i = 0; i < style.BorderThickness; i++)
-                        {
-                            Vector2 offset = new Vector2(i, i);
-                            Vector4 color = style.BorderColor.Vector.AddTransparency(alpha);
-                            drawList.AddRect(localPos + offset, localPos + size - offset, ImGui.ColorConvertFloat4ToU32(color));
-                        }
-                    }
-
-                    if (style.Glow)
-                    {
-                        DrawIconGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
-                    }
-                });
-            }
-            else
+            if (!triggered && !Preview)
             {
                 StartData = null;
                 StartTime = null;
+                return;
             }
+
+            UpdateStartData(data);
+            UpdateDragData(localPos, size);
+
+            DrawHelpers.DrawInWindow($"##{ID}", localPos, size, Preview, SetPosition, (drawList) =>
+            {
+                if (Preview)
+                {
+                    data = UpdatePreviewData(data);
+                    if (LastFrameWasDragging)
+                    {
+                        localPos = ImGui.GetWindowPos();
+                        style.Position = localPos - pos;
+                    }
+                }
+
+                if (style.IconOption == 2)
+                {
+                    return;
+                }
+
+                bool desaturate = style.DesaturateIcon;
+                float alpha = style.Opacity;
+
+                if (style.IconOption == 3)
+                {
+                    drawList.AddRectFilled(localPos, localPos + size, style.IconColor.Base);
+                }
+                else
+                {
+                    uint icon = style.IconOption switch
+                    {
+                        0 => data.Icon,
+                        1 => style.CustomIcon,
+                        _ => 0
+                    };
+
+                    if (icon > 0)
+                    {
+                        DrawHelpers.DrawIcon(icon, localPos, size, style.CropIcon, 0, desaturate, alpha, drawList);
+                    }
+                }
+
+                if (style.ShowProgressSwipe && datas.Length > style.ProgressDataSourceIndex)
+                {
+                    float progressValue = datas[style.ProgressDataSourceIndex].GetProgressValue(style.ProgressDataSourceFieldIndex);
+                    float progressMaxValue = datas[style.ProgressDataSourceIndex].GetMaxValue(style.ProgressDataSourceFieldIndex);
+
+                    if (style.InvertValues)
+                    {
+                        progressValue = progressMaxValue - progressValue;
+                    }
+
+                    if (style.GcdSwipe && (progressValue == 0 || progressMaxValue == 0 || style.GcdSwipeOnly))
+                    {
+                        ActionHelpers.GetGCDInfo(out var recastInfo);
+                        DrawProgressSwipe(style, localPos, size, recastInfo.RecastTime - recastInfo.RecastTimeElapsed, recastInfo.RecastTime, alpha, drawList);
+                    }
+                    else
+                    {
+                        DrawProgressSwipe(style, localPos, size, progressValue, progressMaxValue, alpha, drawList);
+                    }
+                }
+
+                if (style.ShowBorder)
+                {
+                    for (int i = 0; i < style.BorderThickness; i++)
+                    {
+                        Vector2 offset = new Vector2(i, i);
+                        Vector4 color = style.BorderColor.Vector.AddTransparency(alpha);
+                        drawList.AddRect(localPos + offset, localPos + size - offset, ImGui.ColorConvertFloat4ToU32(color));
+                    }
+                }
+
+                if (style.Glow)
+                {
+                    DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                }
+            });
 
             foreach (Label label in LabelListConfig.Labels)
             {
@@ -305,26 +304,6 @@ namespace DelvCD.UIElements
 
             ImGui.PopClipRect();
         }
-
-        private void DrawIconGlow(Vector2 pos, Vector2 size, int thickness, int segments, float speed, ConfigColor col1, ConfigColor col2, ImDrawListPtr drawList)
-        {
-            speed = Math.Abs(speed);
-            int mod = speed == 0 ? 1 : (int)(250 / speed);
-            float prog = (float)(DateTimeOffset.Now.ToUnixTimeMilliseconds() % mod) / mod;
-
-            float offset = thickness / 2 + thickness % 2;
-            Vector2 pad = new Vector2(offset);
-            Vector2 c1 = new Vector2(pos.X, pos.Y);
-            Vector2 c2 = new Vector2(pos.X + size.X, pos.Y);
-            Vector2 c3 = new Vector2(pos.X + size.X, pos.Y + size.Y);
-            Vector2 c4 = new Vector2(pos.X, pos.Y + size.Y);
-
-            DrawHelpers.DrawSegmentedLineHorizontal(drawList, c1, size.X, thickness, prog, segments, col1, col2);
-            DrawHelpers.DrawSegmentedLineVertical(drawList, c2.AddX(-thickness), thickness, size.Y, prog, segments, col1, col2);
-            DrawHelpers.DrawSegmentedLineHorizontal(drawList, c3.AddY(-thickness), -size.X, thickness, prog, segments, col1, col2);
-            DrawHelpers.DrawSegmentedLineVertical(drawList, c4, thickness, -size.Y, prog, segments, col1, col2);
-        }
-
         public void Resize(Vector2 size, bool conditions)
         {
             IconStyleConfig.Size = size;
