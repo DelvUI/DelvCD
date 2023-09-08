@@ -76,13 +76,12 @@ namespace DelvCD.Config
 
             ProgressDataSourceIndex = Math.Clamp(ProgressDataSourceIndex, 0, dataSources.Length);
 
-            List<string> list = new();
+            _progressDataSourceOptions = new string[dataSources.Length];
             for (int i = 0; i < dataSources.Length; i++)
             {
-                list.Add("Trigger " + (i + 1));
+                _progressDataSourceOptions[i] = $"Trigger {i + 1}";
             }
             
-            _progressDataSourceOptions = list.ToArray();
             _progressDataSourceFieldOptions = dataSources[ProgressDataSourceIndex].ProgressFieldNames.ToArray();
 
             ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length);

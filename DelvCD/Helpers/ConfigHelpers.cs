@@ -1,4 +1,5 @@
-﻿using Dalamud.Interface.Internal.Notifications;
+﻿using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Interface.Internal.Notifications;
 using Dalamud.Logging;
 using DelvCD.Config;
 using DelvCD.UIElements;
@@ -99,6 +100,15 @@ namespace DelvCD.Helpers
                 decodedJsonString = SanitizedJsonString(decodedJsonString);
 
                 T? importedObj = JsonConvert.DeserializeObject<T>(decodedJsonString, _serializerSettings);
+
+                if (!decodedJsonString.Contains("\"Version\":"))
+                {
+                    if (importedObj is UIElement element)
+                    {
+                        MigrateStyleConditions(element);
+                    }
+                }
+
                 return importedObj;
             }
             catch (Exception ex)
@@ -169,45 +179,34 @@ namespace DelvCD.Helpers
         {
             foreach (UIElement element in elements)
             {
-                if (element is Group group)
-                {
-                    MigrateStyleConditions(group.ElementList.UIElements);
-                }
-                else if (element is Icon icon)
-                {
-                    foreach (StyleCondition<IconStyleConfig> condition in icon.StyleConditions.Conditions)
-                    {
-                        if (condition.Source > 2)
-                        {
-                            condition.Source -= 2;
-                        }
-                    }
+                MigrateStyleConditions(element);
+            }
+        }
 
-                    foreach (Label label in icon.LabelListConfig.Labels)
-                    {
-                        foreach (StyleCondition<LabelStyleConfig> condition in label.StyleConditions.Conditions)
-                        {
-                            if (condition.Source > 2)
-                            {
-                                condition.Source -= 2;
-                            }
-                        }
-                    }
-                }
-                else if (element is Bar bar)
+        public static void MigrateStyleConditions(UIElement element)
+        {
+            if (element is Group group)
+            {
+                MigrateStyleConditions(group.ElementList.UIElements);
+            }
+            else if (element is Icon icon)
+            {
+                foreach (StyleCondition<IconStyleConfig> condition in icon.StyleConditions.Conditions)
                 {
-                    foreach (StyleCondition<BarStyleConfig> condition in bar.StyleConditions.Conditions)
+                    condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
+
+                    if (condition.Source > 2)
                     {
-                        if (condition.Source > 2)
-                        {
-                            condition.Source -= 2;
-                        }
+                        condition.Source -= 2;
                     }
                 }
-                else if (element is Label label)
+
+                foreach (Label label in icon.LabelListConfig.Labels)
                 {
                     foreach (StyleCondition<LabelStyleConfig> condition in label.StyleConditions.Conditions)
                     {
+                        condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
+
                         if (condition.Source > 2)
                         {
                             condition.Source -= 2;
@@ -215,8 +214,32 @@ namespace DelvCD.Helpers
                     }
                 }
             }
-        }
+            else if (element is Bar bar)
+            {
+                foreach (StyleCondition<BarStyleConfig> condition in bar.StyleConditions.Conditions)
+                {
+                    condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
 
+                    if (condition.Source > 2)
+                    {
+                        condition.Source -= 2;
+                    }
+                }
+            }
+            else if (element is Label label)
+            {
+                foreach (StyleCondition<LabelStyleConfig> condition in label.StyleConditions.Conditions)
+                {
+                    condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
+
+                    if (condition.Source > 2)
+                    {
+                        condition.Source -= 2;
+                    }
+                }
+            }
+        }
+        
         public static void SaveConfig()
         {
             ConfigHelpers.SaveConfig(Singletons.Get<DelvCDConfig>());

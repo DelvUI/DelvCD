@@ -65,7 +65,7 @@ namespace DelvCD.UIElements
             Vector2 size = parentSize.HasValue ? parentSize.Value : ImGui.GetMainViewport().Size;
             pos = parentSize.HasValue ? pos : Vector2.Zero;
 
-            LabelStyleConfig style = StyleConditions.GetStyle(_data, _dataIndex) ?? LabelStyleConfig;
+            LabelStyleConfig style = StyleConditions.GetStyle(_data) ?? LabelStyleConfig;
 
             string text = _data is not null && _dataIndex < _data.Length && _data[_dataIndex] is not null
                 ? _data[_dataIndex].GetFormattedString(style.TextFormat, "N", style.Rounding)
@@ -91,7 +91,6 @@ namespace DelvCD.UIElements
             _data = data;
             _dataIndex = index;
 
-            StyleConditions.UpdateTriggerCount(data.Length);
             StyleConditions.UpdateDataSources(data);
         }
     }
