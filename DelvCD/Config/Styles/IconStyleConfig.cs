@@ -106,6 +106,8 @@ namespace DelvCD.Config
 
                 ProgressDataSourceIndex = newIndex;
                 _progressDataSourceFieldOptions = dataSources[newIndex].ProgressFieldNames.ToArray();
+
+                NeedsDataSourceCheck = false;
             }
         }
 
