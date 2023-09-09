@@ -205,15 +205,6 @@ namespace DelvCD.UIElements
 
                     // fill
                     ConfigColor fillColor = bar.FillColor ?? style.FillColor;
-                    if (bar.FillColor == null && style.Threshold)
-                    {
-                        TriggerDataOp op = _thresholdOperators[style.ThresholdOpIndex];
-                        if (Utils.GetResult(realValue, op, style.ThresholdValue))
-                        {
-                            fillColor = style.ThresholdColor;
-                        }
-                    }
-
                     drawList.AddRectFilled(
                         localPos + bar.FillPosition,
                         localPos + bar.FillPosition + bar.FillSize,

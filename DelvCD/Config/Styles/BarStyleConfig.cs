@@ -46,11 +46,6 @@ namespace DelvCD.Config
         public int ChunkPadding = 2;
         public ConfigColor IncompleteChunkColor = new ConfigColor(0.6f, 0.6f, 0.6f, 1);
 
-        public bool Threshold = false;
-        public float ThresholdValue = 10;
-        public int ThresholdOpIndex = 0;
-        public ConfigColor ThresholdColor = new ConfigColor(1, 0.8f, 0.8f, 1);
-
         public bool Glow = false;
         public int GlowThickness = 2;
         public int GlowSegments = 8;
@@ -186,29 +181,6 @@ namespace DelvCD.Config
                     if (ImGui.ColorEdit4("Incomplete Chunk Color", ref vector, ImGuiColorEditFlags.AlphaPreview | ImGuiColorEditFlags.AlphaBar))
                     {
                         IncompleteChunkColor.Vector = vector;
-                    }
-                }
-
-                // threshold
-                ImGui.NewLine();
-                ImGui.Checkbox("Threshold", ref Threshold);
-                if (Threshold)
-                {
-                    DrawHelpers.DrawNestIndicator(1);
-                    ImGui.PushItemWidth(100 * _scale);
-                    ImGui.Combo("##OpCombo", ref ThresholdOpIndex, _thresholdOpOptions, _thresholdOpOptions.Length);
-                    ImGui.PopItemWidth();
-
-                    ImGui.SameLine();
-                    ImGui.PushItemWidth(180 * _scale);
-                    ImGui.DragFloat("##Value", ref ThresholdValue, 0.1f);
-                    ImGui.PopItemWidth();
-
-                    DrawHelpers.DrawNestIndicator(1);
-                    vector = ThresholdColor.Vector;
-                    if (ImGui.ColorEdit4("Threshold Color", ref vector, ImGuiColorEditFlags.AlphaPreview | ImGuiColorEditFlags.AlphaBar))
-                    {
-                        ThresholdColor.Vector = vector;
                     }
                 }
 
