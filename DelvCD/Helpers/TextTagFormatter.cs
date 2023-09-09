@@ -116,6 +116,21 @@ namespace DelvCD.Helpers
             _ => FloatFormat(num, format, decimals, rounding)
         };
 
+        public static string GetFormattedString(DataSource[] dataSources, string format, string numberFormat, int rounding)
+        {
+            string result = format;
+
+            foreach (DataSource dataSource in dataSources)
+            {
+                result = TextTagRegex.Replace(
+                    result,
+                    new TextTagFormatter(dataSource, numberFormat, rounding, dataSource.GetType()).Evaluate
+                );
+            }
+
+            return result;
+        }
+
 
         public static void InitializeTextTags()
         {

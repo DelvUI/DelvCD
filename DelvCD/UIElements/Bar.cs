@@ -240,7 +240,7 @@ namespace DelvCD.UIElements
 
                 if (triggered || label.Preview)
                 {
-                    label.SetData(datas, triggeredIndex);
+                    label.UpdateDataSources(datas);
                     label.Draw(localPos, size, visible);
                 }
             }

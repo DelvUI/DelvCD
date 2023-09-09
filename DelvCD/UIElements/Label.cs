@@ -11,8 +11,7 @@ namespace DelvCD.UIElements
 {
     public class Label : UIElement
     {
-        [JsonIgnore] private DataSource[]? _data;
-        [JsonIgnore] private int _dataIndex;
+        [JsonIgnore] private DataSource[]? _dataSources;
 
         public override ElementType Type => ElementType.Label;
 
@@ -65,11 +64,11 @@ namespace DelvCD.UIElements
             Vector2 size = parentSize.HasValue ? parentSize.Value : ImGui.GetMainViewport().Size;
             pos = parentSize.HasValue ? pos : Vector2.Zero;
 
-            LabelStyleConfig style = StyleConditions.GetStyle(_data) ?? LabelStyleConfig;
+            LabelStyleConfig style = StyleConditions.GetStyle(_dataSources) ?? LabelStyleConfig;
 
-            string text = _data is not null && _dataIndex < _data.Length && _data[_dataIndex] is not null
-                ? _data[_dataIndex].GetFormattedString(style.TextFormat, "N", style.Rounding)
-                : style.TextFormat;
+            string text = _dataSources == null ? 
+                style.TextFormat : 
+                TextTagFormatter.GetFormattedString(_dataSources, style.TextFormat, "N", style.Rounding);
 
             using (FontsManager.PushFont(style.FontKey))
             {
@@ -86,10 +85,9 @@ namespace DelvCD.UIElements
             }
         }
 
-        public void SetData(DataSource[] data, int index)
+        public void UpdateDataSources(DataSource[] data)
         {
-            _data = data;
-            _dataIndex = index;
+            _dataSources = data;
 
             StyleConditions.UpdateDataSources(data);
         }

@@ -28,13 +28,5 @@ namespace DelvCD.Helpers.DataSources
 
         public abstract float GetProgressValue(int index);
         public abstract float GetMaxValue(int index);
-
-
-        public string GetFormattedString(string format, string numberFormat, int rounding)
-        {
-            return TextTagFormatter.TextTagRegex.Replace(
-                format,
-                new TextTagFormatter(this, numberFormat, rounding, GetType()).Evaluate);
-        }
     }
 }
