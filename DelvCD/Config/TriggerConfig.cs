@@ -48,8 +48,6 @@ namespace DelvCD.Config
             }
         }
 
-        public int DataTrigger = 0;
-
         public event TriggerOptionsUpdateEventHandler? TriggerOptionsUpdateEvent;
 
         public TriggerConfig()
@@ -60,7 +58,7 @@ namespace DelvCD.Config
 
         public bool IsTriggered(bool preview, out int triggeredIndex)
         {
-            triggeredIndex = DataTrigger == 0 ? 0 : DataTrigger - 1;
+            triggeredIndex = 0;
             if (!TriggerOptions.Any())
             {
                 return false;
@@ -82,7 +80,7 @@ namespace DelvCD.Config
                     _ => false
                 };
 
-                if (!anyTriggered && currentTriggered && DataTrigger == 0)
+                if (!anyTriggered && currentTriggered)
                 {
                     triggeredIndex = i;
                 }
@@ -124,12 +122,6 @@ namespace DelvCD.Config
 
             if (ImGui.BeginChild("##TriggerConfig", new Vector2(size.X, size.Y), true))
             {
-                if (TriggerOptions.Count > 1)
-                {
-                    string[] dataTriggerOptions = GetTriggerDataOptions();
-                    ImGui.Combo("Use data from Trigger", ref DataTrigger, dataTriggerOptions, dataTriggerOptions.Length);
-                }
-
                 ImGui.Text("Trigger List");
                 ImGuiTableFlags tableFlags =
                     ImGuiTableFlags.RowBg |
@@ -327,10 +319,6 @@ namespace DelvCD.Config
             {
                 TriggerOptions.RemoveAt(i);
                 _selectedIndex = Math.Clamp(_selectedIndex, 0, TriggerOptions.Count - 1);
-                if (TriggerOptions.Count <= 1 || DataTrigger >= i + 1)
-                {
-                    DataTrigger = 0;
-                }
 
                 TriggerOptionsUpdateEvent?.Invoke(this);
             }

@@ -1,10 +1,18 @@
 # Version 0.4.0.0
+- Conditions data options are now dynamically populated depending on the triggers in that element:
+  * The condition properties were fixed before which resulted in confusing behavior if the element didnd't contain the appropiate trigger types.
+  * The "Dynamic" option was removed.
+
+- Updated how the data from triggers is used for Icon swipe animations:
+  * The trigger and its property must be explicitly set to determine what progress is being tracked.
+  * Some of your Icons might need to be manually corrected.
+
 - Added JobGauge triggers:
   * These allow you to use data from your job gauges to make conditions.
   * They only work when playing on the corresponding job.
 
-- Icon's progress swipe animation now requires to specify which data from a trigger it will use to track progress.
-- When adding conditions to an element, the data options will be dynamically populated according to the triggers in that element.
+- Added Bar elements:
+  * Similar to the Icon's swipe animations, these need to be linked to a trigger property to track its progress.
 
 # Version 0.3.0.0
 - Fixed config windows not adjusting to Dalamud's Global Font Scale.
