@@ -194,12 +194,10 @@ namespace DelvCD.Helpers
             else if (element is Icon icon)
             {
                 DataSource[] dataSources = icon.TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray();
-                icon.IconStyleConfig.NeedsDataSourceCheck = true;
-                icon.IconStyleConfig.UpdateDataSources(dataSources);
+                icon.IconStyleConfig.UpdateDataSources(dataSources, true);
 
                 foreach (StyleCondition<IconStyleConfig> condition in icon.StyleConditions.Conditions)
                 {
-                    condition.Style.NeedsDataSourceCheck = true;
                     condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
 
                     if (condition.Source >= 3)
@@ -208,7 +206,7 @@ namespace DelvCD.Helpers
                     }
                 }
 
-                icon.StyleConditions.UpdateDataSources(dataSources);
+                icon.StyleConditions.UpdateDataSources(dataSources, true);
 
                 foreach (Label label in icon.LabelListConfig.Labels)
                 {

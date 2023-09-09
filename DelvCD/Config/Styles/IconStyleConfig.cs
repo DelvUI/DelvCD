@@ -24,8 +24,6 @@ namespace DelvCD.Config
         [JsonIgnore] private string[] _progressDataSourceOptions = new string[] { };
         [JsonIgnore] private string[] _progressDataSourceFieldOptions = new string[] { };
 
-        [JsonIgnore] public bool NeedsDataSourceCheck = false;
-
         public Vector2 Position = Vector2.Zero;
         public Vector2 Size = new Vector2(40, 40);
         public bool ShowBorder = true;
@@ -62,7 +60,7 @@ namespace DelvCD.Config
         public IConfigPage GetDefault() => new IconStyleConfig();
 
 
-        public void UpdateDataSources(DataSource[] dataSources)
+        public void UpdateDataSources(DataSource[] dataSources, bool needsDataSourceCheck = false)
         {
             _dataSources = dataSources.Where(x => x.ProgressFieldNames.Count > 0).ToArray();
 
@@ -87,7 +85,7 @@ namespace DelvCD.Config
 
             ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length - 1);
 
-            if (NeedsDataSourceCheck)
+            if (needsDataSourceCheck)
             {
                 int newIndex = 0;
 
@@ -106,8 +104,6 @@ namespace DelvCD.Config
 
                 ProgressDataSourceIndex = newIndex;
                 _progressDataSourceFieldOptions = dataSources[newIndex].ProgressFieldNames.ToArray();
-
-                NeedsDataSourceCheck = false;
             }
         }
 

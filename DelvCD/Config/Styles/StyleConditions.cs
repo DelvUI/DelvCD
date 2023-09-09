@@ -66,11 +66,11 @@ namespace DelvCD.Config
             } || Singletons.Get<PluginManager>().IsConfigurableOpen(this);
         }
 
-        public void UpdateDataSources(DataSource[] dataSources)
+        public void UpdateDataSources(DataSource[] dataSources, bool needsDataSourceCheck = false)
         {
             if (Style is IconStyleConfig iconStyle)
             {
-                iconStyle.UpdateDataSources(dataSources);
+                iconStyle.UpdateDataSources(dataSources, needsDataSourceCheck);
             }
             else if (Style is BarStyleConfig barStyle)
             {
@@ -139,7 +139,7 @@ namespace DelvCD.Config
             return true;
         }
 
-        public void UpdateDataSources(DataSource[] dataSources)
+        public void UpdateDataSources(DataSource[] dataSources, bool needsDataSourceCheck = false)
         {
             if (CompareDataSources(dataSources))
             {
@@ -157,7 +157,7 @@ namespace DelvCD.Config
 
             foreach (var condition in Conditions)
             {
-                condition.UpdateDataSources(dataSources);
+                condition.UpdateDataSources(dataSources, needsDataSourceCheck);
             }
         }
 
