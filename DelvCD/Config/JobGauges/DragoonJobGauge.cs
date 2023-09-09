@@ -22,7 +22,7 @@ namespace DelvCD.Config.JobGauges
         {
             _names = new List<string>() {
                 "Life of the Dragon",
-                "Life of the Dragon Timer (milliseconds)",
+                "Life of the Dragon Timer",
                 "First Brood's Gaze Stacks",
                 "Firstminds' Focus Stacks"
             };

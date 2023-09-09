@@ -31,12 +31,12 @@ namespace DelvCD.Config.JobGauges
                 "Aetherflow Stacks",
                 "Next Summon",
                 "Active Summon",
-                "Summon Timer (milliseconds)",
+                "Summon Timer",
                 "Ifrit Ready",
                 "Titan Ready",
                 "Garuda Ready",
                 "Active Attunement",
-                "Attunement Timer (milliseconds)",
+                "Attunement Timer",
                 "Attunement Stacks"
             };
 

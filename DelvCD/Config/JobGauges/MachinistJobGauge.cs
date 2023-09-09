@@ -23,10 +23,10 @@ namespace DelvCD.Config.JobGauges
             _names = new List<string>() {
                 "Heat",
                 "Overheat",
-                "Overheat Timer (milliseconds)",
+                "Overheat Timer",
                 "Battery",
                 "Summon",
-                "Summon Timer (milliseconds)"
+                "Summon Timer"
             };
 
             _types = new List<TriggerConditionType>() {

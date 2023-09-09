@@ -22,7 +22,7 @@ namespace DelvCD.Config.JobGauges
             _names = new List<string>() {
                 "Aetherflow Stacks",
                 "Faerie",
-                "Seraph Timer (milliseconds)"
+                "Seraph Timer"
             };
 
             _types = new List<TriggerConditionType>() {

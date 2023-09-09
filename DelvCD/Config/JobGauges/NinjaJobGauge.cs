@@ -20,7 +20,7 @@ namespace DelvCD.Config.JobGauges
         protected override void InitializeConditions()
         {
             _names = new List<string>() {
-                "Huton Timer (milliseconds)",
+                "Huton Timer",
                 "Ninki"
             };
 

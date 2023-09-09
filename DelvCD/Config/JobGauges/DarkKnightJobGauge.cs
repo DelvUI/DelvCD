@@ -21,8 +21,8 @@ namespace DelvCD.Config.JobGauges
         {
             _names = new List<string>() {
                 "Blood",
-                "Darkside Timer (milliseconds)",
-                "Shadow Timer (milliseconds)",
+                "Darkside Timer",
+                "Shadow Timer",
                 "Dark Arts"
             };
 

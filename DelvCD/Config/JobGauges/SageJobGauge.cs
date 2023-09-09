@@ -21,7 +21,7 @@ namespace DelvCD.Config.JobGauges
         {
             _names = new List<string>() {
                 "Eukrasia",
-                "Addersgall Timer (milliseconds)",
+                "Addersgall Timer",
                 "Addersgall Stacks",
                 "Addersting Stacks"
             };

@@ -22,7 +22,7 @@ namespace DelvCD.Config.JobGauges
             _names = new List<string>() {
                 "Soul",
                 "Shroud",
-                "Enshroud Timer (milliseconds)",
+                "Enshroud Timer",
                 "Lemure Shroud Stacks",
                 "Void Shroud Stacks"
             };
