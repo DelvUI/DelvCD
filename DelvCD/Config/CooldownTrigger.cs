@@ -53,16 +53,16 @@ namespace DelvCD.Config
         public override TriggerType Type => TriggerType.Cooldown;
         public override TriggerSource Source => TriggerSource.Player;
 
-        [JsonIgnore] private CooldownDataSource _dataSource = new() { Type = CooldownDataSourceType.Action };
+        [JsonIgnore] private CooldownDataSource _dataSource = new();
         [JsonIgnore] public override DataSource DataSource => _dataSource;
 
         public override bool IsTriggered(bool preview)
         {
             if (preview)
             {
-                _dataSource.Value = 10;
-                _dataSource.Stacks = 2;
-                _dataSource.MaxStacks = 2;
+                _dataSource.Cooldown_Timer = 10;
+                _dataSource.Cooldown_Stacks = 2;
+                _dataSource.Max_Cooldown_Stacks = 2;
                 _dataSource.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
 
                 return true;
@@ -124,10 +124,10 @@ namespace DelvCD.Config
             }
 
             _dataSource.Id = actionId;
-            _dataSource.Value = cooldown;
-            _dataSource.MaxValue = chargeTime;
-            _dataSource.Stacks = stacks;
-            _dataSource.MaxStacks = recastInfo.MaxCharges;
+            _dataSource.Cooldown_Timer = cooldown;
+            _dataSource.Max_Cooldown_Timer = chargeTime;
+            _dataSource.Cooldown_Stacks = stacks;
+            _dataSource.Max_Cooldown_Stacks = recastInfo.MaxCharges;
             _dataSource.Icon = Adjust ? helper.GetIconIdForAction(actionId) : actionTrigger.Icon;
 
             return
@@ -135,8 +135,8 @@ namespace DelvCD.Config
                 (!Usable || (UsableValue == 0 ? usable : !usable)) &&
                 (!RangeCheck || (RangeValue == 0 ? inRange : !inRange)) &&
                 (!LosCheck || (LosValue == 0 ? inLos : !inLos)) &&
-                (!Cooldown || Utils.GetResult(_dataSource.Value, CooldownOp, CooldownValue)) &&
-                (!ChargeCount || Utils.GetResult(_dataSource.Stacks, ChargeCountOp, ChargeCountValue));
+                (!Cooldown || Utils.GetResult(_dataSource.Cooldown_Timer, CooldownOp, CooldownValue)) &&
+                (!ChargeCount || Utils.GetResult(_dataSource.Cooldown_Stacks, ChargeCountOp, ChargeCountValue));
         }
 
         public override void DrawTriggerOptions(Vector2 size, float padX, float padY)

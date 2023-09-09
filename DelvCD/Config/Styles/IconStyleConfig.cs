@@ -91,11 +91,13 @@ namespace DelvCD.Config
 
                 for (int i = 0; i < dataSources.Length; i ++)
                 {
-                    if (dataSources[i] is CooldownDataSource cd)
+                    if (dataSources[i] is CooldownDataSource ||
+                        dataSources[i] is ItemCooldownDataSource ||
+                        dataSources[i] is StatusDataSource)
                     {
                         newIndex = i;
 
-                        if (cd.Type == CooldownDataSourceType.Action)
+                        if (dataSources[i] is CooldownDataSource)
                         {
                             break;
                         }

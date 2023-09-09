@@ -43,7 +43,7 @@ namespace DelvCD.Config
         public override TriggerType Type => TriggerType.Status;
         public override TriggerSource Source => TriggerSource;
 
-        [JsonIgnore] private CooldownDataSource _dataSource = new() { Type = CooldownDataSourceType.Status };
+        [JsonIgnore] private StatusDataSource _dataSource = new();
         [JsonIgnore] public override DataSource DataSource => _dataSource;
 
         public override bool IsTriggered(bool preview)
@@ -55,9 +55,9 @@ namespace DelvCD.Config
 
             if (preview)
             {
-                _dataSource.Value = 10;
-                _dataSource.Stacks = 2;
-                _dataSource.MaxStacks = 2;
+                _dataSource.Status_Timer = 10;
+                _dataSource.Status_Stacks = 2;
+                _dataSource.Max_Status_Stacks = 2;
                 _dataSource.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
 
                 return true;
@@ -82,7 +82,7 @@ namespace DelvCD.Config
                 return false;
             }
 
-            bool wasInactive = _dataSource.Value == 0;
+            bool wasInactive = _dataSource.Status_Timer == 0;
             bool active = false;
             _dataSource.Icon = TriggerData.First().Icon;
 
@@ -97,14 +97,14 @@ namespace DelvCD.Config
                     {
                         active = true;
                         _dataSource.Id = status.StatusId;
-                        _dataSource.Value = Math.Abs(status.RemainingTime);
-                        _dataSource.Stacks = status.StackCount;
-                        _dataSource.MaxStacks = trigger.MaxStacks;
+                        _dataSource.Status_Timer = Math.Abs(status.RemainingTime);
+                        _dataSource.Status_Stacks = status.StackCount;
+                        _dataSource.Max_Status_Stacks = trigger.MaxStacks;
                         _dataSource.Icon = trigger.Icon;
 
                         if (wasInactive)
                         {
-                            _dataSource.MaxValue = _dataSource.Value;
+                            _dataSource.Max_Status_Timer = _dataSource.Status_Timer;
                         }
 
                         break;
@@ -114,14 +114,14 @@ namespace DelvCD.Config
 
             if (!active)
             {
-                _dataSource.Value = 0;
+                _dataSource.Status_Timer = 0;
             }
 
             bool triggered = TriggerCondition switch
             {
                 0 => active &&
-                        (!Duration || Utils.GetResult(_dataSource.Value, DurationOp, DurationValue)) &&
-                        (!StackCount || Utils.GetResult(_dataSource.Stacks, StackCountOp, StackCountValue)),
+                        (!Duration || Utils.GetResult(_dataSource.Status_Timer, DurationOp, DurationValue)) &&
+                        (!StackCount || Utils.GetResult(_dataSource.Status_Stacks, StackCountOp, StackCountValue)),
                 1 => !active,
                 _ => false
             };

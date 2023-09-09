@@ -137,6 +137,8 @@ namespace DelvCD.Helpers
             Type[] types = new Type[]
             {
                 typeof(CooldownDataSource),
+                typeof(StatusDataSource),
+                typeof(ItemCooldownDataSource),
                 typeof(CharacterStateDataSource),
                 typeof(AstrologianDataSource),
                 typeof(BardDataSource),

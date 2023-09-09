@@ -27,7 +27,7 @@ namespace DelvCD.Config
         public override TriggerType Type => TriggerType.ItemCooldown;
         public override TriggerSource Source => TriggerSource.Player;
 
-        [JsonIgnore] private CooldownDataSource _dataSource = new() { Type = CooldownDataSourceType.Item };
+        [JsonIgnore] private ItemCooldownDataSource _dataSource = new();
         [JsonIgnore] public override DataSource DataSource => _dataSource;
 
         public override bool IsTriggered(bool preview)
@@ -39,9 +39,9 @@ namespace DelvCD.Config
 
             if (preview)
             {
-                _dataSource.Value = 10;
-                _dataSource.Stacks = 1;
-                _dataSource.MaxStacks = 1;
+                _dataSource.Item_Cooldown_Timer = 10;
+                _dataSource.Item_Cooldown_Stacks = 1;
+                _dataSource.Max_Item_Cooldown_Stacks = 1;
                 _dataSource.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
 
                 return true;
@@ -51,15 +51,15 @@ namespace DelvCD.Config
             TriggerData actionTrigger = TriggerData.First();
             helper.GetItemRecastInfo(actionTrigger.Id, out RecastInfo recastInfo);
 
-            _dataSource.MaxValue = recastInfo.RecastTime;
-            _dataSource.Value = recastInfo.RecastTime - recastInfo.RecastTimeElapsed;
+            _dataSource.Max_Item_Cooldown_Timer = recastInfo.RecastTime;
+            _dataSource.Item_Cooldown_Timer = recastInfo.RecastTime - recastInfo.RecastTimeElapsed;
             _dataSource.Icon = actionTrigger.Icon;
             _dataSource.Id = actionTrigger.Id;
 
-            _dataSource.Stacks = GetQuantity(actionTrigger.Id);
-            _dataSource.MaxStacks = _dataSource.Stacks;
+            _dataSource.Item_Cooldown_Stacks = GetQuantity(actionTrigger.Id);
+            _dataSource.Max_Item_Cooldown_Stacks = _dataSource.Item_Cooldown_Stacks;
 
-            return !Cooldown || Utils.GetResult(_dataSource.Value, CooldownOp, CooldownValue);
+            return !Cooldown || Utils.GetResult(_dataSource.Item_Cooldown_Timer, CooldownOp, CooldownValue);
         }
 
         private unsafe int GetQuantity(uint itemId)

@@ -7,6 +7,13 @@
   * The trigger and its property must be explicitly set to determine what progress is being tracked.
   * Some of your Icons might need to be manually corrected.
 
+- Updated how text tags work:
+  * Text tags are now more explicit which provides more control on which trigger the label will use to get the data from.
+  * For example to show the cooldown of an action, instead of `[value]`, you would now do `[cooldown_timer]`.
+  * Existing text tags will be automatically changed when updating to this version.
+  * Some of your Labels might need to be manually corrected.
+  * Use the 'Tags' button next to the Text Format input field in Labels to see all the available text tags for each type of trigger.
+
 - Added JobGauge triggers:
   * These allow you to use data from your job gauges to make conditions.
   * They only work when playing on the corresponding job.

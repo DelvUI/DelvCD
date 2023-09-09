@@ -1,57 +1,48 @@
 ﻿namespace DelvCD.Helpers.DataSources
 {
-    public enum CooldownDataSourceType
-    {
-        Action = 0,
-        Status = 1,
-        Item = 2
-    }
-
     public class CooldownDataSource : DataSource
     {
-        public new static string GetDisplayName() => "Cooldown and Status";
+        public new static string GetDisplayName() => "Cooldown";
 
-        public float Value;
-        public float MaxValue;
-        public int Stacks;
-        public int MaxStacks;
-
-        public CooldownDataSourceType Type;
+        public float Cooldown_Timer;
+        public float Max_Cooldown_Timer;
+        public int Cooldown_Stacks;
+        public int Max_Cooldown_Stacks;
 
         public override float GetConditionValue(int index) => index switch
         {
-            0 => Value,
-            1 => Stacks,
-            2 => MaxStacks,
+            0 => Cooldown_Timer,
+            1 => Cooldown_Stacks,
+            2 => Max_Cooldown_Stacks,
             _ => 0
         };
 
         public override float GetProgressValue(int index) => index switch
         {
-            0 => Value,
-            1 => Stacks,
+            0 => Cooldown_Timer,
+            1 => Cooldown_Stacks,
             _ => 0
         };
 
         public override float GetMaxValue(int index) => index switch
         {
-            0 => MaxValue,
-            1 => MaxStacks,
+            0 => Max_Cooldown_Timer,
+            1 => Max_Cooldown_Stacks,
             _ => 0
         };
 
         public CooldownDataSource()
         {
             _conditionFieldNames = new() {
-                nameof(Value),
-                nameof(Stacks),
-                nameof(MaxStacks)
+                nameof(Cooldown_Timer),
+                nameof(Cooldown_Stacks),
+                nameof(Max_Cooldown_Stacks)
             };
 
             _progressFieldNames = new()
             {
-                nameof(Value),
-                nameof(Stacks)
+                nameof(Cooldown_Timer),
+                nameof(Cooldown_Stacks)
             };
         }
     }

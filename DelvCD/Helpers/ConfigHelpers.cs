@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -210,6 +211,8 @@ namespace DelvCD.Helpers
 
                 foreach (Label label in icon.LabelListConfig.Labels)
                 {
+                    MigrateTextFormats(label, dataSources);
+
                     foreach (StyleCondition<LabelStyleConfig> condition in label.StyleConditions.Conditions)
                     {
                         condition.TriggerDataSourceIndex = Math.Max(0, condition.TriggerDataSourceIndex - 1);
@@ -244,6 +247,58 @@ namespace DelvCD.Helpers
                         condition.Source -= 3;
                     }
                 }
+            }
+        }
+
+        private static List<Dictionary<string, string>> _migrationTextFormatMap = new()
+        {
+            new Dictionary<string, string>()
+            {
+                ["[value"] = "[cooldown_timer",
+                ["[maxvalue"] = "[max_cooldown_timer",
+                ["[stacks"] = "[cooldown_stacks",
+                ["[maxstacks"] = "[max_cooldown_stacks",
+            },
+
+            new Dictionary<string, string>()
+            {
+                ["[value"] = "[status_value",
+                ["[maxvalue"] = "[max_status_value",
+                ["[stacks"] = "[cooldown_stacks",
+                ["[maxstacks"] = "[max_cooldown_value",
+            },
+
+            new Dictionary<string, string>()
+            {
+                ["[value"] = "[item_cooldown_timer",
+                ["[maxvalue"] = "[max_item_cooldown_timer",
+                ["[stacks"] = "[item_cooldown_stacks",
+                ["[maxstacks"] = "[max_item_cooldown_stacks",
+            },
+        };
+
+        private static void MigrateTextFormats(Label label, DataSource[] dataSources)
+        {
+            bool hasCooldownTrigger = dataSources.Any(x => x is CooldownDataSource);
+            bool hasStatusTrigger = dataSources.Any(x => x is StatusDataSource);
+            bool hasItemCooldownTrigger = dataSources.Any(x => x is ItemCooldownDataSource);
+
+            int index = hasCooldownTrigger ? 0 : (hasStatusTrigger ? 1 : (hasItemCooldownTrigger ? 2 : -1));
+            if (index == -1) { return; }
+
+            MigrateTextFormat(label.LabelStyleConfig, _migrationTextFormatMap[index]);
+
+            foreach (StyleCondition<LabelStyleConfig> condition in label.StyleConditions.Conditions)
+            {
+                MigrateTextFormat(condition.Style, _migrationTextFormatMap[index]);
+            }
+        }
+
+        private static void MigrateTextFormat(LabelStyleConfig labelStyle, Dictionary<string, string> map)
+        {
+            foreach (KeyValuePair<string, string> item in map)
+            {
+                labelStyle.TextFormat = labelStyle.TextFormat.Replace(item.Key, item.Value);
             }
         }
         
