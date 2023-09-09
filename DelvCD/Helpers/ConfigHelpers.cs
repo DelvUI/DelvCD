@@ -2,6 +2,7 @@
 using Dalamud.Interface.Internal.Notifications;
 using Dalamud.Logging;
 using DelvCD.Config;
+using DelvCD.Helpers.DataSources;
 using DelvCD.UIElements;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 
 namespace DelvCD.Helpers
@@ -191,7 +193,9 @@ namespace DelvCD.Helpers
             }
             else if (element is Icon icon)
             {
+                DataSource[] dataSources = icon.TriggerConfig.TriggerOptions.Select(x => x.DataSource).ToArray();
                 icon.IconStyleConfig.NeedsDataSourceCheck = true;
+                icon.IconStyleConfig.UpdateDataSources(dataSources);
 
                 foreach (StyleCondition<IconStyleConfig> condition in icon.StyleConditions.Conditions)
                 {
@@ -203,6 +207,8 @@ namespace DelvCD.Helpers
                         condition.Source -= 3;
                     }
                 }
+
+                icon.StyleConditions.UpdateDataSources(dataSources);
 
                 foreach (Label label in icon.LabelListConfig.Labels)
                 {
