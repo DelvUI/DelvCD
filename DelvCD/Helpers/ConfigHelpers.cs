@@ -262,10 +262,10 @@ namespace DelvCD.Helpers
 
             new Dictionary<string, string>()
             {
-                ["[value"] = "[status_value",
-                ["[maxvalue"] = "[max_status_value",
+                ["[value"] = "[status_timer",
+                ["[maxvalue"] = "[max_status_timer",
                 ["[stacks"] = "[cooldown_stacks",
-                ["[maxstacks"] = "[max_cooldown_value",
+                ["[maxstacks"] = "[max_cooldown_stacks",
             },
 
             new Dictionary<string, string>()
