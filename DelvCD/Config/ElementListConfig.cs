@@ -19,7 +19,7 @@ namespace DelvCD.Config
 
         [JsonIgnore] private ElementType _selectedType = ElementType.Icon;
         [JsonIgnore] private string _input = string.Empty;
-        [JsonIgnore] private string[] _options = new string[] { "Icon", "Bar", "Group" };
+        [JsonIgnore] private string[] _options = new string[] { "Icon", "Bar", "Circle", "Group" };
         [JsonIgnore] private int _swapX = -1;
         [JsonIgnore] private int _swapY = -1;
 
@@ -180,6 +180,7 @@ namespace DelvCD.Config
                     ElementType.Group => new Group(name),
                     ElementType.Icon => Icon.GetDefaultUIElementIcon(name),
                     ElementType.Bar => Bar.GetDefaultUIElementBar(name),
+                    ElementType.Circle => Circle.GetDefaultUIElementCircle(name),
                     _ => null
                 };
 

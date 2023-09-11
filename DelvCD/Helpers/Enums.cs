@@ -10,6 +10,7 @@ namespace DelvCD.Helpers
     {
         Icon,
         Bar,
+        Circle,
         Group,
         Label
     }
@@ -67,6 +68,12 @@ namespace DelvCD.Helpers
         Left,
         Up,
         Down,
+    }
+    
+    public enum CircleDirection
+    {
+        Clockwise,
+        AntiClockwise,
     }
 
     public enum ChunkStyles
