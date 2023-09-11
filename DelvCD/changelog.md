@@ -21,6 +21,9 @@
 - Added Bar elements:
   * Similar to the Icon's swipe animations, these need to be linked to a trigger property to track its progress.
 
+- Added automatic settings backup system:
+  * Every time DelvCD's is updated, a backup of your settings will be created in `%APPDATA%\XIVLauncher\pluginConfigs\DelvCD\Backups\<previous_version>`.
+  
 - Added `/dcd` command to open DelvCD's settings.
 
 # Version 0.3.0.0

@@ -57,6 +57,8 @@ namespace DelvCD
             Plugin.ConfigFileDir = pluginInterface.GetPluginConfigDirectory();
             Plugin.ConfigFilePath = Path.Combine(pluginInterface.GetPluginConfigDirectory(), Plugin.ConfigFileName);
 
+            ConfigHelpers.CheckVersion();
+
             // Register Dalamud APIs
             Singletons.Register(buddyList);
             Singletons.Register(clientState);

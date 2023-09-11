@@ -319,6 +319,70 @@ namespace DelvCD.Helpers
                 PluginLog.Error(ex.ToString());
             }
         }
+
+        public static void CheckVersion()
+        {
+            string path = Path.Combine(Plugin.ConfigFileDir, "version");
+            string? previousVersion = null;
+
+            try
+            {
+                bool needsWrite = false;
+                bool needsBackup = false;
+
+                if (!File.Exists(path))
+                {
+                    needsWrite = true;
+                    needsBackup = true;
+                    previousVersion = "0.3.0.0";
+                }
+                else
+                {
+                    previousVersion = File.ReadAllText(path);
+                    if (previousVersion != Plugin.Version)
+                    {
+                        needsWrite = true;
+                        needsBackup = true;
+                    }
+                }
+
+                if (needsWrite)
+                {
+                    File.WriteAllText(path, Plugin.Version);
+                }
+
+                if (needsBackup && previousVersion != null)
+                {
+                    BackupPreviousVersion(previousVersion);
+                }
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error checking version: " + e.Message);
+            }
+        }
+
+        private static void BackupPreviousVersion(string version)
+        {
+            string backupsRoot = Path.Combine(Plugin.ConfigFileDir, "Backups");
+            if (!Directory.Exists(backupsRoot))
+            {
+                Directory.CreateDirectory(backupsRoot);
+            }
+
+            string versionFolder = Path.Combine(backupsRoot, version);
+            if (!Directory.Exists(versionFolder))
+            {
+                Directory.CreateDirectory(versionFolder);
+            }
+
+            try
+            {
+                string destination = Path.Combine(versionFolder, "DelvCD.json");
+                File.Copy(Plugin.ConfigFilePath, destination);
+            }
+            catch { }
+        }
     }
 
     public class LabelConverter : JsonConverter
