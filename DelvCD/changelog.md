@@ -1,6 +1,6 @@
 # Version 0.4.0.0
 - Conditions data options are now dynamically populated depending on the triggers in that element:
-  * The condition properties were fixed before which resulted in confusing behavior if the element didnd't contain the appropiate trigger types.
+  * The condition properties were fixed before which resulted in confusing behavior if the element didn't contain the appropriate trigger types.
   * The "Dynamic" option was removed.
 
 - Updated how the data from triggers is used for Icon swipe animations:
@@ -23,7 +23,7 @@
 
 - Added automatic settings backup system:
   * Every time DelvCD's is updated, a backup of your settings will be created in `%APPDATA%\XIVLauncher\pluginConfigs\DelvCD\Backups\<previous_version>`.
-  
+
 - Added `/dcd` command to open DelvCD's settings.
 
 # Version 0.3.0.0
