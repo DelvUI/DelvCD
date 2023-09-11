@@ -61,6 +61,15 @@ namespace DelvCD
                 }
             );
 
+            CommandManager.AddHandler(
+                "/dcd",
+                new CommandInfo(PluginCommand)
+                {
+                    HelpMessage = "Opens the DelvCD configuration window.",
+                    ShowInHelp = true
+                }
+            );
+
             ClientState.Logout += OnLogout;
             PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUi;
             PluginInterface.UiBuilder.Draw += Draw;
@@ -165,6 +174,7 @@ namespace DelvCD
                 PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
                 ClientState.Logout -= OnLogout;
                 CommandManager.RemoveHandler("/delvcd");
+                CommandManager.RemoveHandler("/dcd");
                 WindowSystem.RemoveAllWindows();
             }
         }

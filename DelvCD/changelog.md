@@ -21,6 +21,8 @@
 - Added Bar elements:
   * Similar to the Icon's swipe animations, these need to be linked to a trigger property to track its progress.
 
+- Added `/dcd` command to open DelvCD's settings.
+
 # Version 0.3.0.0
 - Fixed config windows not adjusting to Dalamud's Global Font Scale.
 
