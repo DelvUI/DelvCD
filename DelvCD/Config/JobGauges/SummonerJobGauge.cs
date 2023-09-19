@@ -58,7 +58,7 @@ namespace DelvCD.Config.JobGauges
             {
                 [1] = summons,
                 [2] = summons,
-                [7] = new string[] { "None", "Ifrit", "Titan", "Phoenix" }
+                [7] = new string[] { "None", "Ifrit", "Titan", "Garuda" }
             };
         }
 
@@ -92,7 +92,7 @@ namespace DelvCD.Config.JobGauges
                 EvaluateCondition(3, _dataSource.Summon_Timer) &&
                 EvaluateCondition(4, gauge.IsIfritReady) &&
                 EvaluateCondition(5, gauge.IsTitanReady) &&
-                EvaluateCondition(6, gauge.IsPhoenixReady) &&
+                EvaluateCondition(6, gauge.IsGarudaReady) &&
                 EvaluateCondition(7, attunement) &&
                 EvaluateCondition(8, _dataSource.Attunement_Timer) &&
                 EvaluateCondition(9, _dataSource.Attunement_Stacks);

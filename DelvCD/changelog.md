@@ -1,3 +1,6 @@
+# Version 0.4.0.1
+- Fixed Summoner's Garuda related conditions not working properly.
+
 # Version 0.4.0.0
 - Conditions data options are now dynamically populated depending on the triggers in that element:
   * The condition properties were fixed before which resulted in confusing behavior if the element didn't contain the appropriate trigger types.
