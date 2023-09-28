@@ -54,7 +54,8 @@ namespace DelvCD
             ISigScanner sigScanner,
             ITargetManager targetManager,
             IPluginLog logger,
-            ITextureProvider textureProvider
+            ITextureProvider textureProvider,
+            ITextureSubstitutionProvider textureSubstitutionProvider
         )
         {
             Plugin.Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? Plugin.Version;
@@ -80,6 +81,7 @@ namespace DelvCD
             Singletons.Register(pluginInterface.UiBuilder);
             Singletons.Register(logger);
             Singletons.Register(textureProvider);
+            Singletons.Register(textureSubstitutionProvider);
             Singletons.Register(new TexturesCache());
             Singletons.Register(new ActionHelpers(sigScanner));
             Singletons.Register(new StatusHelpers());

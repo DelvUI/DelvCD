@@ -39,7 +39,8 @@ namespace DelvCD.Helpers
             string? path = Singletons.Get<ITextureProvider>().GetIconPath(iconId + stackCount, flags);
             if (path != null)
             {
-                IDalamudTextureWrap? texture = GetDesaturatedTextureWrap(path);
+                path = Singletons.Get<ITextureSubstitutionProvider>().GetSubstitutedPath(path);
+                IDalamudTextureWrap ? texture = GetDesaturatedTextureWrap(path);
                 if (texture != null)
                 {
                     _desaturatedCache.Add(iconId + stackCount, texture);
