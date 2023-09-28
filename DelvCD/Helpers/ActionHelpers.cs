@@ -1,6 +1,6 @@
-﻿using Dalamud.Data;
-using Dalamud.Game;
+﻿using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
@@ -64,7 +64,7 @@ namespace DelvCD.Helpers
             [Job.BLU] = 11385  // Water Cannon
         };
 
-        public unsafe ActionHelpers(SigScanner scanner)
+        public unsafe ActionHelpers(ISigScanner scanner)
         {
             _actionManager = ActionManager.Instance();
             _castRay = Marshal.GetDelegateForFunctionPointer<CastRayNative>(scanner.ScanText(CastRaySig));
@@ -79,7 +79,7 @@ namespace DelvCD.Helpers
                 return _actionIdToIconId[actionId];
             }
 
-            ushort icon = Singletons.Get<DataManager>().GetExcelSheet<LuminaAction>()?.GetRow(actionId)?.Icon ?? 0;
+            ushort icon = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>()?.GetRow(actionId)?.Icon ?? 0;
             if (icon != 0)
             {
                 _actionIdToIconId.Add(actionId, icon);
@@ -137,7 +137,7 @@ namespace DelvCD.Helpers
             return;
         }
 
-        public unsafe bool CanUseAction(uint actionId, ActionType type = ActionType.Spell, long targetId = 0xE000_0000)
+        public unsafe bool CanUseAction(uint actionId, ActionType type = ActionType.Spell, ulong targetId = 0xE000_0000)
         {
             return _actionManager->GetActionStatus(type, actionId, targetId, false, true) == 0;
         }
@@ -180,7 +180,7 @@ namespace DelvCD.Helpers
 
         public static List<TriggerData> FindItemEntries(string input)
         {
-            ExcelSheet<Item>? sheet = Singletons.Get<DataManager>().GetExcelSheet<Item>();
+            ExcelSheet<Item>? sheet = Singletons.Get<IDataManager>().GetExcelSheet<Item>();
 
             if (!string.IsNullOrEmpty(input) && sheet is not null)
             {
@@ -230,7 +230,7 @@ namespace DelvCD.Helpers
         public static List<TriggerData> FindEntriesFromActionSheet(string input)
         {
             List<TriggerData> actionList = new List<TriggerData>();
-            ExcelSheet<LuminaAction>? actionSheet = Singletons.Get<DataManager>().GetExcelSheet<LuminaAction>();
+            ExcelSheet<LuminaAction>? actionSheet = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>();
 
             if (actionSheet is null)
             {
@@ -268,7 +268,7 @@ namespace DelvCD.Helpers
         public static List<TriggerData> FindEntriesFromActionIndirectionSheet(string input)
         {
             List<TriggerData> actionList = new List<TriggerData>();
-            ExcelSheet<ActionIndirection>? actionIndirectionSheet = Singletons.Get<DataManager>().GetExcelSheet<ActionIndirection>();
+            ExcelSheet<ActionIndirection>? actionIndirectionSheet = Singletons.Get<IDataManager>().GetExcelSheet<ActionIndirection>();
 
             if (actionIndirectionSheet is null)
             {
@@ -308,7 +308,7 @@ namespace DelvCD.Helpers
         public static List<TriggerData> FindEntriesFromGeneralActionSheet(string input)
         {
             List<TriggerData> actionList = new List<TriggerData>();
-            ExcelSheet<GeneralAction>? generalSheet = Singletons.Get<DataManager>().GetExcelSheet<GeneralAction>();
+            ExcelSheet<GeneralAction>? generalSheet = Singletons.Get<IDataManager>().GetExcelSheet<GeneralAction>();
 
             if (generalSheet is null)
             {
@@ -349,7 +349,7 @@ namespace DelvCD.Helpers
             }
 
             List<uint> comboIds = new List<uint>() { baseComboId };
-            ExcelSheet<ActionIndirection>? actionIndirectionSheet = Singletons.Get<DataManager>().GetExcelSheet<ActionIndirection>();
+            ExcelSheet<ActionIndirection>? actionIndirectionSheet = Singletons.Get<IDataManager>().GetExcelSheet<ActionIndirection>();
 
             if (actionIndirectionSheet is null)
             {

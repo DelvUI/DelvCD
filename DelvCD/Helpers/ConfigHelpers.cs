@@ -1,17 +1,13 @@
-﻿using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Interface.Internal.Notifications;
-using Dalamud.Logging;
+﻿using Dalamud.Interface.Internal.Notifications;
+using Dalamud.Plugin.Services;
 using DelvCD.Config;
 using DelvCD.Helpers.DataSources;
 using DelvCD.UIElements;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -74,7 +70,7 @@ namespace DelvCD.Helpers
             }
             catch (Exception ex)
             {
-                PluginLog.Error(ex.ToString());
+                Singletons.Get<IPluginLog>().Error(ex.ToString());
             }
 
             return null;
@@ -116,7 +112,7 @@ namespace DelvCD.Helpers
             }
             catch (Exception ex)
             {
-                PluginLog.Error(ex.ToString());
+                Singletons.Get<IPluginLog>().Error(ex.ToString());
             }
 
             return default;
@@ -158,7 +154,7 @@ namespace DelvCD.Helpers
             }
             catch (Exception ex)
             {
-                PluginLog.Error(ex.ToString());
+                Singletons.Get<IPluginLog>().Error(ex.ToString());
 
                 string backupPath = $"{path}.bak";
                 if (File.Exists(path))
@@ -166,11 +162,11 @@ namespace DelvCD.Helpers
                     try
                     {
                         File.Copy(path, backupPath);
-                        PluginLog.Information($"Backed up DelvCD config to '{backupPath}'.");
+                        Singletons.Get<IPluginLog>().Information($"Backed up DelvCD config to '{backupPath}'.");
                     }
                     catch
                     {
-                        PluginLog.Warning($"Unable to back up DelvCD config.");
+                        Singletons.Get<IPluginLog>().Warning($"Unable to back up DelvCD config.");
                     }
                 }
             }
@@ -301,7 +297,7 @@ namespace DelvCD.Helpers
                 labelStyle.TextFormat = labelStyle.TextFormat.Replace(item.Key, item.Value);
             }
         }
-        
+
         public static void SaveConfig()
         {
             ConfigHelpers.SaveConfig(Singletons.Get<DelvCDConfig>());
@@ -316,7 +312,7 @@ namespace DelvCD.Helpers
             }
             catch (Exception ex)
             {
-                PluginLog.Error(ex.ToString());
+                Singletons.Get<IPluginLog>().Error(ex.ToString());
             }
         }
 
@@ -358,7 +354,7 @@ namespace DelvCD.Helpers
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error checking version: " + e.Message);
+                Singletons.Get<IPluginLog>().Error("Error checking version: " + e.Message);
             }
         }
 
@@ -435,7 +431,7 @@ namespace DelvCD.Helpers
             }
             catch (Exception ex)
             {
-                PluginLog.Warning(ex.ToString());
+                Singletons.Get<IPluginLog>().Warning(ex.ToString());
             }
 
             return label;

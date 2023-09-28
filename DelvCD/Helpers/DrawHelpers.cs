@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface;
+using Dalamud.Interface.Internal;
 using Dalamud.Interface.Internal.Notifications;
 using DelvCD.Config;
 using ImGuiNET;
@@ -76,7 +77,7 @@ namespace DelvCD.Helpers
             float opacity,
             ImDrawListPtr drawList)
         {
-            TextureWrap? tex = Singletons.Get<TexturesCache>().GetTextureFromIconId(iconId, (uint)stackCount, true, desaturate, opacity);
+            IDalamudTextureWrap? tex = Singletons.Get<TexturesCache>().GetTextureFromIconId(iconId, (uint)stackCount, true, desaturate, opacity);
 
             if (tex is null)
             {
@@ -88,7 +89,7 @@ namespace DelvCD.Helpers
             drawList.AddImage(tex.ImGuiHandle, position, position + size, uv0, uv1);
         }
 
-        public static (Vector2, Vector2) GetTexCoordinates(TextureWrap texture, Vector2 size, bool cropIcon = true)
+        public static (Vector2, Vector2) GetTexCoordinates(IDalamudTextureWrap texture, Vector2 size, bool cropIcon = true)
         {
             if (texture == null)
             {

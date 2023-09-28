@@ -1,9 +1,9 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -38,7 +38,7 @@ namespace DelvCD.Config.JobGauges
 
         public override bool IsTriggered(bool preview)
         {
-            RPRGauge gauge = Singletons.Get<DalamudJobGauges>().Get<RPRGauge>();
+            RPRGauge gauge = Singletons.Get<IJobGauges>().Get<RPRGauge>();
 
             _dataSource.Soul = gauge.Soul;
             _dataSource.Shroud = gauge.Shroud;

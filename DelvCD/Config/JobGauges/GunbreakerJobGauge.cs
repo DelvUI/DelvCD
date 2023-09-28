@@ -1,9 +1,9 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -25,7 +25,7 @@ namespace DelvCD.Config.JobGauges
 
         public override bool IsTriggered(bool preview)
         {
-            GNBGauge gauge = Singletons.Get<DalamudJobGauges>().Get<GNBGauge>();
+            GNBGauge gauge = Singletons.Get<IJobGauges>().Get<GNBGauge>();
 
             _dataSource.Cartridges = gauge.Ammo;
 

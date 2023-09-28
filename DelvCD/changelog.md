@@ -1,3 +1,7 @@
+# Version 0.5.0.0
+- Added support for patch 6.5 and Dalamud API 9.
+- Added new trigger condition for Red Mage's Job Gauge that compares White and Black Mana.
+
 # Version 0.4.0.1
 - Fixed Summoner's Garuda related conditions not working properly.
 

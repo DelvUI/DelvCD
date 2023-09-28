@@ -1,7 +1,6 @@
-﻿using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Interface;
-using Dalamud.Logging;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Interface.Utility;
+using Dalamud.Plugin.Services;
 using DelvCD.Config.JobGauges;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
@@ -65,11 +64,12 @@ namespace DelvCD.Config
 
         public override bool IsTriggered(bool preview)
         {
-            if (!TriggerData.Any() || _jobGauge == null) {
+            if (!TriggerData.Any() || _jobGauge == null)
+            {
                 return false;
             }
 
-            PlayerCharacter? player = Singletons.Get<ClientState>().LocalPlayer;
+            PlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
             if (player == null || player.ClassJob.Id != (uint)_jobGauge.Job)
             {
                 return false;
@@ -81,7 +81,7 @@ namespace DelvCD.Config
             }
             catch (Exception e)
             {
-                PluginLog.Log(e.Message);
+                Singletons.Get<IPluginLog>().Debug(e.Message);
             }
 
             return false;
@@ -187,7 +187,7 @@ namespace DelvCD.Config
             TriggerName = triggerData.Name.ToString();
             _triggerNameInput = TriggerName;
             TriggerData.Add(triggerData);
-            Dalamud.Logging.PluginLog.Information($"{triggerData.Name}: {triggerData.Icon}");
+            Singletons.Get<IPluginLog>().Information($"{triggerData.Name}: {triggerData.Icon}");
         }
 
 

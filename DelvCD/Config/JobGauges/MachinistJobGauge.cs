@@ -1,10 +1,9 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -41,7 +40,7 @@ namespace DelvCD.Config.JobGauges
 
         public override bool IsTriggered(bool preview)
         {
-            MCHGauge gauge = Singletons.Get<DalamudJobGauges>().Get<MCHGauge>();
+            MCHGauge gauge = Singletons.Get<IJobGauges>().Get<MCHGauge>();
 
             _dataSource.Heat = gauge.Heat;
             _dataSource.Overheat = gauge.IsOverheated;

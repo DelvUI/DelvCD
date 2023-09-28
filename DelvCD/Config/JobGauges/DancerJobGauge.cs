@@ -1,9 +1,9 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -65,7 +65,7 @@ namespace DelvCD.Config.JobGauges
 
         public override bool IsTriggered(bool preview)
         {
-            DNCGauge gauge = Singletons.Get<DalamudJobGauges>().Get<DNCGauge>();
+            DNCGauge gauge = Singletons.Get<IJobGauges>().Get<DNCGauge>();
 
             _dataSource.Feather_Stacks = gauge.Feathers;
             _dataSource.Esprit = gauge.Esprit;

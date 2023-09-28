@@ -1,9 +1,9 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -36,7 +36,7 @@ namespace DelvCD.Config.JobGauges
 
         public override bool IsTriggered(bool preview)
         {
-            DRKGauge gauge = Singletons.Get<DalamudJobGauges>().Get<DRKGauge>();
+            DRKGauge gauge = Singletons.Get<IJobGauges>().Get<DRKGauge>();
 
             _dataSource.Blood = gauge.Blood;
             _dataSource.Darkside_Timer = gauge.DarksideTimeRemaining / 1000f;

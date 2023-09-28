@@ -4,6 +4,7 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace DelvCD.Helpers
@@ -152,14 +153,11 @@ namespace DelvCD.Helpers
             AtkUnitList* loadedUnitsList = &manager->AtkUnitManager.AllLoadedUnitsList;
             if (loadedUnitsList == null) { return; }
 
-            AtkUnitBase** addonList = &loadedUnitsList->AtkUnitEntries;
-            if (addonList == null) { return; }
-
             for (var i = 0; i < loadedUnitsList->Count; i++)
             {
                 try
                 {
-                    AtkUnitBase* addon = addonList[i];
+                    AtkUnitBase* addon = *(AtkUnitBase**)Unsafe.AsPointer(ref loadedUnitsList->EntriesSpan[i]);
                     if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
                     {
                         continue;

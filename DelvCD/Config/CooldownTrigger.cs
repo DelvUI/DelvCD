@@ -1,5 +1,5 @@
-using Dalamud.Game.ClientState;
-using Dalamud.Interface;
+using Dalamud.Interface.Utility;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
@@ -102,12 +102,12 @@ namespace DelvCD.Config
 
             if (RangeCheck)
             {
-                inRange = helper.GetActionInRange(actionId, Singletons.Get<ClientState>().LocalPlayer, Utils.FindTarget());
+                inRange = helper.GetActionInRange(actionId, Singletons.Get<IClientState>().LocalPlayer, Utils.FindTarget());
             }
 
             if (LosCheck)
             {
-                inLos = helper.IsTargetInLos(Singletons.Get<ClientState>().LocalPlayer, Utils.FindTarget());
+                inLos = helper.IsTargetInLos(Singletons.Get<IClientState>().LocalPlayer, Utils.FindTarget());
             }
 
             if (Combo && actionTrigger.ComboId.Length > 0)

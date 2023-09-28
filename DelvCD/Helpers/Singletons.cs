@@ -8,33 +8,15 @@ namespace DelvCD.Helpers
 
     public static class Singletons
     {
-        private static readonly Dictionary<Type, Func<object>> TypeInitializers = new Dictionary<Type, Func<object>>()
-        {
-        };
-
         private static readonly ConcurrentDictionary<Type, object> ActiveInstances = new ConcurrentDictionary<Type, object>();
 
         public static T Get<T>()
         {
-            return (T)ActiveInstances.GetOrAdd(typeof(T), (objectType) =>
-            {
-                object newInstance;
-                if (Singletons.TypeInitializers.TryGetValue(objectType, out Func<object>? initializer))
-                {
-                    newInstance = initializer();
-                }
-                else
-                {
-                    throw new Exception($"No initializer found for Type '{objectType.FullName}'.");
-                }
+            if (ActiveInstances.TryGetValue(typeof(T), out object? o) && o != null) {
+                return (T)o;
+            }
 
-                if (newInstance is null || newInstance is not T)
-                {
-                    throw new Exception($"Received invalid result from initializer for type '{objectType.FullName}'");
-                }
-
-                return newInstance;
-            });
+            throw new Exception($"Singleton not initialized '{typeof(T).FullName}'.");
         }
 
         public static bool IsRegistered<T>()
@@ -42,9 +24,11 @@ namespace DelvCD.Helpers
             return ActiveInstances.ContainsKey(typeof(T));
         }
 
-        public static void Register(object newSingleton)
+        public static void Register<T>(T newSingleton)
         {
-            if (!ActiveInstances.TryAdd(newSingleton.GetType(), newSingleton))
+            if (newSingleton == null) { return; }
+
+            if (!ActiveInstances.TryAdd(typeof(T), newSingleton))
             {
                 throw new Exception($"Failed to register new singleton for type {newSingleton.GetType()}");
             }

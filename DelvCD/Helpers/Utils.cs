@@ -1,7 +1,6 @@
-﻿using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Objects;
+﻿using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Logging;
+using Dalamud.Plugin.Services;
 using System;
 using System.Diagnostics;
 using System.Numerics;
@@ -30,7 +29,7 @@ namespace DelvCD.Helpers
 
         public static GameObject? FindTarget()
         {
-            TargetManager targetManager = Singletons.Get<TargetManager>();
+            ITargetManager targetManager = Singletons.Get<ITargetManager>();
             return targetManager.SoftTarget ?? targetManager.Target;
         }
 
@@ -42,7 +41,7 @@ namespace DelvCD.Helpers
                 return null;
             }
 
-            GameObject? player = Singletons.Get<ClientState>().LocalPlayer;
+            GameObject? player = Singletons.Get<IClientState>().LocalPlayer;
             if (target.TargetObjectId == 0 && player is not null && player.TargetObjectId == 0)
             {
                 return player;
@@ -50,7 +49,7 @@ namespace DelvCD.Helpers
 
             // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
             // we do a step of 2 because its always an actor followed by its companion
-            ObjectTable objectTable = Singletons.Get<ObjectTable>();
+            IObjectTable objectTable = Singletons.Get<IObjectTable>();
             for (int i = 0; i < 200; i += 2)
             {
                 GameObject? actor = objectTable[i];
@@ -118,7 +117,7 @@ namespace DelvCD.Helpers
                 }
                 catch (Exception e)
                 {
-                    PluginLog.Error("Error trying to open url: " + e.Message);
+                    Singletons.Get<IPluginLog>().Error("Error trying to open url: " + e.Message);
                 }
             }
         }

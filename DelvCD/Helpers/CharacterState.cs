@@ -1,7 +1,6 @@
-﻿using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Conditions;
+﻿using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.Gui;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
@@ -16,7 +15,7 @@ namespace DelvCD.Helpers
 
         public static bool IsCharacterBusy()
         {
-            Condition condition = Singletons.Get<Condition>();
+            ICondition condition = Singletons.Get<ICondition>();
             return condition[ConditionFlag.WatchingCutscene] ||
                 condition[ConditionFlag.WatchingCutscene78] ||
                 condition[ConditionFlag.OccupiedInCutSceneEvent] ||
@@ -30,36 +29,36 @@ namespace DelvCD.Helpers
 
         public static bool IsInCombat()
         {
-            Condition condition = Singletons.Get<Condition>();
+            ICondition condition = Singletons.Get<ICondition>();
             return condition[ConditionFlag.InCombat];
         }
 
         public static bool IsInDuty()
         {
-            Condition condition = Singletons.Get<Condition>();
+            ICondition condition = Singletons.Get<ICondition>();
             return condition[ConditionFlag.BoundByDuty];
         }
 
         public static bool IsPerforming()
         {
-            Condition condition = Singletons.Get<Condition>();
+            ICondition condition = Singletons.Get<ICondition>();
             return condition[ConditionFlag.Performing];
         }
 
         public static bool IsInPvP()
         {
-            var clientState = Singletons.Get<ClientState>();
+            var clientState = Singletons.Get<IClientState>();
             return clientState.IsPvP || clientState.TerritoryType == 250;
         }
 
         public static bool IsInGoldenSaucer()
         {
-            return _goldenSaucerIDs.Any(id => id == Singletons.Get<ClientState>().TerritoryType);
+            return _goldenSaucerIDs.Any(id => id == Singletons.Get<IClientState>().TerritoryType);
         }
 
         public static Job GetCharacterJob()
         {
-            var player = Singletons.Get<ClientState>().LocalPlayer;
+            var player = Singletons.Get<IClientState>().LocalPlayer;
             if (player is null)
             {
                 return Job.UKN;
@@ -73,23 +72,23 @@ namespace DelvCD.Helpers
 
         public static int GetCharacterLevel()
         {
-            return Singletons.Get<ClientState>().LocalPlayer?.Level ?? 0;
+            return Singletons.Get<IClientState>().LocalPlayer?.Level ?? 0;
         }
 
         public static bool IsWeaponDrawn()
         {
-            var player = Singletons.Get<ClientState>().LocalPlayer;
+            var player = Singletons.Get<IClientState>().LocalPlayer;
             return player != null && player.StatusFlags.HasFlag(StatusFlags.WeaponOut);
         }
 
         public static unsafe bool ShouldBeVisible()
         {
-            if (Singletons.Get<ClientState>().LocalPlayer == null || IsCharacterBusy())
+            if (Singletons.Get<IClientState>().LocalPlayer == null || IsCharacterBusy())
             {
                 return false;
             }
 
-            var gameGui = Singletons.Get<GameGui>();
+            var gameGui = Singletons.Get<IGameGui>();
             var parameterWidget = (AtkUnitBase*)gameGui.GetAddonByName("_ParameterWidget", 1);
             var fadeMiddleWidget = (AtkUnitBase*)gameGui.GetAddonByName("FadeMiddle", 1);
             var paramenterVisible = parameterWidget != null && parameterWidget->IsVisible;

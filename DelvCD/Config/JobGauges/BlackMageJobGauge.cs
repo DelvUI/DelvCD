@@ -1,11 +1,10 @@
-﻿using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -53,7 +52,7 @@ namespace DelvCD.Config.JobGauges
 
         public override bool IsTriggered(bool preview)
         {
-            BLMGauge gauge = Singletons.Get<DalamudJobGauges>().Get<BLMGauge>();
+            BLMGauge gauge = Singletons.Get<IJobGauges>().Get<BLMGauge>();
 
             _dataSource.Enochian = gauge.IsEnochianActive;
             _dataSource.Enochian_Timer = gauge.EnochianTimer / 1000f;
@@ -65,7 +64,7 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Umbral_Hearts = gauge.UmbralHearts;
             _dataSource.Paradox = gauge.IsParadoxActive;
 
-            PlayerCharacter? player = Singletons.Get<ClientState>().LocalPlayer;
+            PlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
             _dataSource.Max_Polyglot_Stacks = player == null ? 2 : (player.Level >= 80 ? 2 : 1);
 
             if (preview) { return true; }

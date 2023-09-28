@@ -1,10 +1,10 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -49,7 +49,7 @@ namespace DelvCD.Config.JobGauges
 
         public override bool IsTriggered(bool preview)
         {
-            BRDGauge gauge = Singletons.Get<DalamudJobGauges>().Get<BRDGauge>();
+            BRDGauge gauge = Singletons.Get<IJobGauges>().Get<BRDGauge>();
 
             _dataSource.Active_Song = _comboOptions[0][_values[0]];
             _dataSource.Last_Active_Song = _comboOptions[0][_values[0]];

@@ -1,9 +1,9 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -34,7 +34,7 @@ namespace DelvCD.Config.JobGauges
 
         public override bool IsTriggered(bool preview)
         {
-            WHMGauge gauge = Singletons.Get<DalamudJobGauges>().Get<WHMGauge>();
+            WHMGauge gauge = Singletons.Get<IJobGauges>().Get<WHMGauge>();
 
             _dataSource.Lily_Timer = gauge.LilyTimer / 1000f;
             _dataSource.Lily_Stacks = gauge.Lily;

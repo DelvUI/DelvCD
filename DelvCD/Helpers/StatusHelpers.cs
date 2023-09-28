@@ -1,8 +1,7 @@
-using Dalamud.Data;
-using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Plugin.Services;
 using Lumina.Excel;
 using System;
 using System.Collections.Generic;
@@ -44,7 +43,7 @@ namespace DelvCD.Helpers
                 dict.Clear();
             }
 
-            PlayerCharacter? player = Singletons.Get<ClientState>().LocalPlayer;
+            PlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
             if (player is null)
             {
                 return;
@@ -57,7 +56,7 @@ namespace DelvCD.Helpers
                     TriggerSource.Player => player,
                     TriggerSource.Target => Utils.FindTarget(),
                     TriggerSource.TargetOfTarget => Utils.FindTargetOfTarget(),
-                    TriggerSource.FocusTarget => Singletons.Get<TargetManager>().FocusTarget,
+                    TriggerSource.FocusTarget => Singletons.Get<ITargetManager>().FocusTarget,
                     _ => null
                 };
 
@@ -81,7 +80,7 @@ namespace DelvCD.Helpers
 
         public static List<TriggerData> FindStatusEntries(string input)
         {
-            ExcelSheet<LuminaStatus>? sheet = Singletons.Get<DataManager>().GetExcelSheet<LuminaStatus>();
+            ExcelSheet<LuminaStatus>? sheet = Singletons.Get<IDataManager>().GetExcelSheet<LuminaStatus>();
 
             if (!string.IsNullOrEmpty(input) && sheet is not null)
             {

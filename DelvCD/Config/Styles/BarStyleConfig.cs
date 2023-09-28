@@ -1,4 +1,4 @@
-﻿using Dalamud.Interface;
+﻿using Dalamud.Interface.Utility;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
@@ -115,7 +115,7 @@ namespace DelvCD.Config
                 ImGui.DragFloat2("Position", ref Position, 1, -_screenSize.X / 2, _screenSize.X / 2);
                 ImGui.DragFloat2("Size", ref Size, 1, 0, _screenSize.Y);
 
-                ImGui.Combo("Fill Direction", ref Unsafe.As<BarDirection, int>(ref Direction) , _directionOptions, _directionOptions.Length);
+                ImGui.Combo("Fill Direction", ref Unsafe.As<BarDirection, int>(ref Direction), _directionOptions, _directionOptions.Length);
 
                 Vector4 vector = FillColor.Vector;
                 if (ImGui.ColorEdit4("Fill Color", ref vector, ImGuiColorEditFlags.AlphaPreview | ImGuiColorEditFlags.AlphaBar))

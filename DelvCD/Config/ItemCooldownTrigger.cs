@@ -1,9 +1,9 @@
-using Dalamud.Interface;
+using Dalamud.Interface.Utility;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
-using System;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -161,7 +161,7 @@ namespace DelvCD.Config
             TriggerName = triggerData.Name.ToString();
             _triggerNameInput = TriggerName;
             TriggerData.Add(triggerData);
-            Dalamud.Logging.PluginLog.Information($"{triggerData.Name}: {triggerData.Icon}");
+            Singletons.Get<IPluginLog>().Information($"{triggerData.Name}: {triggerData.Icon}");
         }
     }
 }

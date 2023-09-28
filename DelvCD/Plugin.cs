@@ -9,8 +9,10 @@ using Dalamud.Game.ClientState.Party;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.Interface;
+using Dalamud.Interface.Internal;
 using Dalamud.Logging;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using DelvCD.Config;
 using DelvCD.Helpers;
 using ImGuiScene;
@@ -25,32 +27,33 @@ namespace DelvCD
     {
         public const string ConfigFileName = "DelvCD.json";
 
-        public static string Version { get; private set; } = "0.4.0.1";
+        public static string Version { get; private set; } = "0.5.0.0";
 
         public static string ConfigFileDir { get; private set; } = "";
 
         public static string ConfigFilePath { get; private set; } = "";
 
-        public static TextureWrap? IconTexture { get; private set; } = null;
+        public static IDalamudTextureWrap? IconTexture { get; private set; } = null;
 
         public static string Changelog { get; private set; } = string.Empty;
 
         public string Name => "DelvCD";
 
         public Plugin(
-            BuddyList buddyList,
-            ClientState clientState,
-            CommandManager commandManager,
-            Condition condition,
+            IBuddyList buddyList,
+            IClientState clientState,
+            ICommandManager commandManager,
+            ICondition condition,
             DalamudPluginInterface pluginInterface,
-            DataManager dataManager,
-            Framework framework,
-            GameGui gameGui,
-            JobGauges jobGauges,
-            ObjectTable objectTable,
-            PartyList partyList,
-            SigScanner sigScanner,
-            TargetManager targetManager
+            IDataManager dataManager,
+            IFramework framework,
+            IGameGui gameGui,
+            IJobGauges jobGauges,
+            IObjectTable objectTable,
+            IPartyList partyList,
+            ISigScanner sigScanner,
+            ITargetManager targetManager,
+            IPluginLog logger
         )
         {
             Plugin.Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? Plugin.Version;
@@ -74,6 +77,7 @@ namespace DelvCD
             Singletons.Register(sigScanner);
             Singletons.Register(targetManager);
             Singletons.Register(pluginInterface.UiBuilder);
+            Singletons.Register(logger);
             Singletons.Register(new TexturesCache(pluginInterface));
             Singletons.Register(new ActionHelpers(sigScanner));
             Singletons.Register(new StatusHelpers());
@@ -100,7 +104,7 @@ namespace DelvCD
             Singletons.Register(new PluginManager(clientState, commandManager, pluginInterface, config));
         }
 
-        private static TextureWrap? LoadIconTexture(UiBuilder uiBuilder)
+        private static IDalamudTextureWrap? LoadIconTexture(UiBuilder uiBuilder)
         {
             string? pluginPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             if (string.IsNullOrEmpty(pluginPath))
@@ -114,14 +118,14 @@ namespace DelvCD
                 return null;
             }
 
-            TextureWrap? texture = null;
+            IDalamudTextureWrap? texture = null;
             try
             {
                 texture = uiBuilder.LoadImage(iconPath);
             }
             catch (Exception ex)
             {
-                PluginLog.Warning($"Failed to load DelvCD Icon {ex.ToString()}");
+                Singletons.Get<IPluginLog>().Warning($"Failed to load DelvCD Icon {ex.ToString()}");
             }
 
             return texture;
@@ -147,7 +151,7 @@ namespace DelvCD
                 }
                 catch (Exception ex)
                 {
-                    PluginLog.Warning($"Error loading changelog: {ex.ToString()}");
+                    Singletons.Get<IPluginLog>().Warning($"Error loading changelog: {ex.ToString()}");
                 }
             }
 

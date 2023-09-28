@@ -1,10 +1,9 @@
-﻿using Dalamud.Game.ClientState.JobGauge;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -37,7 +36,7 @@ namespace DelvCD.Config.JobGauges
 
         public override bool IsTriggered(bool preview)
         {
-            DRGGauge gauge = Singletons.Get<DalamudJobGauges>().Get<DRGGauge>();
+            DRGGauge gauge = Singletons.Get<IJobGauges>().Get<DRGGauge>();
 
             _dataSource.Life_Of_The_Dragon = gauge.IsLOTDActive;
             _dataSource.Life_Of_The_Dragon_Timer = gauge.LOTDTimer / 1000f;

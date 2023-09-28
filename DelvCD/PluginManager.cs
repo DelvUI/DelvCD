@@ -1,8 +1,8 @@
-﻿using Dalamud.Game.ClientState;
-using Dalamud.Game.Command;
-using Dalamud.Interface;
+﻿using Dalamud.Game.Command;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using DelvCD.Config;
 using DelvCD.Helpers;
 using DelvCD.UIElements;
@@ -15,11 +15,11 @@ namespace DelvCD
 {
     public class PluginManager : IPluginDisposable
     {
-        private ClientState ClientState { get; init; }
+        private IClientState ClientState { get; init; }
 
         private DalamudPluginInterface PluginInterface { get; init; }
 
-        private CommandManager CommandManager { get; init; }
+        private ICommandManager CommandManager { get; init; }
 
         private WindowSystem WindowSystem { get; init; }
 
@@ -38,8 +38,8 @@ namespace DelvCD
             ImGuiWindowFlags.NoBringToFrontOnFocus;
 
         public PluginManager(
-            ClientState clientState,
-            CommandManager commandManager,
+            IClientState clientState,
+            ICommandManager commandManager,
             DalamudPluginInterface pluginInterface,
             DelvCDConfig config)
         {
@@ -142,7 +142,7 @@ namespace DelvCD
             }
         }
 
-        private void OnLogout(object? sender, EventArgs? args)
+        private void OnLogout()
         {
             ConfigHelpers.SaveConfig();
         }

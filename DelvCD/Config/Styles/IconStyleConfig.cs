@@ -1,4 +1,4 @@
-﻿using Dalamud.Interface;
+﻿using Dalamud.Interface.Utility;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
@@ -80,7 +80,7 @@ namespace DelvCD.Config
             {
                 _progressDataSourceOptions[i] = $"Trigger {i + 1}";
             }
-            
+
             _progressDataSourceFieldOptions = dataSources[ProgressDataSourceIndex].ProgressFieldNames.ToArray();
 
             ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length - 1);
@@ -89,7 +89,7 @@ namespace DelvCD.Config
             {
                 int newIndex = 0;
 
-                for (int i = 0; i < dataSources.Length; i ++)
+                for (int i = 0; i < dataSources.Length; i++)
                 {
                     if (dataSources[i] is CooldownDataSource ||
                         dataSources[i] is ItemCooldownDataSource ||

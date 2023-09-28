@@ -1,8 +1,8 @@
-using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Interface;
+using Dalamud.Interface.Utility;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
@@ -63,7 +63,7 @@ namespace DelvCD.Config
                 return true;
             }
 
-            PlayerCharacter? player = Singletons.Get<ClientState>().LocalPlayer;
+            PlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
             if (player is null)
             {
                 return false;
@@ -74,7 +74,7 @@ namespace DelvCD.Config
                 TriggerSource.Player => player,
                 TriggerSource.Target => Utils.FindTarget(),
                 TriggerSource.TargetOfTarget => Utils.FindTargetOfTarget(),
-                TriggerSource.FocusTarget => Singletons.Get<TargetManager>().FocusTarget,
+                TriggerSource.FocusTarget => Singletons.Get<ITargetManager>().FocusTarget,
                 _ => null
             };
             if (actor is null)

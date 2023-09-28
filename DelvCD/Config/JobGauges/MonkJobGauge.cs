@@ -1,10 +1,10 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
-using DalamudJobGauges = Dalamud.Game.ClientState.JobGauge.JobGauges;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -49,7 +49,7 @@ namespace DelvCD.Config.JobGauges
 
         public override bool IsTriggered(bool preview)
         {
-            MNKGauge gauge = Singletons.Get<DalamudJobGauges>().Get<MNKGauge>();
+            MNKGauge gauge = Singletons.Get<IJobGauges>().Get<MNKGauge>();
 
             _dataSource.Chakra_Stacks = gauge.Chakra;
             _dataSource.Masters_Gauge_Chakra_1 = _comboOptions[1][_values[1]];

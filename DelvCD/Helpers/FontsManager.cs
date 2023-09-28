@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Logging;
+using Dalamud.Plugin.Services;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -100,8 +101,8 @@ namespace DelvCD.Helpers
                 }
                 catch (Exception ex)
                 {
-                    PluginLog.Error($"Failed to load font from path [{fontPath}]!");
-                    PluginLog.Error(ex.ToString());
+                    Singletons.Get<IPluginLog>().Error($"Failed to load font from path [{fontPath}]!");
+                    Singletons.Get<IPluginLog>().Error(ex.ToString());
                 }
             }
 
@@ -205,7 +206,7 @@ namespace DelvCD.Helpers
                 }
                 catch (Exception ex)
                 {
-                    PluginLog.Warning($"Failed to create User Font Directory {ex.ToString()}");
+                    Singletons.Get<IPluginLog>().Warning($"Failed to create User Font Directory {ex.ToString()}");
                 }
             }
 
@@ -240,7 +241,7 @@ namespace DelvCD.Helpers
                 }
                 catch (Exception ex)
                 {
-                    PluginLog.Warning($"Failed to copy font {font} to User Font Directory: {ex.ToString()}");
+                    Singletons.Get<IPluginLog>().Warning($"Failed to copy font {font} to User Font Directory: {ex.ToString()}");
                 }
             }
         }

@@ -1,14 +1,13 @@
 using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
-using DelvCD.UIElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace DelvCD.Config
@@ -127,8 +126,8 @@ namespace DelvCD.Config
                 _dataSourcesTypes = types;
                 return false;
             }
-            
-            for (int i = 0; i< dataSources.Length; i++)
+
+            for (int i = 0; i < dataSources.Length; i++)
             {
                 if (types[i] != _dataSourcesTypes[i])
                 {

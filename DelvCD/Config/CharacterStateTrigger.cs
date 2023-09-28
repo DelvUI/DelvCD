@@ -1,8 +1,7 @@
-using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Buddy;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Interface;
+using Dalamud.Interface.Utility;
+using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
@@ -82,10 +81,10 @@ namespace DelvCD.Config
 
             GameObject? actor = TriggerSource switch
             {
-                TriggerSource.Player => Singletons.Get<ClientState>().LocalPlayer,
+                TriggerSource.Player => Singletons.Get<IClientState>().LocalPlayer,
                 TriggerSource.Target => Utils.FindTarget(),
                 TriggerSource.TargetOfTarget => Utils.FindTargetOfTarget(),
-                TriggerSource.FocusTarget => Singletons.Get<TargetManager>().FocusTarget,
+                TriggerSource.FocusTarget => Singletons.Get<ITargetManager>().FocusTarget,
                 _ => null
             };
 
@@ -107,7 +106,7 @@ namespace DelvCD.Config
                 _dataSource.Level = chara.Level;
                 _dataSource.Distance = chara.YalmDistanceX;
                 _dataSource.HasPet = TriggerSource == TriggerSource.Player &&
-                    Singletons.Get<BuddyList>().PetBuddy != null;
+                    Singletons.Get<IBuddyList>().PetBuddy != null;
 
                 unsafe
                 {
