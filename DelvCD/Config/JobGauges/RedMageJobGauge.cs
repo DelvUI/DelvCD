@@ -22,13 +22,20 @@ namespace DelvCD.Config.JobGauges
             _names = new List<string>() {
                 "White Mana",
                 "Black Mana",
-                "Mana Stacks"
+                "Mana Stacks",
+                "Mana Comparison"
             };
 
             _types = new List<TriggerConditionType>() {
                 TriggerConditionType.Numeric,
                 TriggerConditionType.Numeric,
-                TriggerConditionType.Numeric
+                TriggerConditionType.Numeric,
+                TriggerConditionType.Combo,
+            };
+
+            _comboOptions = new Dictionary<int, string[]>()
+            {
+                [3] = new string[] { "Equal", "White Mana > Black Mana", "Black Mana > White Mana" }
             };
         }
 
@@ -45,7 +52,15 @@ namespace DelvCD.Config.JobGauges
             return
                 EvaluateCondition(0, _dataSource.White_Mana) &&
                 EvaluateCondition(1, _dataSource.Black_Mana) &&
-                EvaluateCondition(2, _dataSource.Mana_Stacks);
+                EvaluateCondition(2, _dataSource.Mana_Stacks) &&
+                EvaluateCondition(3, ManaComparisonValue(_dataSource.White_Mana, _dataSource.Black_Mana));
+        }
+
+        private int ManaComparisonValue(int whiteMana, int blackMana)
+        {
+            if (whiteMana == blackMana) { return 0; }
+            if (whiteMana >  blackMana) { return 1; }
+            return 2;
         }
     }
 }
