@@ -6,6 +6,7 @@ using ImGuiNET;
 using ImGuiScene;
 using System;
 using System.Numerics;
+using static Dalamud.Interface.Utility.Raii.ImRaii;
 
 namespace DelvCD.Helpers
 {
@@ -77,7 +78,7 @@ namespace DelvCD.Helpers
             float opacity,
             ImDrawListPtr drawList)
         {
-            IDalamudTextureWrap? tex = Singletons.Get<TexturesCache>().GetTextureFromIconId(iconId, (uint)stackCount, true, desaturate, opacity);
+            IDalamudTextureWrap? tex = Singletons.Get<TexturesCache>().GetTextureFromIconId(iconId, (uint)stackCount, true, desaturate);
 
             if (tex is null)
             {
@@ -86,7 +87,8 @@ namespace DelvCD.Helpers
 
             (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(tex, size, cropIcon);
 
-            drawList.AddImage(tex.ImGuiHandle, position, position + size, uv0, uv1);
+            uint alpha = (uint)(opacity * 255) << 24 | 0x00FFFFFF;
+            drawList.AddImage(tex.ImGuiHandle, position, position + size, uv0, uv1, alpha);
         }
 
         public static (Vector2, Vector2) GetTexCoordinates(IDalamudTextureWrap texture, Vector2 size, bool cropIcon = true)
