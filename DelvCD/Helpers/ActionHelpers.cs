@@ -96,7 +96,7 @@ namespace DelvCD.Helpers
         public unsafe void GetAdjustedRecastInfo(uint actionId, out RecastInfo recastInfo)
         {
             recastInfo = default;
-            int recastGroup = _actionManager->GetRecastGroup((int)ActionType.Spell, actionId);
+            int recastGroup = _actionManager->GetRecastGroup((int)ActionType.Action, actionId);
             RecastDetail* recastDetail = _actionManager->GetRecastGroupDetail(recastGroup);
             if (recastDetail == null)
             {
@@ -137,7 +137,7 @@ namespace DelvCD.Helpers
             return;
         }
 
-        public unsafe bool CanUseAction(uint actionId, ActionType type = ActionType.Spell, ulong targetId = 0xE000_0000)
+        public unsafe bool CanUseAction(uint actionId, ActionType type = ActionType.Action, ulong targetId = 0xE000_0000)
         {
             return _actionManager->GetActionStatus(type, actionId, targetId, false, true) == 0;
         }
@@ -369,7 +369,7 @@ namespace DelvCD.Helpers
             return comboIds.ToArray();
         }
 
-        public static unsafe void GetGCDInfo(out RecastInfo recastInfo, ActionType actionType = ActionType.Spell)
+        public static unsafe void GetGCDInfo(out RecastInfo recastInfo, ActionType actionType = ActionType.Action)
         {
             if (!_jobActionIDs.TryGetValue(CharacterState.GetCharacterJob(), out uint actionId))
             {
