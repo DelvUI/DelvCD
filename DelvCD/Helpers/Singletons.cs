@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 namespace DelvCD.Helpers
 {
-    public interface IPluginDisposable : IDisposable { }
+    public interface IPluginDisposable { 
+        void Dispose();
+    }
 
     public static class Singletons
     {

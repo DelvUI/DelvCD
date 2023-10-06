@@ -55,7 +55,7 @@ namespace DelvCD.Helpers
             Vector2 oldCursor = ImGui.GetCursorPos();
             Vector2 offset = new Vector2(26 * Math.Max((depth - 1), 0), 2);
             ImGui.SetCursorPos(oldCursor + offset);
-            ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
+            ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2514");
             ImGui.SameLine();
             ImGui.SetCursorPosY(oldCursor.Y);
         }

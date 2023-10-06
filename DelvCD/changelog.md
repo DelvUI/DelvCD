@@ -1,3 +1,7 @@
+# Version 0.5.1.0
+- Improved config migration code that allows to use a very old config file.
+- Fixed weird artifacts in some parts of the config window.
+
 # Version 0.5.0.0
 - Added support for patch 6.5 and Dalamud API 9.
 - Added new trigger condition for Red Mage's Job Gauge that compares White and Black Mana.

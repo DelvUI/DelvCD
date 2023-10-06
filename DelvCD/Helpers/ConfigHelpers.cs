@@ -140,12 +140,21 @@ namespace DelvCD.Helpers
                 if (File.Exists(path))
                 {
                     string jsonString = File.ReadAllText(path);
+                    bool forceMigration = false;
+
+                    if (jsonString.Contains("\"$type\": \"XIVAuras.Config.XIVAurasConfig\""))
+                    {
+                        jsonString = SanitizedJsonString(jsonString);
+                        forceMigration = true;
+                    }
+
                     config = JsonConvert.DeserializeObject<DelvCDConfig>(jsonString, _serializerSettings);
 
                     // TODO: Eventualy remove this:
                     // special migration needed for 0.3.0.0 -> 0.4.0.0
                     // ugly, but it is what it is...
-                    if (config != null && jsonString.Contains("\"Version\": \"0.3.0.0\""))
+                    bool oldConfig = jsonString.Contains("\"Version\": \"0.3.0.0\"");
+                    if (config != null && (forceMigration || oldConfig))
                     {
                         MigrateStyleConditions(config.ElementList.UIElements);
                         SaveConfig(config);
