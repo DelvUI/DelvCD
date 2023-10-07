@@ -86,7 +86,7 @@ namespace DelvCD.Config
 
             if (HideWhenSheathed && !CharacterState.IsWeaponDrawn()
                 && (!IgnoreInCombat || (IgnoreInCombat && !CharacterState.IsInCombat()))
-                && (!IgnoreInDuty) || (IgnoreInDuty && !CharacterState.IsInDuty()))
+                && (!IgnoreInDuty || (IgnoreInDuty && !CharacterState.IsInDuty())))
             {
                 return false;
             }
