@@ -25,6 +25,7 @@ namespace DelvCD.Config
         [JsonIgnore] private DataSource[] _dataSources = new DataSource[] { };
         [JsonIgnore] private string[] _progressDataSourceOptions = new string[] { };
         [JsonIgnore] private string[] _progressDataSourceFieldOptions = new string[] { };
+        [JsonIgnore] private string[] _chunkStyles = Enum.GetNames<ChunkStyles>();
 
         public int ProgressDataSourceIndex = 0;
         public int ProgressDataSourceFieldIndex = 0;
@@ -45,6 +46,9 @@ namespace DelvCD.Config
         public int ChunkCount = 5;
         public int ChunkPadding = 2;
         public ConfigColor IncompleteChunkColor = new ConfigColor(0.6f, 0.6f, 0.6f, 1);
+        public string ChunkStyle = "Default";
+        public int ChunkStylesIndex = 0;
+        public float Radius = 0;
 
         public bool Glow = false;
         public int GlowThickness = 2;
@@ -150,6 +154,11 @@ namespace DelvCD.Config
                 ImGui.Checkbox("Draw in Chunks", ref Chunked);
                 if (Chunked)
                 {
+
+                    ImGui.PushItemWidth(100 * _scale);
+                    ImGui.Combo("Chunk Style", ref ChunkStylesIndex, _chunkStyles, _chunkStyles.Length);
+                    ImGui.PopItemWidth();
+
                     DrawHelpers.DrawNestIndicator(1);
                     if (ImGui.RadioButton("Stacks from Trigger", ChunkedStacksFromTrigger))
                     {
@@ -173,8 +182,27 @@ namespace DelvCD.Config
                         ImGui.DragInt("Chunk Count", ref ChunkCount, 0.1f, 1, 200);
                     }
 
-                    DrawHelpers.DrawNestIndicator(1);
-                    ImGui.DragInt("Chunk Padding", ref ChunkPadding, 0.1f, 0, 50);
+                    if (ChunkStylesIndex > 0)
+                    {
+                        DrawHelpers.DrawNestIndicator(1);
+                        if (Direction == BarDirection.Left || Direction == BarDirection.Right)
+                        {
+                            ImGui.DragFloat("Radius", ref Size.Y, 1, -_screenSize.X / 2, _screenSize.X / 2); Radius = Size.Y;
+                            DrawHelpers.DrawNestIndicator(1);
+                            ImGui.DragFloat("Chunk Padding", ref Size.X, 1, -_screenSize.X / 2, _screenSize.X / 2);
+                        }
+                        if (Direction == BarDirection.Up || Direction == BarDirection.Down)
+                        {
+                            ImGui.DragFloat("Radius", ref Size.X, 1, -_screenSize.X / 2, _screenSize.X / 2); Radius = Size.X;
+                            DrawHelpers.DrawNestIndicator(1);
+                            ImGui.DragFloat("Chunk Padding", ref Size.Y, 1, -_screenSize.X / 2, _screenSize.X / 2);
+                        }
+                    }
+                    else
+                    {
+                        DrawHelpers.DrawNestIndicator(1);
+                        ImGui.DragInt("Chunk Padding", ref ChunkPadding, 0.1f, 0, 50);
+                    }
 
                     DrawHelpers.DrawNestIndicator(1);
                     vector = IncompleteChunkColor.Vector;

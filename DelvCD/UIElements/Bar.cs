@@ -196,33 +196,74 @@ namespace DelvCD.UIElements
 
                 foreach (BarData bar in bars)
                 {
-                    // background
-                    drawList.AddRectFilled(
-                        localPos + bar.BackgroundPosition,
-                        localPos + bar.BackgroundPosition + bar.BackgroundSize,
-                        ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector)
-                    );
-
-                    // fill
-                    ConfigColor fillColor = bar.FillColor ?? style.FillColor;
-                    drawList.AddRectFilled(
-                        localPos + bar.FillPosition,
-                        localPos + bar.FillPosition + bar.FillSize,
-                        ImGui.ColorConvertFloat4ToU32(fillColor.Vector)
-                    );
-
-                    if (style.ShowBorder)
+                    if (style.ChunkStylesIndex == 0)
                     {
-                        drawList.AddRect(
+                        // background
+                        drawList.AddRectFilled(
                             localPos + bar.BackgroundPosition,
                             localPos + bar.BackgroundPosition + bar.BackgroundSize,
-                            ImGui.ColorConvertFloat4ToU32(style.BorderColor.Vector)
+                            ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector)
                         );
+
+                        // fill
+                        ConfigColor fillColor = bar.FillColor ?? style.FillColor;
+                        drawList.AddRectFilled(
+                            localPos + bar.FillPosition,
+                            localPos + bar.FillPosition + bar.FillSize,
+                            ImGui.ColorConvertFloat4ToU32(fillColor.Vector)
+                        );
+
+                        if (style.ShowBorder)
+                        {
+                            drawList.AddRect(
+                                localPos + bar.BackgroundPosition,
+                                localPos + bar.BackgroundPosition + bar.BackgroundSize,
+                                ImGui.ColorConvertFloat4ToU32(style.BorderColor.Vector)
+                            );
+                        }
+
+                        if (style.Glow)
+                        {
+                            DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                        }
                     }
 
-                    if (style.Glow)
+                    if (style.ChunkStylesIndex == 1)
                     {
-                        DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                        // background
+                        drawList.AddQuadFilled(
+                            localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, 0),
+                            localPos + bar.BackgroundPosition + new Vector2(style.Radius, style.Radius / 2),
+                            localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, style.Radius),
+                            localPos + bar.BackgroundPosition + new Vector2(0, style.Radius / 2),
+                            ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector)
+                        );
+
+                        // fill
+                        ConfigColor fillColor = bar.FillColor ?? style.FillColor;
+                        drawList.AddQuadFilled(
+                            localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, 0),
+                            localPos + bar.BackgroundPosition + new Vector2(style.Radius, style.Radius / 2),
+                            localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, style.Radius),
+                            localPos + bar.BackgroundPosition + new Vector2(0, style.Radius / 2),
+                            ImGui.ColorConvertFloat4ToU32(fillColor.Vector)
+                        );
+
+                        if (style.ShowBorder)
+                        {
+                            drawList.AddQuad(
+                                localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, 0),
+                                localPos + bar.BackgroundPosition + new Vector2(style.Radius, style.Radius / 2),
+                                localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, style.Radius),
+                                localPos + bar.BackgroundPosition + new Vector2(0, style.Radius / 2),
+                                    ImGui.ColorConvertFloat4ToU32(style.BorderColor.Vector)
+                            );
+                        }
+
+                        if (style.Glow)
+                        {
+                            DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                        }
                     }
                 }
             });

@@ -63,6 +63,12 @@ namespace DelvCD.Helpers
         Down,
     }
 
+    public enum ChunkStyles
+    {
+        Default,
+        Diamond,
+    }
+
     public enum Job
     {
         UKN = 0,
