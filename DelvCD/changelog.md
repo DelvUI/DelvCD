@@ -1,3 +1,6 @@
+# Version 0.5.1.1
+- Fixed Hide When Sheathed logic.
+
 # Version 0.5.1.0
 - Improved config migration code that allows to use a very old config file.
 - Fixed weird artifacts in some parts of the config window.

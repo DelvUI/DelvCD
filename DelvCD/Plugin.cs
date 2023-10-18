@@ -27,7 +27,7 @@ namespace DelvCD
     {
         public const string ConfigFileName = "DelvCD.json";
 
-        public static string Version { get; private set; } = "0.5.1.0";
+        public static string Version { get; private set; } = "0.5.1.1";
 
         public static string ConfigFileDir { get; private set; } = "";
 
