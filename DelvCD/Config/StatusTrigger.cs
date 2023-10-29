@@ -247,10 +247,14 @@ namespace DelvCD.Config
             // Sanity check
             if (actor == null || actor is not BattleChara) { return false; }
 
-            // Do we want to include BattleNpcSubKind.Pet or BattleNpcSubKind.Chocobo as friendly?
-            if (sourceType is TriggerSourceType.Friendly && actor is PlayerCharacter) { return true; }
+            bool friendly = sourceType == TriggerSourceType.Friendly;
+            if (actor is PlayerCharacter) { return friendly; }
 
-            if (sourceType is TriggerSourceType.Enemy && actor is BattleNpc && ((BattleNpc)actor).BattleNpcKind is BattleNpcSubKind.Enemy) { return true; }
+            if (actor is BattleNpc npc) {
+                if (npc.BattleNpcKind == BattleNpcSubKind.Pet || npc.BattleNpcKind == BattleNpcSubKind.Chocobo) { return friendly; }
+                
+                return friendly == Utils.IsHostile((Character)actor);
+            }
 
             // If none of the above cases are hit, then the actor and SourceType mismatch and the aura should not be triggered.
             return false;

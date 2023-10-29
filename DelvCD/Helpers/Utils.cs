@@ -1,10 +1,12 @@
 ﻿using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using System;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using CharacterStruct = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvCD.Helpers
 {
@@ -60,6 +62,14 @@ namespace DelvCD.Helpers
             }
 
             return null;
+        }
+
+        public static unsafe bool IsHostile(Character character)
+        {
+            CharacterStruct* chara = (CharacterStruct*)character.Address;
+            return character != null
+                && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == (byte)BattleNpcSubKind.BattleNpcPart)
+                && chara->CharacterData.Battalion > 0);
         }
 
         public static bool GetResult(
