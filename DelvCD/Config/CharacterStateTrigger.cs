@@ -8,8 +8,8 @@ using ImGuiNET;
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization;
-using CharacterStruct = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
+using System.Text.Json.Serialization;using CharacterStruct = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
+
 
 namespace DelvCD.Config
 {

@@ -31,6 +31,12 @@ namespace DelvCD.Helpers
         FocusTarget
     }
 
+    public enum TriggerSourceType {
+        Any,
+        Friendly,
+        Enemy
+    }
+
     public enum TriggerCond
     {
         And,
