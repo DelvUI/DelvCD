@@ -64,12 +64,18 @@ namespace DelvCD.Helpers
             return null;
         }
 
+        /// <summary>
+        /// Checks if a character is considered hostile relative to the player.
+        /// </summary>
+        /// <param name="character">The <c>Character</c> object to check.</param>
+        /// <returns>Returns true if <c>Character</c> provided is hostile, otherwise false.</returns>
         public static unsafe bool IsHostile(Character character)
         {
             CharacterStruct* chara = (CharacterStruct*)character.Address;
+
             return character != null
                 && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == (byte)BattleNpcSubKind.BattleNpcPart)
-                && chara->CharacterData.Battalion > 0);
+                && chara->CharacterData.Battalion > 0); // Since its not super clear, CharacterData.Battalion used for determining friend/enemy state
         }
 
         public static bool GetResult(

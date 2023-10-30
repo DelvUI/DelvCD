@@ -87,8 +87,9 @@ namespace DelvCD.Config
             }
 
             // If the actor DOES NOT match the TriggerSourceType configured, the aura should not be triggered. We can ignore all subsequent checks.
-            // Players are always friendly, and we don't want to check TriggerSourceType if the TriggerSource is set to Player in the case TriggerSourceType is set to Enemy somehow.
-            if (this.TriggerSource is not TriggerSource.Player && !DoesActorMatchTriggerSourceType(actor, this.TriggerSourceType)) { return false; }
+            // The trigger source is not a configurable option for TriggerSource.Player so we can just skip the check if the trigger is set to that.
+            if (this.TriggerSource is not TriggerSource.Player &&
+                !DoesActorMatchTriggerSourceType(actor, this.TriggerSourceType)) { return false; }
 
             bool wasInactive = _dataSource.Status_Timer == 0;
             bool active = false;
@@ -247,16 +248,19 @@ namespace DelvCD.Config
             // Sanity check
             if (actor == null || actor is not BattleChara) { return false; }
 
+            // For Friendly character checks, this will be true. For Enemy character checks, this will be false.
             bool friendly = sourceType == TriggerSourceType.Friendly;
+
             if (actor is PlayerCharacter) { return friendly; }
 
             if (actor is BattleNpc npc) {
                 if (npc.BattleNpcKind == BattleNpcSubKind.Pet || npc.BattleNpcKind == BattleNpcSubKind.Chocobo) { return friendly; }
                 
-                return friendly == Utils.IsHostile((Character)actor);
+                // For enemy trigger checks, the 'friendly' variable will be set to false, so we want to negate that first.
+                return !friendly == Utils.IsHostile((Character)actor);
             }
 
-            // If none of the above cases are hit, then the actor and SourceType mismatch and the aura should not be triggered.
+            // If none of the above cases are hit, then the actor did not explictly match so just return false.
             return false;
         }
     }
