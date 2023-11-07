@@ -38,7 +38,7 @@ namespace DelvCD.Config.JobGauges
                 TriggerConditionType.Boolean
             };
 
-            string[] chakras = new string[] { "None", "Coeurl", "Raptor", "Opo-opo" };
+            string[] chakras = new string[] { "None", "Coeurl", "Opo-opo", "Raptor" };
             _comboOptions = new Dictionary<int, string[]>()
             {
                 [1] = chakras,
