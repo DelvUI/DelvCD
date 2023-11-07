@@ -8,7 +8,8 @@ using ImGuiNET;
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization;using CharacterStruct = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
+using System.Text.Json.Serialization;
+using CharacterStruct = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 
 namespace DelvCD.Config
@@ -42,21 +43,25 @@ namespace DelvCD.Config
         public TriggerDataOp HpOp = TriggerDataOp.GreaterThan;
         public float HpValue;
         public bool MaxHp;
+        public bool HpPercent;
 
         public bool Mp = false;
         public TriggerDataOp MpOp = TriggerDataOp.GreaterThan;
         public float MpValue;
         public bool MaxMp;
+        public bool MpPercent;
 
         public bool Cp = false;
         public TriggerDataOp CpOp = TriggerDataOp.GreaterThan;
         public float CpValue;
         public bool MaxCp;
+        public bool CpPercent;
 
         public bool Gp = false;
         public TriggerDataOp GpOp = TriggerDataOp.GreaterThan;
         public float GpValue;
         public bool MaxGp;
+        public bool GpPercent;
 
         public bool PetCheck;
         public int PetValue;
@@ -114,11 +119,21 @@ namespace DelvCD.Config
                 }
             }
 
+            float hp = MaxHp || !HpPercent ? _dataSource.Hp : _dataSource.Hp / _dataSource.MaxHp * 100;
+            float mp = MaxMp || !MpPercent ? _dataSource.Mp : _dataSource.Mp / _dataSource.MaxMp * 100;
+            float cp = MaxCp || !CpPercent ? _dataSource.Cp : _dataSource.Cp / _dataSource.MaxCp * 100;
+            float gp = MaxGp || !GpPercent ? _dataSource.Gp : _dataSource.Gp / _dataSource.MaxGp * 100;
+
+            float hpValue = MaxHp ? _dataSource.MaxHp : HpValue;
+            float mpValue = MaxMp ? _dataSource.MaxMp : MpValue;
+            float cpValue = MaxCp ? _dataSource.MaxCp : CpValue;
+            float gpValue = MaxGp ? _dataSource.MaxGp : GpValue;
+
             return
-                (!Hp || Utils.GetResult(_dataSource.Hp, HpOp, MaxHp ? _dataSource.MaxHp : HpValue)) &&
-                (!Mp || Utils.GetResult(_dataSource.Mp, MpOp, MaxMp ? _dataSource.MaxMp : MpValue)) &&
-                (!Cp || Utils.GetResult(_dataSource.Cp, CpOp, MaxCp ? _dataSource.MaxCp : CpValue)) &&
-                (!Gp || Utils.GetResult(_dataSource.Gp, GpOp, MaxGp ? _dataSource.MaxGp : GpValue)) &&
+                (!Hp || Utils.GetResult(hp, HpOp, hpValue)) &&
+                (!Mp || Utils.GetResult(mp, MpOp, mpValue)) &&
+                (!Cp || Utils.GetResult(cp, CpOp, cpValue)) &&
+                (!Gp || Utils.GetResult(gp, GpOp, gpValue)) &&
                 (!Level || Utils.GetResult(_dataSource.Level, LevelOp, LevelValue)) &&
                 (!PetCheck || (PetValue == 0 ? _dataSource.HasPet : !_dataSource.HasPet));
         }
@@ -197,9 +212,12 @@ namespace DelvCD.Config
                     }
 
                     ImGui.PopItemWidth();
+
                     ImGui.SameLine();
+                    ImGui.Checkbox("%##HPPercent", ref HpPercent);
                 }
 
+                ImGui.SameLine();
                 ImGui.Checkbox("Max HP", ref MaxHp);
             }
 
@@ -234,9 +252,12 @@ namespace DelvCD.Config
                     }
 
                     ImGui.PopItemWidth();
+
                     ImGui.SameLine();
+                    ImGui.Checkbox("%##MPPercent", ref MpPercent);
                 }
 
+                ImGui.SameLine();
                 ImGui.Checkbox("Max MP", ref MaxMp);
             }
 
@@ -271,9 +292,12 @@ namespace DelvCD.Config
                     }
 
                     ImGui.PopItemWidth();
+
                     ImGui.SameLine();
+                    ImGui.Checkbox("%##CPPercent", ref CpPercent);
                 }
 
+                ImGui.SameLine();
                 ImGui.Checkbox("Max CP", ref MaxCp);
             }
 
@@ -308,9 +332,12 @@ namespace DelvCD.Config
                     }
 
                     ImGui.PopItemWidth();
+
                     ImGui.SameLine();
+                    ImGui.Checkbox("%##GPPercent", ref GpPercent);
                 }
 
+                ImGui.SameLine();
                 ImGui.Checkbox("Max GP", ref MaxGp);
             }
 

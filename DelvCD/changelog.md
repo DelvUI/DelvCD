@@ -2,6 +2,8 @@
 - Added Source Type for Status Triggers:
   * This allows to make triggers that only work on enemies or allies.
 
+- Added option to configure HP, MP, CP and GP triggers with percentages instead of raw values.
+
 - Fixed Monk's Master Gauge Chakra not working correctly:
   * Opo-opo and Raptor chakras were inverted.
 
