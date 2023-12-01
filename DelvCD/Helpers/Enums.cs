@@ -66,7 +66,8 @@ namespace DelvCD.Helpers
     public enum ChunkStyles
     {
         Default,
-        Diamond,
+        Circles,
+        Polygons
     }
 
     public enum Job
