@@ -49,6 +49,7 @@ namespace DelvCD.Config
         public string ChunkStyle = "Default";
         public int ChunkStylesIndex = 0;
         public float Radius = 0;
+        public int NgonSides = 0;
 
         public bool Glow = false;
         public int GlowThickness = 2;
@@ -187,15 +188,25 @@ namespace DelvCD.Config
                         DrawHelpers.DrawNestIndicator(1);
                         if (Direction == BarDirection.Left || Direction == BarDirection.Right)
                         {
-                            ImGui.DragFloat("Radius", ref Size.Y, 1, -_screenSize.X / 2, _screenSize.X / 2); Radius = Size.Y;
+                            ImGui.DragFloat("Radius", ref Size.Y, 1, 0, _screenSize.X / 2); Radius = Size.Y;
+                            if (ChunkStylesIndex == 2)
+                            {
+                                DrawHelpers.DrawNestIndicator(1);
+                                ImGui.DragInt("Sides", ref NgonSides, 1, 3, 12);
+                            }
                             DrawHelpers.DrawNestIndicator(1);
-                            ImGui.DragFloat("Chunk Padding", ref Size.X, 1, -_screenSize.X / 2, _screenSize.X / 2);
+                            ImGui.DragFloat("Chunk Padding", ref Size.X, 1, 0, _screenSize.X / 2);
                         }
                         if (Direction == BarDirection.Up || Direction == BarDirection.Down)
                         {
-                            ImGui.DragFloat("Radius", ref Size.X, 1, -_screenSize.X / 2, _screenSize.X / 2); Radius = Size.X;
+                            ImGui.DragFloat("Radius", ref Size.X, 1, 0, _screenSize.X / 2); Radius = Size.X;
+                            if (ChunkStylesIndex == 2)
+                            {
+                                DrawHelpers.DrawNestIndicator(1);
+                                ImGui.DragInt("Sides", ref NgonSides, 1, 3, 12);
+                            }
                             DrawHelpers.DrawNestIndicator(1);
-                            ImGui.DragFloat("Chunk Padding", ref Size.Y, 1, -_screenSize.X / 2, _screenSize.X / 2);
+                            ImGui.DragFloat("Chunk Padding", ref Size.Y, 1, 0, _screenSize.X / 2);
                         }
                     }
                     else
