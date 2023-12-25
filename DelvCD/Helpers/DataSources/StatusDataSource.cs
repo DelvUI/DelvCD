@@ -4,6 +4,7 @@
     {
         public new static string GetDisplayName() => "Status";
 
+        public string? Name = string.Empty;
         public float Status_Timer;
         public float Max_Status_Timer;
         public int Status_Stacks;
