@@ -4,6 +4,7 @@
     {
         public new static string GetDisplayName() => "Cooldown";
 
+        public string? Name = string.Empty;
         public float Cooldown_Timer;
         public float Max_Cooldown_Timer;
         public int Cooldown_Stacks;

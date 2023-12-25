@@ -64,6 +64,7 @@ namespace DelvCD.Config
                 _dataSource.Cooldown_Stacks = 2;
                 _dataSource.Max_Cooldown_Stacks = 2;
                 _dataSource.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
+                _dataSource.Name = TriggerData.FirstOrDefault()?.Name ?? string.Empty;
 
                 return true;
             }
@@ -129,6 +130,7 @@ namespace DelvCD.Config
             _dataSource.Cooldown_Stacks = stacks;
             _dataSource.Max_Cooldown_Stacks = recastInfo.MaxCharges;
             _dataSource.Icon = Adjust ? helper.GetIconIdForAction(actionId) : actionTrigger.Icon;
+            _dataSource.Name = Adjust ? helper.GetAdjustedActionName(actionId) : actionTrigger.Name;
 
             return
                 (!Combo || (ComboValue == 0 ? comboActive : !comboActive)) &&

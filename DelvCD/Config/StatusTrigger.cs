@@ -62,6 +62,7 @@ namespace DelvCD.Config
                 _dataSource.Status_Stacks = 2;
                 _dataSource.Max_Status_Stacks = 2;
                 _dataSource.Icon = TriggerData.FirstOrDefault()?.Icon ?? 0;
+                _dataSource.Name = TriggerData.FirstOrDefault()?.Name ?? string.Empty;
 
                 return true;
             }
@@ -109,7 +110,9 @@ namespace DelvCD.Config
                         _dataSource.Status_Timer = Math.Abs(status.RemainingTime);
                         _dataSource.Status_Stacks = status.StackCount;
                         _dataSource.Max_Status_Stacks = trigger.MaxStacks;
-                        _dataSource.Icon = trigger.Icon;
+                        if (_dataSource.Max_Status_Stacks > 0) { _dataSource.Icon = (uint)(trigger.Icon + _dataSource.Status_Stacks - 1); }
+                        else { _dataSource.Icon = trigger.Icon; }
+                        _dataSource.Name = trigger.Name;
 
                         if (wasInactive)
                         {

@@ -93,6 +93,20 @@ namespace DelvCD.Helpers
             return _actionManager->GetAdjustedActionId(actionId);
         }
 
+        public string? GetNameForAction(uint actionId)
+        {
+            string name = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>()?.GetRow(actionId)?.Name ?? string.Empty;
+
+            return name;
+        }
+
+        public unsafe string GetAdjustedActionName(uint actionId)
+        {
+            var newid = GetAdjustedActionId(actionId);
+
+            return GetNameForAction(newid) ?? string.Empty;
+        }
+
         public unsafe void GetAdjustedRecastInfo(uint actionId, out RecastInfo recastInfo)
         {
             recastInfo = default;
