@@ -1,3 +1,17 @@
+# Version 0.5.2.0
+- Added Source Type for Status Triggers:
+  * This allows to make triggers that only work on enemies or allies.
+
+- Added option to configure HP, MP, CP and GP triggers with percentages instead of raw values.
+
+- Fixed Monk's Master Gauge Chakra not working correctly:
+  * Opo-opo and Raptor chakras were inverted.
+
+- Fixed the Conditions tab sometimes not rendering properly.
+
+# Version 0.5.1.1
+- Fixed Hide When Sheathed logic.
+
 # Version 0.5.1.0
 - Improved config migration code that allows to use a very old config file.
 - Fixed weird artifacts in some parts of the config window.
