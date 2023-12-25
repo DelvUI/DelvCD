@@ -1,3 +1,9 @@
+# Version 1.0.0.0
+- Moved from testing.
+- Added Chunk Styles for bars.
+- Fixed stackable statuses icons.
+- Fixed names not working correctly when using other plugins like XIVCombo.
+
 # Version 0.5.2.0
 - Added Source Type for Status Triggers:
   * This allows to make triggers that only work on enemies or allies.
