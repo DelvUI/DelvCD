@@ -196,33 +196,74 @@ namespace DelvCD.UIElements
 
                 foreach (BarData bar in bars)
                 {
-                    // background
-                    drawList.AddRectFilled(
-                        localPos + bar.BackgroundPosition,
-                        localPos + bar.BackgroundPosition + bar.BackgroundSize,
-                        ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector)
-                    );
-
-                    // fill
-                    ConfigColor fillColor = bar.FillColor ?? style.FillColor;
-                    drawList.AddRectFilled(
-                        localPos + bar.FillPosition,
-                        localPos + bar.FillPosition + bar.FillSize,
-                        ImGui.ColorConvertFloat4ToU32(fillColor.Vector)
-                    );
-
-                    if (style.ShowBorder)
+                    if (style.ChunkStylesIndex == 0)
                     {
-                        drawList.AddRect(
+                        // background
+                        drawList.AddRectFilled(
                             localPos + bar.BackgroundPosition,
                             localPos + bar.BackgroundPosition + bar.BackgroundSize,
-                            ImGui.ColorConvertFloat4ToU32(style.BorderColor.Vector)
+                            ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector)
                         );
+
+                        // fill
+                        ConfigColor fillColor = bar.FillColor ?? style.FillColor;
+                        drawList.AddRectFilled(
+                            localPos + bar.FillPosition,
+                            localPos + bar.FillPosition + bar.FillSize,
+                            ImGui.ColorConvertFloat4ToU32(fillColor.Vector)
+                        );
+
+                        if (style.ShowBorder)
+                        {
+                            drawList.AddRect(
+                                localPos + bar.BackgroundPosition,
+                                localPos + bar.BackgroundPosition + bar.BackgroundSize,
+                                ImGui.ColorConvertFloat4ToU32(style.BorderColor.Vector)
+                            );
+                        }
+
+                        if (style.Glow)
+                        {
+                            DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                        }
                     }
 
-                    if (style.Glow)
+                    if (style.ChunkStylesIndex == 1 || style.ChunkStylesIndex == 2) // Circles || Polygons
                     {
-                        DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                        var ngonsides = style.NgonSides;
+                        if (style.ChunkStylesIndex == 1) { ngonsides = 0; } // Circles
+
+                        // background
+                        drawList.AddCircleFilled(
+                            localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, style.Radius / 2),
+                            style.Radius/2,
+                            ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector),
+                            ngonsides
+                        );
+
+                        // fill
+                        ConfigColor fillColor = bar.FillColor ?? style.FillColor;
+                        drawList.AddCircleFilled(
+                            localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, style.Radius / 2),
+                            style.Radius/2,
+                            ImGui.ColorConvertFloat4ToU32(fillColor.Vector),
+                            ngonsides
+                        );
+
+                        if (style.ShowBorder)
+                        {
+                            drawList.AddCircle(
+                            localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, style.Radius / 2),
+                                    style.Radius/2,
+                                    ImGui.ColorConvertFloat4ToU32(style.BorderColor.Vector),
+                                    ngonsides
+                            );
+                        }
+
+                        if (style.Glow) // Doesn't work on these yet, requires a new DrawHelper
+                        {
+                            DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                        }
                     }
                 }
             });
