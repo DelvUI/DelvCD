@@ -207,11 +207,24 @@ namespace DelvCD.UIElements
 
                         // fill
                         ConfigColor fillColor = bar.FillColor ?? style.FillColor;
+                        // Alignment Hotfix
+                        // Add check to FillSize and only draw if the fillsize is more than 1 pixel to avoid artifacting at 0%.
+                        if ((bar.FillSize.X >= 1 && bar.FillSize.Y >= 1))
+                        {
+                            drawList.AddRectFilled(
+                                localPos + bar.FillPosition,
+                                localPos + bar.FillPosition + bar.FillSize,
+                                ImGui.ColorConvertFloat4ToU32(fillColor.Vector)
+                            );
+                        }
+                        // Previously
+                        /*
                         drawList.AddRectFilled(
                             localPos + bar.FillPosition,
                             localPos + bar.FillPosition + bar.FillSize,
                             ImGui.ColorConvertFloat4ToU32(fillColor.Vector)
                         );
+                        */
 
                         if (style.ShowBorder)
                         {
