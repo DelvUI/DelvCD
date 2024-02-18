@@ -289,8 +289,19 @@ namespace DelvCD.Helpers
 
             DrawSegmentedLineHorizontal(drawList, c1, size.X, thickness, prog, segments, col1, col2);
             DrawSegmentedLineVertical(drawList, c2.AddX(-thickness), thickness, size.Y, prog, segments, col1, col2);
+
+            // Alignment Hotfix
+            // Add special case when thickness is 1 to avoid weird alignment issues wih Glow rect.
+            int adjustedThickness = thickness;
+            if (thickness == 1) { adjustedThickness = thickness - 1; }
+
+            DrawSegmentedLineHorizontal(drawList, c3.AddY(-thickness), -size.X + 2, adjustedThickness - 1, prog, segments, col1, col2);
+            DrawSegmentedLineVertical(drawList, c4, adjustedThickness - 1, -size.Y + 1, prog, segments, col1, col2);
+            // Previously
+            /*
             DrawSegmentedLineHorizontal(drawList, c3.AddY(-thickness), -size.X, thickness, prog, segments, col1, col2);
             DrawSegmentedLineVertical(drawList, c4, thickness, -size.Y, prog, segments, col1, col2);
+            */
         }
     }
 }
