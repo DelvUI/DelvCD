@@ -61,6 +61,7 @@ namespace DelvCD.UIElements
         public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
             bool visible = VisibilityConfig.IsVisible(parentVisible);
+            int index = 0;
             foreach (UIElement element in ElementList.UIElements)
             {
                 if (!Preview && LastFrameWasPreview)
@@ -74,7 +75,19 @@ namespace DelvCD.UIElements
 
                 if (visible || Singletons.Get<PluginManager>().IsConfigOpen())
                 {
-                    element.Draw(pos + GroupConfig.Position, null, visible);
+                    if (GroupConfig.Dynamic)
+                    {
+                        float groupX = GroupConfig.Position.X + (index * GroupConfig.DynamicOffset.X);
+                        float groupY = GroupConfig.Position.Y + (index * GroupConfig.DynamicOffset.Y);
+
+                        Vector2 groupWithOffset = new Vector2(groupX, groupY);
+
+                        index++;
+
+                        element.Draw(pos + groupWithOffset, null, visible);
+                    } else {
+                        element.Draw(pos + GroupConfig.Position, null, visible);
+                    }
                 }
             }
 

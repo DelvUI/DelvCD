@@ -12,6 +12,8 @@ namespace DelvCD.Config
         [JsonIgnore] private static Vector2 _screenSize = ImGui.GetMainViewport().Size;
 
         public string Name => "Group";
+        public bool Dynamic = false;
+        public Vector2 DynamicOffset = new Vector2(0, 0);
 
         public Vector2 Position = new Vector2(0, 0);
 
@@ -29,6 +31,12 @@ namespace DelvCD.Config
             if (ImGui.BeginChild("##GroupConfig", new Vector2(size.X, size.Y), true))
             {
                 ImGui.DragFloat2("Group Position", ref Position);
+
+                ImGui.NewLine();
+                ImGui.Checkbox("Dynamic Grouping", ref Dynamic);
+                if (Dynamic) {
+                  ImGui.DragFloat2("Dynamic Offset", ref DynamicOffset);
+                }
 
                 ImGui.NewLine();
                 ImGui.Text("Resize Icons");
