@@ -62,6 +62,7 @@ namespace DelvCD.UIElements
         {
             bool visible = VisibilityConfig.IsVisible(parentVisible);
             int index = 0;
+            
             foreach (UIElement element in ElementList.UIElements)
             {
                 if (!Preview && LastFrameWasPreview)
@@ -75,19 +76,11 @@ namespace DelvCD.UIElements
 
                 if (visible || Singletons.Get<PluginManager>().IsConfigOpen())
                 {
-                    if (GroupConfig.Dynamic)
-                    {
-                        float groupX = GroupConfig.Position.X + (index * GroupConfig.DynamicOffset.X);
-                        float groupY = GroupConfig.Position.Y + (index * GroupConfig.DynamicOffset.Y);
+                    Vector2 offset = GroupConfig.IsDynamic ? index * GroupConfig.DynamicOffset : Vector2.Zero;
 
-                        Vector2 groupWithOffset = new Vector2(groupX, groupY);
+                    element.Draw(pos + GroupConfig.Position + offset, null, visible);
 
-                        index++;
-
-                        element.Draw(pos + groupWithOffset, null, visible);
-                    } else {
-                        element.Draw(pos + GroupConfig.Position, null, visible);
-                    }
+                    index++;
                 }
             }
 
