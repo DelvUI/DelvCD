@@ -292,5 +292,28 @@ namespace DelvCD.Helpers
             DrawSegmentedLineHorizontal(drawList, c3.AddY(-thickness), -size.X, thickness, prog, segments, col1, col2);
             DrawSegmentedLineVertical(drawList, c4, thickness, -size.Y, prog, segments, col1, col2);
         }
+
+        public static void DrawGlowNGon(Vector2 center, float radius, int thickness, int sides, int segments, float speed, ConfigColor col1, ConfigColor col2, ImDrawListPtr drawList)
+        {
+            speed = Math.Abs(speed);
+            int mod = speed == 0 ? 1 : (int)(250 / speed);
+            float prog = (float)(DateTimeOffset.Now.ToUnixTimeMilliseconds() % mod) / mod;
+
+            uint[] colors = new uint[2] { prog < 0.5 ? col2.Base : col1.Base, prog < 0.5 ? col1.Base : col2.Base };
+
+            for (int n = 0; n < segments - 1; n++)
+            {
+                for (int i = 0; i < thickness; i++)
+                {
+                    float offset = i;
+                    drawList.AddCircle(
+                    center,
+                    (radius / 2) - offset,
+                    colors[n % colors.Length],
+                    sides
+                        );
+                }
+            }
+        }
     }
 }
