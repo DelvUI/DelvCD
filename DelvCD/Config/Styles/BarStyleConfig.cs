@@ -231,8 +231,12 @@ namespace DelvCD.Config
                     DrawHelpers.DrawNestIndicator(1);
                     ImGui.DragInt("Thickness##Glow", ref GlowThickness, 1, 1, 16);
 
-                    DrawHelpers.DrawNestIndicator(1);
-                    ImGui.DragInt("Glow Segments##Glow", ref GlowSegments, 1, 2, 16);
+
+                    if (ChunkStylesIndex == 0)
+                    {
+                        DrawHelpers.DrawNestIndicator(1);
+                        ImGui.DragInt("Glow Segments##Glow", ref GlowSegments, 1, 2, 16);
+                    }
 
                     DrawHelpers.DrawNestIndicator(1);
                     ImGui.DragFloat("Animation Speed##Glow", ref GlowSpeed, 0.05f, 0, 2f);
