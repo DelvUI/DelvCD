@@ -212,14 +212,17 @@ namespace DelvCD.UIElements
                             localPos + bar.FillPosition + bar.FillSize,
                             ImGui.ColorConvertFloat4ToU32(fillColor.Vector)
                         );
-
+                        
                         if (style.ShowBorder)
                         {
-                            drawList.AddRect(
-                                localPos + bar.BackgroundPosition,
-                                localPos + bar.BackgroundPosition + bar.BackgroundSize,
-                                ImGui.ColorConvertFloat4ToU32(style.BorderColor.Vector)
-                            );
+                            for (int i = 0; i < style.BorderThickness; i++)
+                            {
+                                Vector2 offset = new Vector2(i, i);
+                                drawList.AddRect(
+                                    localPos + bar.BackgroundPosition + offset,
+                                    localPos + bar.BackgroundPosition + bar.BackgroundSize - offset,
+                                    ImGui.ColorConvertFloat4ToU32(style.BorderColor.Vector));
+                            }
                         }
 
                         if (style.Glow)
@@ -252,17 +255,31 @@ namespace DelvCD.UIElements
 
                         if (style.ShowBorder)
                         {
-                            drawList.AddCircle(
-                            localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, style.Radius / 2),
-                                    style.Radius/2,
+                            for (int i = 0; i < style.BorderThickness; i++)
+                            {
+                                float offset = i;
+                                drawList.AddCircle(
+                                    localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, style.Radius / 2),
+                                    (style.Radius / 2) - offset,
                                     ImGui.ColorConvertFloat4ToU32(style.BorderColor.Vector),
                                     ngonsides
-                            );
+                                    );
+                            }
                         }
 
-                        if (style.Glow) // Doesn't work on these yet, requires a new DrawHelper
+                        if (style.Glow) // First draft, opted for "flashing" border effect since drawing the glow effect on non-rectangles seems messy
                         {
-                            DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                            DrawHelpers.DrawGlowNGon(
+                                localPos + bar.BackgroundPosition + new Vector2(style.Radius / 2, style.Radius / 2),
+                                style.Radius,
+                                style.GlowThickness,
+                                ngonsides,
+                                style.GlowSegments,
+                                style.GlowSpeed,
+                                style.GlowColor,
+                                style.GlowColor2,
+                                drawList
+                                );
                         }
                     }
                 }
