@@ -17,7 +17,7 @@ namespace DelvCD.Config
 
         [JsonIgnore] public string Name => "Bar";
 
-        [JsonIgnore] private Vector2 _screenSize = ImGui.GetMainViewport().Size;
+        [JsonIgnore] private Vector2 _screenSize => ImGui.GetMainViewport().Size;
 
         [JsonIgnore] private string[] _directionOptions = Enum.GetNames<BarDirection>();
         [JsonIgnore] private string[] _thresholdOpOptions = new string[] { "<", ">", "<=", ">=" };

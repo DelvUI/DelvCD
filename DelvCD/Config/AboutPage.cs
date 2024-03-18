@@ -7,7 +7,7 @@ namespace DelvCD.Config
 {
     public class AboutPage : IConfigPage
     {
-        private float _scale = ImGuiHelpers.GlobalScale;
+        private float _scale => ImGuiHelpers.GlobalScale;
 
         public string Name => "Changelog";
 

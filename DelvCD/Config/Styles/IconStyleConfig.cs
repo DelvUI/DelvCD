@@ -18,7 +18,7 @@ namespace DelvCD.Config
 
         [JsonIgnore] private string _iconSearchInput = string.Empty;
         [JsonIgnore] private List<TriggerData> _iconSearchResults = new List<TriggerData>();
-        [JsonIgnore] private Vector2 _screenSize = ImGui.GetMainViewport().Size;
+        [JsonIgnore] private Vector2 _screenSize => ImGui.GetMainViewport().Size;
 
         [JsonIgnore] private DataSource[] _dataSources = new DataSource[] { };
         [JsonIgnore] private string[] _progressDataSourceOptions = new string[] { };

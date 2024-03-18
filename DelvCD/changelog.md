@@ -1,3 +1,8 @@
+# Version 1.0.0.1
+- Fixed bars border thickness not working.
+- Fixed glows not working properly for chunked bars.
+- Fixed issues that caused the Conditions window to not load properly sometimes.
+
 # Version 1.0.0.0
 - Moved from testing.
 - Added Chunk Styles for bars.

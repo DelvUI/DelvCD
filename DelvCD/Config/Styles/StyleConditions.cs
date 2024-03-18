@@ -259,7 +259,8 @@ namespace DelvCD.Config
 
             if (ImGui.TableSetColumnIndex(2))
             {
-                if (_sourceOptions[condition.TriggerDataSourceIndex].Length > 0)
+                if (condition.TriggerDataSourceIndex > _sourceOptions.Length &&
+                    _sourceOptions[condition.TriggerDataSourceIndex].Length > 0)
                 {
                     condition.Source = Math.Clamp(condition.Source, 0, _sourceOptions[condition.TriggerDataSourceIndex].Length - 1);
 

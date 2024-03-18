@@ -9,7 +9,7 @@ namespace DelvCD.Config
     public class GroupConfig : IConfigPage
     {
         [JsonIgnore] private float _scale => ImGuiHelpers.GlobalScale;
-        [JsonIgnore] private static Vector2 _screenSize = ImGui.GetMainViewport().Size;
+        [JsonIgnore] private static Vector2 _screenSize => ImGui.GetMainViewport().Size;
 
         public string Name => "Group";
 
