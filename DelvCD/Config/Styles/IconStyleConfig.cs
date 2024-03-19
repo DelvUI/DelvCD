@@ -197,9 +197,13 @@ namespace DelvCD.Config
                         ImGui.ColorEdit4("Icon Color", ref vector, ImGuiColorEditFlags.AlphaPreview | ImGuiColorEditFlags.AlphaBar);
                         IconColor.Vector = vector;
                     }
+                }
 
-                    DrawHelpers.DrawSpacing(1);
-                    ImGui.DragFloat2("Position", ref Position, 1, -_screenSize.X / 2, _screenSize.X / 2);
+                DrawHelpers.DrawSpacing(1);
+                ImGui.DragFloat2("Position", ref Position, 1, -_screenSize.X / 2, _screenSize.X / 2);
+                
+                if (IconOption != 2)
+                {
                     ImGui.DragFloat2("Icon Size", ref Size, 1, 0, _screenSize.Y);
 
                     if (IconOption < 2)

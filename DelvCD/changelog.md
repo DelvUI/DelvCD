@@ -1,3 +1,7 @@
+# Version 1.0.0.2
+- Fixed Position setting not appearing when No Icon option is selected.
+- Improved calculation of distance to target in CharacterState triggers.
+
 # Version 1.0.0.1
 - Fixed bars border thickness not working.
 - Fixed glows not working properly for chunked bars.
