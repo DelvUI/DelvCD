@@ -103,7 +103,7 @@ namespace DelvCD.Config
             if (player is not null)
             {
                 Vector3 delta = player.Position - actor.Position;
-                _dataSource.Distance = MathF.Sqrt(delta.X * delta.X + delta.Z * delta.Z) - actor.HitboxRadius;
+                _dataSource.Distance = Math.Max(MathF.Sqrt(delta.X * delta.X + delta.Z * delta.Z) - actor.HitboxRadius, 0);
             }
 
             if (actor is Character chara)
