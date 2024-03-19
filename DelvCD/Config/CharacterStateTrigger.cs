@@ -102,8 +102,8 @@ namespace DelvCD.Config
             var player = Singletons.Get<IClientState>().LocalPlayer;
             if (player is not null)
             {
-                Vector3 difference = player.Position - actor.Position;
-                _dataSource.Distance = MathF.Sqrt( difference.X * difference.X + difference.Z * difference.Z ) - actor.HitboxRadius;
+                Vector3 delta = player.Position - actor.Position;
+                _dataSource.Distance = MathF.Sqrt(delta.X * delta.X + delta.Z * delta.Z) - actor.HitboxRadius;
             }
 
             if (actor is Character chara)
