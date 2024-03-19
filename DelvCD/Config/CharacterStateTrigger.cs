@@ -93,9 +93,17 @@ namespace DelvCD.Config
                 _ => null
             };
 
-            if (actor is not null)
+            if (actor is null)
             {
-                _dataSource.Name = actor.Name.ToString();
+                return false;
+            }
+            
+            _dataSource.Name = actor.Name.ToString();
+            var player = Singletons.Get<IClientState>().LocalPlayer;
+            if (player is not null)
+            {
+                Vector3 difference = player.Position - actor.Position;
+                _dataSource.Distance = MathF.Sqrt( difference.X * difference.X + difference.Z * difference.Z ) - actor.HitboxRadius;
             }
 
             if (actor is Character chara)
@@ -109,7 +117,6 @@ namespace DelvCD.Config
                 _dataSource.Gp = chara.CurrentGp;
                 _dataSource.MaxGp = chara.MaxGp;
                 _dataSource.Level = chara.Level;
-                _dataSource.Distance = chara.YalmDistanceX;
                 _dataSource.HasPet = TriggerSource == TriggerSource.Player &&
                     Singletons.Get<IBuddyList>().PetBuddy != null;
 
