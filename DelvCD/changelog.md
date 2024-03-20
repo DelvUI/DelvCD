@@ -1,6 +1,7 @@
 # Version 1.0.0.2
 - Fixed Position setting not appearing when No Icon option is selected.
 - Improved calculation of distance to target in CharacterState triggers.
+- Implemented text fonts with new Dalamud FontAtlas API.
 
 # Version 1.0.0.1
 - Fixed bars border thickness not working.

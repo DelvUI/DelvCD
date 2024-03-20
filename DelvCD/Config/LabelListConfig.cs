@@ -33,7 +33,7 @@ namespace DelvCD.Config
         {
             Label valueLabel = new Label("Value", "[value:t]");
             valueLabel.LabelStyleConfig.FontKey = FontsManager.DefaultBigFontKey;
-            valueLabel.LabelStyleConfig.FontID = Singletons.Get<FontsManager>().GetFontIndex(FontsManager.DefaultBigFontKey);
+            valueLabel.LabelStyleConfig.FontID = FontsManager.GetFontIndex(FontsManager.DefaultBigFontKey);
             valueLabel.StyleConditions.Conditions.Add(new StyleCondition<LabelStyleConfig>()
             {
                 Source = 0,
@@ -43,7 +43,7 @@ namespace DelvCD.Config
 
             Label stacksLabel = new Label("Stacks", "[stacks]");
             stacksLabel.LabelStyleConfig.FontKey = FontsManager.DefaultMediumFontKey;
-            stacksLabel.LabelStyleConfig.FontID = Singletons.Get<FontsManager>().GetFontIndex(FontsManager.DefaultMediumFontKey);
+            stacksLabel.LabelStyleConfig.FontID = FontsManager.GetFontIndex(FontsManager.DefaultMediumFontKey);
             stacksLabel.LabelStyleConfig.Position = new Vector2(-1, 0);
             stacksLabel.LabelStyleConfig.ParentAnchor = DrawAnchor.BottomRight;
             stacksLabel.LabelStyleConfig.TextAlign = DrawAnchor.BottomRight;
