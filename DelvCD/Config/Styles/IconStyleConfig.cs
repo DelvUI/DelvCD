@@ -148,7 +148,7 @@ namespace DelvCD.Config
                     if (ImGui.InputTextWithHint("Search", "Search Icons by Name or ID", ref _iconSearchInput, 32, ImGuiInputTextFlags.EnterReturnsTrue))
                     {
                         _iconSearchResults.Clear();
-                        if (ushort.TryParse(_iconSearchInput, out ushort iconId))
+                        if (uint.TryParse(_iconSearchInput, out uint iconId))
                         {
                             _iconSearchResults.Add(new TriggerData("", 0, iconId));
                         }
