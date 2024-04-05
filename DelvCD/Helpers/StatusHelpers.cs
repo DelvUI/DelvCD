@@ -81,36 +81,32 @@ namespace DelvCD.Helpers
         public static List<TriggerData> FindStatusEntries(string input)
         {
             ExcelSheet<LuminaStatus>? sheet = Singletons.Get<IDataManager>().GetExcelSheet<LuminaStatus>();
+            List<TriggerData> statusList = new List<TriggerData>();
 
-            if (!string.IsNullOrEmpty(input) && sheet is not null)
+            if (string.IsNullOrEmpty(input) || sheet is null) { return statusList; }
+
+            // Add by id
+            if (uint.TryParse(input, out uint value))
             {
-                List<TriggerData> statusList = new List<TriggerData>();
-
-                // Add by id
-                if (uint.TryParse(input, out uint value))
+                if (value > 0)
                 {
-                    if (value > 0)
+                    LuminaStatus? status = sheet.GetRow(value);
+                    if (status is not null)
                     {
-                        LuminaStatus? status = sheet.GetRow(value);
-                        if (status is not null)
-                        {
-                            statusList.Add(new TriggerData(status.Name, status.RowId, status.Icon, status.MaxStacks));
-                        }
+                        statusList.Add(new TriggerData(status.Name, status.RowId, status.Icon, status.MaxStacks));
                     }
                 }
-
-                // Add by name
-                if (statusList.Count == 0)
-                {
-                    statusList.AddRange(
-                        sheet.Where(status => input.ToLower().Equals(status.Name.ToString().ToLower()))
-                            .Select(status => new TriggerData(status.Name, status.RowId, status.Icon, status.MaxStacks)));
-                }
-
-                return statusList;
             }
 
-            return new List<TriggerData>();
+            // Add by name
+            if (statusList.Count == 0)
+            {
+                statusList.AddRange(
+                    sheet.Where(status => input.ToLower().Equals(status.Name.ToString().ToLower()))
+                        .Select(status => new TriggerData(status.Name, status.RowId, status.Icon, status.MaxStacks)));
+            }
+
+            return statusList;
         }
     }
 }

@@ -1,3 +1,4 @@
+using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
@@ -149,7 +150,7 @@ namespace DelvCD.Config
             }
 
             ImGui.Combo("Combat Type", ref Unsafe.As<CombatType, int>(ref CombatType), _combatTypeOptions, _combatTypeOptions.Length);
-            if (ImGui.InputTextWithHint("Action", "Action Name or ID", ref _triggerNameInput, 32, ImGuiInputTextFlags.EnterReturnsTrue))
+            if (ImGui.InputTextWithHint("Action", "Action Name or ID", ref _triggerNameInput, 32))
             {
                 TriggerData.Clear();
                 if (!string.IsNullOrEmpty(_triggerNameInput))
@@ -159,6 +160,31 @@ namespace DelvCD.Config
                         AddTriggerData(triggerData);
                     }
                 }
+            }
+
+            bool valid = TriggerData.Count > 0;
+            string validText = valid ? FontAwesomeIcon.CheckSquare.ToIconString() : FontAwesomeIcon.SquareXmark.ToIconString();
+            ImGui.SameLine();
+            ImGui.PushFont(UiBuilder.IconFont);
+            ImGui.Text(validText);
+            ImGui.PopFont();
+
+            Vector2 cursorPos = ImGui.GetCursorPos();
+            if (valid)
+            {
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+                float width = ImGui.GetWindowWidth();
+                Vector2 iconPos = ImGui.GetWindowPos() + new Vector2(width - 100 * _scale, 20 * _scale);
+                DrawHelpers.DrawIcon(
+                    TriggerData[0].Icon,
+                    iconPos,
+                    new Vector2(40 * _scale, 40 * _scale),
+                    false,
+                    0,
+                    false,
+                    1f,
+                    drawList
+                );
             }
 
             ImGui.Checkbox("Use Adjusted Action", ref Adjust);

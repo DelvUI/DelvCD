@@ -2,10 +2,12 @@ using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
+using DelvCD.UIElements;
 using ImGuiNET;
 using System;
 using System.Linq;
@@ -110,8 +112,15 @@ namespace DelvCD.Config
                         _dataSource.Status_Timer = Math.Abs(status.RemainingTime);
                         _dataSource.Status_Stacks = status.StackCount;
                         _dataSource.Max_Status_Stacks = trigger.MaxStacks;
-                        if (_dataSource.Max_Status_Stacks > 0) { _dataSource.Icon = (uint)(trigger.Icon + _dataSource.Status_Stacks - 1); }
-                        else { _dataSource.Icon = trigger.Icon; }
+
+                        if (_dataSource.Max_Status_Stacks > 0) { 
+                            _dataSource.Icon = (uint)(trigger.Icon + _dataSource.Status_Stacks - 1); 
+                        }
+                        else 
+                        {
+                            _dataSource.Icon = trigger.Icon;
+                        }
+
                         _dataSource.Name = trigger.Name;
 
                         if (wasInactive)
@@ -155,13 +164,38 @@ namespace DelvCD.Config
                 _triggerNameInput = TriggerName;
             }
 
-            if (ImGui.InputTextWithHint("Status", "Status Name or ID", ref _triggerNameInput, 32, ImGuiInputTextFlags.EnterReturnsTrue))
+            if (ImGui.InputTextWithHint("Status", "Status Name or ID", ref _triggerNameInput, 32))
             {
                 TriggerData.Clear();
                 if (!string.IsNullOrEmpty(_triggerNameInput))
                 {
                     StatusHelpers.FindStatusEntries(_triggerNameInput).ForEach(t => AddTriggerData(t));
                 }
+            }
+
+            bool valid = TriggerData.Count > 0;
+            string validText = valid ? FontAwesomeIcon.CheckSquare.ToIconString() : FontAwesomeIcon.SquareXmark.ToIconString();
+            ImGui.SameLine();
+            ImGui.PushFont(UiBuilder.IconFont);
+            ImGui.Text(validText);
+            ImGui.PopFont();
+
+            Vector2 cursorPos = ImGui.GetCursorPos();
+            if (valid)
+            {
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+                float width = ImGui.GetWindowWidth();
+                Vector2 iconPos = ImGui.GetWindowPos() + new Vector2(width - 100 * _scale, 20 * _scale);
+                DrawHelpers.DrawIcon(
+                    TriggerData[0].Icon,
+                    iconPos, 
+                    new Vector2(40 * _scale, 54 * _scale), 
+                    false, 
+                    0, 
+                    false, 
+                    1f, 
+                    drawList
+                );
             }
 
             ImGui.Checkbox("Only Mine", ref OnlyMine);

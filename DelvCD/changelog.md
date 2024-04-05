@@ -1,3 +1,12 @@
+# Version 1.0.1.0
+- Added indicators on trigger config windows to show if the Action or Status entered is valid:
+  * It is no longer necessary to press Enter after typing the name or ID.
+  * A checkmark or a cross shows to indicate if the entered name or ID is valid.
+  * If the Action or Status is found, a preview of the icon will show.
+
+- Added Shield data to Character State triggers.
+- Fixed some icons not working.
+
 # Version 1.0.0.2
 - Fixed Position setting not appearing when No Icon option is selected.
 - Improved calculation of distance to target in CharacterState triggers.
