@@ -26,6 +26,7 @@ namespace DelvCD.Config
         [JsonIgnore] private string _levelValueInput = string.Empty;
         [JsonIgnore] private string _cpValueInput = string.Empty;
         [JsonIgnore] private string _gpValueInput = string.Empty;
+        [JsonIgnore] private string _shieldValueInput = string.Empty;
 
         public TriggerSource TriggerSource = TriggerSource.Player;
 
@@ -63,6 +64,12 @@ namespace DelvCD.Config
         public bool MaxGp;
         public bool GpPercent;
 
+        public bool Shield = false;
+        public TriggerDataOp ShieldOp = TriggerDataOp.GreaterThan;
+        public float ShieldValue;
+        public bool MaxShield;
+        public bool ShieldPercent;
+
         public bool PetCheck;
         public int PetValue;
 
@@ -72,6 +79,7 @@ namespace DelvCD.Config
             {
                 _dataSource.Hp = 50000;
                 _dataSource.MaxHp = 100000;
+                _dataSource.HpPercent = 50;
                 _dataSource.Mp = 5000;
                 _dataSource.MaxMp = 10000;
                 _dataSource.Cp = 50;
@@ -79,6 +87,9 @@ namespace DelvCD.Config
                 _dataSource.Gp = 50;
                 _dataSource.MaxGp = 100;
                 _dataSource.Level = 90;
+                _dataSource.Shield = 25000;
+                _dataSource.MaxShield = 100000;
+                _dataSource.ShieldPercent = 25;
                 _dataSource.Distance = 10;
                 _dataSource.HasPet = false;
                 return true;
@@ -110,6 +121,7 @@ namespace DelvCD.Config
             {
                 _dataSource.Hp = chara.CurrentHp;
                 _dataSource.MaxHp = chara.MaxHp;
+                _dataSource.HpPercent = (float)Math.Round(_dataSource.Hp / _dataSource.MaxHp * 100);
                 _dataSource.Mp = chara.CurrentMp;
                 _dataSource.MaxMp = chara.MaxMp;
                 _dataSource.Cp = chara.CurrentCp;
@@ -117,6 +129,9 @@ namespace DelvCD.Config
                 _dataSource.Gp = chara.CurrentGp;
                 _dataSource.MaxGp = chara.MaxGp;
                 _dataSource.Level = chara.Level;
+                _dataSource.ShieldPercent = chara.ShieldPercentage;
+                _dataSource.Shield = (float)Math.Round(_dataSource.MaxHp / 100 * _dataSource.ShieldPercent);
+                _dataSource.MaxShield = _dataSource.MaxHp;
                 _dataSource.HasPet = TriggerSource == TriggerSource.Player &&
                     Singletons.Get<IBuddyList>().PetBuddy != null;
 
@@ -130,17 +145,20 @@ namespace DelvCD.Config
             float mp = MaxMp || !MpPercent ? _dataSource.Mp : _dataSource.Mp / _dataSource.MaxMp * 100;
             float cp = MaxCp || !CpPercent ? _dataSource.Cp : _dataSource.Cp / _dataSource.MaxCp * 100;
             float gp = MaxGp || !GpPercent ? _dataSource.Gp : _dataSource.Gp / _dataSource.MaxGp * 100;
+            float shield = !ShieldPercent ? _dataSource.Shield : _dataSource.Shield / _dataSource.MaxShield * 100;
 
             float hpValue = MaxHp ? _dataSource.MaxHp : HpValue;
             float mpValue = MaxMp ? _dataSource.MaxMp : MpValue;
             float cpValue = MaxCp ? _dataSource.MaxCp : CpValue;
             float gpValue = MaxGp ? _dataSource.MaxGp : GpValue;
+            float shieldValue = MaxShield ? _dataSource.MaxShield : ShieldValue;
 
             return
                 (!Hp || Utils.GetResult(hp, HpOp, hpValue)) &&
                 (!Mp || Utils.GetResult(mp, MpOp, mpValue)) &&
                 (!Cp || Utils.GetResult(cp, CpOp, cpValue)) &&
                 (!Gp || Utils.GetResult(gp, GpOp, gpValue)) &&
+                (!Shield || Utils.GetResult(shield, ShieldOp, shieldValue)) &&
                 (!Level || Utils.GetResult(_dataSource.Level, LevelOp, LevelValue)) &&
                 (!PetCheck || (PetValue == 0 ? _dataSource.HasPet : !_dataSource.HasPet));
         }
@@ -226,6 +244,46 @@ namespace DelvCD.Config
 
                 ImGui.SameLine();
                 ImGui.Checkbox("Max HP", ref MaxHp);
+            }
+
+            DrawHelpers.DrawNestIndicator(1);
+            ImGui.Checkbox("Shield", ref Shield);
+            if (Shield)
+            {
+                ImGui.SameLine();
+                padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
+                ImGui.PushItemWidth(opComboWidth);
+                ImGui.Combo("##ShieldOpCombo", ref Unsafe.As<TriggerDataOp, int>(ref ShieldOp), operatorOptions, operatorOptions.Length);
+                ImGui.PopItemWidth();
+                ImGui.SameLine();
+
+                if (string.IsNullOrEmpty(_shieldValueInput))
+                {
+                    _shieldValueInput = ShieldValue.ToString();
+                }
+
+                if (!MaxShield)
+                {
+                    ImGui.PushItemWidth(valueInputWidth);
+                    if (ImGui.InputText("##ShieldValue", ref _shieldValueInput, 10, ImGuiInputTextFlags.CharsDecimal))
+                    {
+                        if (float.TryParse(_shieldValueInput, out float value))
+                        {
+                            ShieldValue = value;
+                        }
+
+                        _shieldValueInput = ShieldValue.ToString();
+                    }
+
+                    ImGui.PopItemWidth();
+
+                    ImGui.SameLine();
+                    ImGui.Checkbox("%##ShieldPercent", ref ShieldPercent);
+                }
+
+                ImGui.SameLine();
+                ImGui.Checkbox("Overshield", ref MaxShield);
             }
 
             DrawHelpers.DrawNestIndicator(1);
