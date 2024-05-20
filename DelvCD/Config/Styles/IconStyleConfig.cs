@@ -83,7 +83,9 @@ namespace DelvCD.Config
 
             _progressDataSourceFieldOptions = dataSources[ProgressDataSourceIndex].ProgressFieldNames.ToArray();
 
-            ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length - 1);
+            ProgressDataSourceFieldIndex = _progressDataSourceFieldOptions.Length > 0 ?
+                Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length - 1) :
+                0;
 
             if (needsDataSourceCheck)
             {

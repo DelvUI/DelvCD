@@ -1,3 +1,6 @@
+# Version 1.0.1.1
+- Fixed ImGui crash.
+
 # Version 1.0.1.0
 - Added indicators on trigger config windows to show if the Action or Status entered is valid:
   * It is no longer necessary to press Enter after typing the name or ID.

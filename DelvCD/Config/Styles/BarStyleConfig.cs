@@ -85,7 +85,9 @@ namespace DelvCD.Config
             _progressDataSourceOptions = list.ToArray();
             _progressDataSourceFieldOptions = dataSources[ProgressDataSourceIndex].ProgressFieldNames.ToArray();
 
-            ProgressDataSourceFieldIndex = Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length - 1);
+            ProgressDataSourceFieldIndex = _progressDataSourceFieldOptions.Length > 0 ?
+                Math.Clamp(ProgressDataSourceFieldIndex, 0, _progressDataSourceFieldOptions.Length - 1) :
+                0;
         }
 
         public void DrawConfig(IConfigurable parent, Vector2 size, float padX, float padY)
