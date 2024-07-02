@@ -1,3 +1,8 @@
+using System;
+using System.Linq;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
@@ -7,13 +12,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
-using DelvCD.UIElements;
 using ImGuiNET;
-using System;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization;
 
 namespace DelvCD.Config
 {
@@ -69,13 +68,13 @@ namespace DelvCD.Config
                 return true;
             }
 
-            PlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
             if (player is null)
             {
                 return false;
             }
 
-            GameObject? actor = Source switch
+            IGameObject? actor = Source switch
             {
                 TriggerSource.Player => player,
                 TriggerSource.Target => Utils.FindTarget(),
@@ -105,7 +104,7 @@ namespace DelvCD.Config
                 foreach (var status in statusList)
                 {
                     if (status is not null &&
-                        (status.SourceId == player.ObjectId || !OnlyMine))
+                        (status.SourceId == player.GameObjectId || !OnlyMine))
                     {
                         active = true;
                         _dataSource.Id = status.StatusId;
@@ -278,23 +277,23 @@ namespace DelvCD.Config
             TriggerData.Add(triggerData);
         }
 
-        private Boolean DoesActorMatchTriggerSourceType(GameObject actor, TriggerSourceType sourceType) {
+        private Boolean DoesActorMatchTriggerSourceType(IGameObject actor, TriggerSourceType sourceType) {
             // Any basically means we don't care about checking the type, so just return true
             if (sourceType is TriggerSourceType.Any) { return true; }
 
             // Sanity check
-            if (actor == null || actor is not BattleChara) { return false; }
+            if (actor == null || actor is not IBattleChara) { return false; }
 
             // For Friendly character checks, this will be true. For Enemy character checks, this will be false.
             bool friendly = sourceType == TriggerSourceType.Friendly;
 
-            if (actor is PlayerCharacter) { return friendly; }
+            if (actor is IPlayerCharacter) { return friendly; }
 
-            if (actor is BattleNpc npc) {
+            if (actor is IBattleNpc npc) {
                 if (npc.BattleNpcKind == BattleNpcSubKind.Pet || npc.BattleNpcKind == BattleNpcSubKind.Chocobo) { return friendly; }
                 
                 // For enemy trigger checks, the 'friendly' variable will be set to false, so we want to negate that first.
-                return !friendly == Utils.IsHostile((Character)actor);
+                return !friendly == Utils.IsHostile((ICharacter)actor);
             }
 
             // If none of the above cases are hit, then the actor did not explictly match so just return false.

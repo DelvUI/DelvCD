@@ -1,11 +1,10 @@
-using FFXIVClientStructs.FFXIV.Client.UI;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using ImGuiNET;
 
 namespace DelvCD.Helpers
 {
@@ -144,7 +143,7 @@ namespace DelvCD.Helpers
         {
             _clipRects.Clear();
 
-            AtkStage* stage = AtkStage.GetSingleton();
+            AtkStage* stage = AtkStage.Instance();
             if (stage == null) { return; }
 
             RaptureAtkUnitManager* manager = stage->RaptureAtkUnitManager;
@@ -157,13 +156,14 @@ namespace DelvCD.Helpers
             {
                 try
                 {
-                    AtkUnitBase* addon = *(AtkUnitBase**)Unsafe.AsPointer(ref loadedUnitsList->EntriesSpan[i]);
+                    AtkUnitBase* addon = *(AtkUnitBase**)Unsafe.AsPointer(ref loadedUnitsList->Entries[i]);
                     if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
                     {
                         continue;
                     }
 
-                    string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
+                    // string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
+                    string? name = addon->NameString;
                     if (name == null || !AddonNames.Contains(name))
                     {
                         continue;

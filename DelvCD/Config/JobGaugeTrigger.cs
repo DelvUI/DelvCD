@@ -1,4 +1,8 @@
-﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+﻿using System;
+using System.Linq;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
 using DelvCD.Config.JobGauges;
@@ -6,10 +10,6 @@ using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace DelvCD.Config
 {
@@ -69,7 +69,7 @@ namespace DelvCD.Config
                 return false;
             }
 
-            PlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
             if (player == null || player.ClassJob.Id != (uint)_jobGauge.Job)
             {
                 return false;

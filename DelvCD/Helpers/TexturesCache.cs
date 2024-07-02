@@ -1,11 +1,11 @@
-﻿using Dalamud.Interface;
-using Dalamud.Interface.Internal;
+﻿using System;
+using System.Collections.Generic;
+using Dalamud.Interface;
+using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using Lumina.Data.Files;
-using System;
-using System.Collections.Generic;
-using static Dalamud.Plugin.Services.ITextureProvider;
 
 namespace DelvCD.Helpers
 {
@@ -24,11 +24,9 @@ namespace DelvCD.Helpers
             bool hdIcon = true,
             bool greyScale = false)
         {
-            IconFlags flags = hdIcon ? IconFlags.HiRes : IconFlags.None;
-
             if (!greyScale)
             {
-                return Singletons.Get<ITextureProvider>().GetIcon(iconId + stackCount, flags);
+                return Singletons.Get<ITextureProvider>().GetFromGameIcon(iconId + stackCount).GetWrapOrDefault();
             }
 
             if (_desaturatedCache.TryGetValue(iconId + stackCount, out IDalamudTextureWrap? t))
@@ -36,7 +34,7 @@ namespace DelvCD.Helpers
                 return t;
             }
 
-            string? path = Singletons.Get<ITextureProvider>().GetIconPath(iconId + stackCount, flags);
+            string? path = Singletons.Get<ITextureProvider>().GetIconPath(new GameIconLookup(iconId: iconId, hiRes: hdIcon));
             if (path != null)
             {
                 path = Singletons.Get<ITextureSubstitutionProvider>().GetSubstitutedPath(path);
@@ -62,7 +60,7 @@ namespace DelvCD.Helpers
             byte[] bytes = file.GetRgbaImageData();
             ConvertBytes(ref bytes);
 
-            return uiBuilder.LoadImageRaw(bytes, file.Header.Width, file.Header.Height, 4);
+            return Singletons.Get<ITextureProvider>().CreateFromRaw(RawImageSpecification.Rgba32(file.Header.Width, file.Header.Height), bytes);
         }
 
         private static void ConvertBytes(ref byte[] bytes)

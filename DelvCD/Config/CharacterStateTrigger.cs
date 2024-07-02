@@ -1,3 +1,7 @@
+using System;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Utility;
@@ -5,12 +9,8 @@ using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
-using System;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization;
-using CharacterStruct = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
+using CharacterStruct = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvCD.Config
 {
@@ -95,7 +95,7 @@ namespace DelvCD.Config
                 return true;
             }
 
-            GameObject? actor = TriggerSource switch
+            IGameObject? actor = TriggerSource switch
             {
                 TriggerSource.Player => Singletons.Get<IClientState>().LocalPlayer,
                 TriggerSource.Target => Utils.FindTarget(),
@@ -117,7 +117,7 @@ namespace DelvCD.Config
                 _dataSource.Distance = Math.Max(MathF.Sqrt(delta.X * delta.X + delta.Z * delta.Z) - actor.HitboxRadius, 0);
             }
 
-            if (actor is Character chara)
+            if (actor is ICharacter chara)
             {
                 _dataSource.Hp = chara.CurrentHp;
                 _dataSource.MaxHp = chara.MaxHp;

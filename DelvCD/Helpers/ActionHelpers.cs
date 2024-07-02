@@ -1,14 +1,15 @@
-﻿using Dalamud.Game;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
+using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.InteropServices;
+
 using LuminaAction = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvCD.Helpers
@@ -156,7 +157,7 @@ namespace DelvCD.Helpers
             return _actionManager->GetActionStatus(type, actionId, targetId, false, true) == 0;
         }
 
-        public unsafe bool GetActionInRange(uint actionId, GameObject? player, GameObject? target)
+        public unsafe bool GetActionInRange(uint actionId, IGameObject? player, IGameObject? target)
         {
             if (player is null || target is null)
             {
@@ -171,7 +172,7 @@ namespace DelvCD.Helpers
             return result != 566; // 0 == in range, 565 == in range but not facing target, 566 == out of range, 562 == not in LoS
         }
 
-        public unsafe bool IsTargetInLos(GameObject? player, GameObject? target)
+        public unsafe bool IsTargetInLos(IGameObject? player, IGameObject? target)
         {
             if (target is null || player is null)
             {

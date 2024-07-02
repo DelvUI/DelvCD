@@ -1,13 +1,13 @@
+using System.Linq;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization;
 
 namespace DelvCD.Config
 {
@@ -82,7 +82,7 @@ namespace DelvCD.Config
                     {
                         InventoryItem* item = container->GetInventorySlot(i);
 
-                        if (item is not null && item->ItemID == itemId)
+                        if (item is not null && item->ItemId == itemId)
                         {
                             return (int)item->Quantity;
                         }
