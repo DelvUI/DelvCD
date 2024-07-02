@@ -1,3 +1,6 @@
+# 1.1.0.0
+- Added support for Dawntrail and Dalamud API 10.
+
 # Version 1.0.1.1
 - Fixed ImGui crash.
 

@@ -15,7 +15,7 @@ namespace DelvCD
     {
         public const string ConfigFileName = "DelvCD.json";
 
-        public static string Version { get; private set; } = "1.0.1.1";
+        public static string Version { get; private set; } = "1.1.0.0";
 
         public static string ConfigFileDir { get; private set; } = "";
 
@@ -106,7 +106,7 @@ namespace DelvCD
                 return null;
             }
 
-            string iconPath = Path.Combine(AssemblyFileDir, "Media", "Images", "icon_small.png");
+            string iconPath = Path.Combine(AssemblyFileDir, "Media", "Images", "icon.png");
             if (!File.Exists(iconPath))
             {
                 return null;
@@ -115,13 +115,11 @@ namespace DelvCD
             IDalamudTextureWrap? texture = null;
             try
             {
-                // texture = uiBuilder.LoadImage(iconPath);
-                texture = textureProvider.GetFromFile(iconPath).GetWrapOrDefault();
-                
+                texture = textureProvider.GetFromFile(iconPath).GetWrapOrDefault();                
             }
             catch (Exception ex)
             {
-                Singletons.Get<IPluginLog>().Warning($"Failed to load LMeter Icon {ex.ToString()}");
+                Singletons.Get<IPluginLog>().Warning($"Failed to load DelvCD Icon {ex.ToString()}");
             }
 
             return texture;
