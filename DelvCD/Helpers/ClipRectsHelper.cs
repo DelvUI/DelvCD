@@ -162,7 +162,6 @@ namespace DelvCD.Helpers
                         continue;
                     }
 
-                    // string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
                     string? name = addon->NameString;
                     if (name == null || !AddonNames.Contains(name))
                     {
