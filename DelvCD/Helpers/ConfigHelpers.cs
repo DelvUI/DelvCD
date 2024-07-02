@@ -1,4 +1,10 @@
-﻿using Dalamud.Interface.Internal.Notifications;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Text;
+using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Plugin.Services;
 using DelvCD.Config;
 using DelvCD.Helpers.DataSources;
@@ -6,12 +12,6 @@ using DelvCD.UIElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
 
 namespace DelvCD.Helpers
 {

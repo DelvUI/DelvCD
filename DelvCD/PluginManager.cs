@@ -1,4 +1,6 @@
-﻿using Dalamud.Game.Command;
+﻿using System;
+using System.Numerics;
+using Dalamud.Game.Command;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
@@ -8,8 +10,6 @@ using DelvCD.Helpers;
 using DelvCD.UIElements;
 using DelvCD.Windows;
 using ImGuiNET;
-using System;
-using System.Numerics;
 
 namespace DelvCD
 {
@@ -17,7 +17,7 @@ namespace DelvCD
     {
         private IClientState ClientState { get; init; }
 
-        private DalamudPluginInterface PluginInterface { get; init; }
+        private IDalamudPluginInterface PluginInterface { get; init; }
 
         private ICommandManager CommandManager { get; init; }
 
@@ -41,7 +41,7 @@ namespace DelvCD
         public PluginManager(
             IClientState clientState,
             ICommandManager commandManager,
-            DalamudPluginInterface pluginInterface,
+            IDalamudPluginInterface pluginInterface,
             DelvCDConfig config)
         {
             ClientState = clientState;

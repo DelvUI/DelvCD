@@ -1,12 +1,12 @@
-﻿﻿using Dalamud.Interface;
+﻿﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using Dalamud.Interface;
 using Dalamud.Interface.ManagedFontAtlas;
 using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
 using ImGuiNET;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 
 namespace DelvCD.Helpers
 {
@@ -47,7 +47,7 @@ namespace DelvCD.Helpers
     {
         private readonly Dictionary<string, IFontHandle> _imGuiFonts = [];
         private string[] _fontList;
-        private readonly UiBuilder _uiBuilder;
+        private readonly IUiBuilder _uiBuilder;
         
         public const string DalamudFontKey = "Dalamud Font";
         public static readonly List<string> DefaultFontKeys = ["big-noodle-too_24", "big-noodle-too_20", "big-noodle-too_16"];
@@ -55,7 +55,7 @@ namespace DelvCD.Helpers
         public static string DefaultMediumFontKey => DefaultFontKeys[1];
         public static string DefaultSmallFontKey => DefaultFontKeys[2];
 
-        public FontsManager(UiBuilder uiBuilder, IEnumerable<FontData> fonts)
+        public FontsManager(IUiBuilder uiBuilder, IEnumerable<FontData> fonts)
         {
             _uiBuilder = uiBuilder;
             _fontList = [DalamudFontKey];

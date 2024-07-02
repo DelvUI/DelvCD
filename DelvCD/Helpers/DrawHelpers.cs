@@ -1,12 +1,11 @@
-﻿using Dalamud.Interface;
-using Dalamud.Interface.Internal;
-using Dalamud.Interface.Internal.Notifications;
+﻿using System;
+using System.Numerics;
+using Dalamud.Interface;
+using Dalamud.Interface.ImGuiNotification;
+using Dalamud.Interface.Textures.TextureWraps;
+using Dalamud.Plugin.Services;
 using DelvCD.Config;
 using ImGuiNET;
-using ImGuiScene;
-using System;
-using System.Numerics;
-using static Dalamud.Interface.Utility.Raii.ImRaii;
 
 namespace DelvCD.Helpers
 {
@@ -40,11 +39,19 @@ namespace DelvCD.Helpers
 
         public static void DrawNotification(
             string message,
-            NotificationType type = NotificationType.Success,
+            NotificationType type = NotificationType.Info,
             uint durationInMs = 3000,
             string title = "DelvCD")
         {
-            Singletons.Get<UiBuilder>().AddNotification(message, title, type, durationInMs);
+            Notification notification = new()
+            {
+                Title = title,
+                Content = message,
+                Type = type,
+                InitialDuration = TimeSpan.FromMilliseconds(durationInMs)
+            };
+
+            Singletons.Get<INotificationManager>().AddNotification(notification);
         }
 
         public static void DrawNestIndicator(int depth)

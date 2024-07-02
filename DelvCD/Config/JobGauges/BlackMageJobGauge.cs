@@ -1,10 +1,10 @@
-﻿using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using System.Collections.Generic;
+using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
-using System.Collections.Generic;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -64,7 +64,7 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Umbral_Hearts = gauge.UmbralHearts;
             _dataSource.Paradox = gauge.IsParadoxActive;
 
-            PlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
             _dataSource.Max_Polyglot_Stacks = player == null ? 2 : (player.Level >= 80 ? 2 : 1);
 
             if (preview) { return true; }

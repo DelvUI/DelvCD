@@ -1,12 +1,12 @@
+using System.Collections.Generic;
+using System.Numerics;
 using Dalamud.Interface;
-using Dalamud.Interface.Internal.Notifications;
+using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Interface.Utility;
 using DelvCD.Helpers;
 using DelvCD.UIElements;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Numerics;
 
 namespace DelvCD.Config
 {

@@ -1,25 +1,13 @@
-﻿using Dalamud.Data;
+﻿using System;
+using System.IO;
+using System.Reflection;
 using Dalamud.Game;
-using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Buddy;
-using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.Objects;
-using Dalamud.Game.ClientState.Party;
-using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
-using Dalamud.Interface;
-using Dalamud.Interface.Internal;
-using Dalamud.Logging;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using DelvCD.Config;
 using DelvCD.Helpers;
-using ImGuiScene;
-using System;
-using System.IO;
-using System.Reflection;
-using SigScanner = Dalamud.Game.SigScanner;
 
 namespace DelvCD
 {
@@ -33,6 +21,8 @@ namespace DelvCD
 
         public static string ConfigFilePath { get; private set; } = "";
 
+        public static string AssemblyFileDir { get; private set; } = "";
+
         public static IDalamudTextureWrap? IconTexture { get; private set; } = null;
 
         public static string Changelog { get; private set; } = string.Empty;
@@ -44,7 +34,7 @@ namespace DelvCD
             IClientState clientState,
             ICommandManager commandManager,
             ICondition condition,
-            DalamudPluginInterface pluginInterface,
+            IDalamudPluginInterface pluginInterface,
             IDataManager dataManager,
             IFramework framework,
             IGameGui gameGui,
@@ -61,6 +51,7 @@ namespace DelvCD
             Plugin.Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? Plugin.Version;
             Plugin.ConfigFileDir = pluginInterface.GetPluginConfigDirectory();
             Plugin.ConfigFilePath = Path.Combine(pluginInterface.GetPluginConfigDirectory(), Plugin.ConfigFileName);
+            Plugin.AssemblyFileDir = pluginInterface.AssemblyLocation.DirectoryName ?? "";
 
             ConfigHelpers.CheckVersion();
 
@@ -83,12 +74,12 @@ namespace DelvCD
             Singletons.Register(textureProvider);
             Singletons.Register(textureSubstitutionProvider);
             Singletons.Register(new TexturesCache());
-            Singletons.Register(new ActionHelpers(sigScanner));
+            Singletons.Register(new ActionHelpers());
             Singletons.Register(new StatusHelpers());
             Singletons.Register(new ClipRectsHelper());
 
             // Load Icon
-            Plugin.IconTexture = LoadIconTexture(pluginInterface.UiBuilder);
+            Plugin.IconTexture = LoadIconTexture(textureProvider);
 
             // Load Changelog
             Plugin.Changelog = LoadChangelog();
@@ -108,15 +99,14 @@ namespace DelvCD
             Singletons.Register(new PluginManager(clientState, commandManager, pluginInterface, config));
         }
 
-        private static IDalamudTextureWrap? LoadIconTexture(UiBuilder uiBuilder)
+        private static IDalamudTextureWrap? LoadIconTexture(ITextureProvider textureProvider)
         {
-            string? pluginPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (string.IsNullOrEmpty(pluginPath))
+            if (string.IsNullOrEmpty(AssemblyFileDir))
             {
                 return null;
             }
 
-            string iconPath = Path.Combine(pluginPath, "Media", "Images", "icon.png");
+            string iconPath = Path.Combine(AssemblyFileDir, "Media", "Images", "icon_small.png");
             if (!File.Exists(iconPath))
             {
                 return null;
@@ -125,11 +115,13 @@ namespace DelvCD
             IDalamudTextureWrap? texture = null;
             try
             {
-                texture = uiBuilder.LoadImage(iconPath);
+                // texture = uiBuilder.LoadImage(iconPath);
+                texture = textureProvider.GetFromFile(iconPath).GetWrapOrDefault();
+                
             }
             catch (Exception ex)
             {
-                Singletons.Get<IPluginLog>().Warning($"Failed to load DelvCD Icon {ex.ToString()}");
+                Singletons.Get<IPluginLog>().Warning($"Failed to load LMeter Icon {ex.ToString()}");
             }
 
             return texture;

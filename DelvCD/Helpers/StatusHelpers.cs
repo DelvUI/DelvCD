@@ -1,11 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using Lumina.Excel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
 using DalamudStatus = Dalamud.Game.ClientState.Statuses.Status;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 
@@ -43,7 +44,7 @@ namespace DelvCD.Helpers
                 dict.Clear();
             }
 
-            PlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
             if (player is null)
             {
                 return;
@@ -51,7 +52,7 @@ namespace DelvCD.Helpers
 
             foreach (var source in _sourceKeys)
             {
-                GameObject? actor = source switch
+                IGameObject? actor = source switch
                 {
                     TriggerSource.Player => player,
                     TriggerSource.Target => Utils.FindTarget(),
@@ -60,7 +61,7 @@ namespace DelvCD.Helpers
                     _ => null
                 };
 
-                if (actor is not BattleChara chara)
+                if (actor is not IBattleChara chara)
                 {
                     continue;
                 }
@@ -70,7 +71,9 @@ namespace DelvCD.Helpers
                     foreach (var status in chara.StatusList)
                     {
                         if (!_statusMap[source].ContainsKey(status.StatusId))
+                        {
                             _statusMap[source].Add(status.StatusId, new List<DalamudStatus>());
+                        }
 
                         _statusMap[source][status.StatusId].Add(status);
                     }

@@ -1,11 +1,12 @@
-﻿using Dalamud.Game.ClientState.Objects;
-using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Plugin.Services;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Plugin.Services;
+
 using CharacterStruct = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvCD.Helpers
@@ -29,21 +30,21 @@ namespace DelvCD.Helpers
             };
         }
 
-        public static GameObject? FindTarget()
+        public static IGameObject? FindTarget()
         {
             ITargetManager targetManager = Singletons.Get<ITargetManager>();
             return targetManager.SoftTarget ?? targetManager.Target;
         }
 
-        public static GameObject? FindTargetOfTarget()
+        public static IGameObject? FindTargetOfTarget()
         {
-            GameObject? target = FindTarget();
+            IGameObject? target = FindTarget();
             if (target == null)
             {
                 return null;
             }
 
-            GameObject? player = Singletons.Get<IClientState>().LocalPlayer;
+            IGameObject? player = Singletons.Get<IClientState>().LocalPlayer;
             if (target.TargetObjectId == 0 && player is not null && player.TargetObjectId == 0)
             {
                 return player;
@@ -54,8 +55,8 @@ namespace DelvCD.Helpers
             IObjectTable objectTable = Singletons.Get<IObjectTable>();
             for (int i = 0; i < 200; i += 2)
             {
-                GameObject? actor = objectTable[i];
-                if (actor?.ObjectId == target.TargetObjectId)
+                IGameObject? actor = objectTable[i];
+                if (actor?.GameObjectId == target.TargetObjectId)
                 {
                     return actor;
                 }
@@ -69,7 +70,7 @@ namespace DelvCD.Helpers
         /// </summary>
         /// <param name="character">The <c>Character</c> object to check.</param>
         /// <returns>Returns true if <c>Character</c> provided is hostile, otherwise false.</returns>
-        public static unsafe bool IsHostile(Character character)
+        public static unsafe bool IsHostile(ICharacter character)
         {
             CharacterStruct* chara = (CharacterStruct*)character.Address;
 
