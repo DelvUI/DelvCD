@@ -56,7 +56,6 @@ namespace DelvCD.Helpers
             TexFile? file = Singletons.Get<IDataManager>().GetFile<TexFile>(path);
             if (file == null) { return null; }
 
-            UiBuilder uiBuilder = Singletons.Get<UiBuilder>();
             byte[] bytes = file.GetRgbaImageData();
             ConvertBytes(ref bytes);
 
