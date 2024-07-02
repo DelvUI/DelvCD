@@ -74,7 +74,7 @@ namespace DelvCD
             Singletons.Register(textureProvider);
             Singletons.Register(textureSubstitutionProvider);
             Singletons.Register(new TexturesCache());
-            Singletons.Register(new ActionHelpers(sigScanner));
+            Singletons.Register(new ActionHelpers());
             Singletons.Register(new StatusHelpers());
             Singletons.Register(new ClipRectsHelper());
 

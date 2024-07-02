@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.InteropServices;
-using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 
@@ -16,14 +15,6 @@ namespace DelvCD.Helpers
 {
     public class ActionHelpers
     {
-        private const string CastRaySig = "48 83 EC 48 48 8B 05 ?? ?? ?? ?? 4D 8B D1";
-        private const string ComboSig = "F3 0F 11 05 ?? ?? ?? ?? 48 83 C7 08";
-
-        [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
-        private unsafe delegate bool CastRayNative(float* origin, float* direction, float distance, float* worldPos, int* flags);
-
-        private readonly CastRayNative _castRay;
-        private readonly unsafe Combo* _combo;
         private readonly unsafe ActionManager* _actionManager;
 
         private readonly Dictionary<uint, ushort> _actionIdToIconId;
@@ -65,12 +56,10 @@ namespace DelvCD.Helpers
             [Job.BLU] = 11385  // Water Cannon
         };
 
-        public unsafe ActionHelpers(ISigScanner scanner)
+        public unsafe ActionHelpers()
         {
             _actionManager = ActionManager.Instance();
-            _castRay = Marshal.GetDelegateForFunctionPointer<CastRayNative>(scanner.ScanText(CastRaySig));
-            _combo = (Combo*)scanner.GetStaticAddressFromSig(ComboSig);
-            _actionIdToIconId = new Dictionary<uint, ushort>();
+            _actionIdToIconId = [];
         }
 
         public ushort GetIconIdForAction(uint actionId)
@@ -179,18 +168,16 @@ namespace DelvCD.Helpers
                 return false;
             }
 
-            Vector3 delta = target.Position - player.Position;
-            float distance = delta.Length();
-            float* origin = stackalloc[] { player.Position.X, player.Position.Y + 2f, player.Position.Z };
-            float* direction = stackalloc[] { delta.X / distance, delta.Y / distance, delta.Z / distance };
-            float* worldPos = stackalloc float[32];
+            Vector3 delta = target.Position - player.Position;            
+            RaycastHit worldPos = default;
+            Vector3 origin = new(player.Position.X, player.Position.Y + 2f, player.Position.Z);
             int* flags = stackalloc int[3] { 0x4000, 0x4000, 0x0 };
-            return !_castRay(origin, direction, distance, worldPos, flags);
+            return !BGCollisionModule.Raycast2(origin, Vector3.Normalize(delta), delta.Length(), &worldPos, flags);
         }
 
         public unsafe uint GetLastUsedActionId()
         {
-            return _combo->Action;
+            return _actionManager->Combo.Action;
         }
 
         public static List<TriggerData> FindItemEntries(string input)
