@@ -109,7 +109,7 @@ namespace DelvCD.Config
 
             if (LosCheck)
             {
-                inLos = helper.IsTargetInLos(Singletons.Get<IClientState>().LocalPlayer, Utils.FindTarget());
+                inLos = helper.IsTargetInLos(Singletons.Get<IClientState>().LocalPlayer, Utils.FindTarget(), actionId);
             }
 
             if (Combo && actionTrigger.ComboId.Length > 0)
