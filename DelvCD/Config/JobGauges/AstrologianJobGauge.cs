@@ -53,10 +53,10 @@ namespace DelvCD.Config.JobGauges
             int card3 = GetCard3Index();
             int minorArcana = GetCrownCardIndex();
 
-            _dataSource.Card1 = _comboOptions[0][card1];
-            _dataSource.Card2 = _comboOptions[1][card2];
-            _dataSource.Card3 = _comboOptions[2][card3];
-            _dataSource.Crown_Card = _comboOptions[3][minorArcana];
+            _dataSource.Card1 = _comboOptions[0][_values[0]];
+            _dataSource.Card2 = _comboOptions[1][_values[1]];
+            _dataSource.Card3 = _comboOptions[2][_values[2]];
+            _dataSource.Crown_Card = _comboOptions[3][_values[3]];
 
             if (preview) { return true; }
 

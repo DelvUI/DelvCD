@@ -151,6 +151,7 @@ namespace DelvCD.Helpers
                 typeof(MonkDataSource),
                 typeof(NinjaDataSource),
                 typeof(PaladinDataSource),
+                typeof(PictomancerDataSource),
                 typeof(ReaperDataSource),
                 typeof(RedMageDataSource),
                 typeof(SageDataSource),

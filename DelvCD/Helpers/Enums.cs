@@ -101,6 +101,7 @@ namespace DelvCD.Helpers
         NIN = 30,
         SAM = 34,
         RPR = 39,
+        VPR = 41,
 
         ARC = 5,
         BRD = 23,
@@ -113,6 +114,7 @@ namespace DelvCD.Helpers
         SMN = 27,
         RDM = 35,
         BLU = 36,
+        PCT = 42,
 
         CRP = 8,
         BSM = 9,
