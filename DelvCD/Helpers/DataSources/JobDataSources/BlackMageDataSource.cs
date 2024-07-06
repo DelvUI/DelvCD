@@ -16,6 +16,7 @@ namespace DelvCD.Helpers.DataSources.JobDataSources
         public int Astral_Fire_Stacks;
         public int Umbral_Hearts;
         public bool Paradox;
+        public int Astral_Soul_Stacks;
 
         public override float GetConditionValue(int index) => index switch
         {
@@ -26,6 +27,7 @@ namespace DelvCD.Helpers.DataSources.JobDataSources
             4 => Umbral_Ice_Stacks,
             5 => Astral_Fire_Stacks,
             6 => Umbral_Hearts,
+            7 => Astral_Soul_Stacks,
             _ => 0
         };
 
@@ -37,6 +39,7 @@ namespace DelvCD.Helpers.DataSources.JobDataSources
             3 => Umbral_Ice_Stacks,
             4 => Astral_Fire_Stacks,
             5 => Umbral_Hearts,
+            6 => Astral_Soul_Stacks,
             _ => 0
         };
 
@@ -48,6 +51,7 @@ namespace DelvCD.Helpers.DataSources.JobDataSources
             3 => 3,
             4 => 3,
             5 => 3,
+            6 => 6,
             _ => 0
         };
 
@@ -61,6 +65,7 @@ namespace DelvCD.Helpers.DataSources.JobDataSources
                 nameof(Umbral_Ice_Stacks),
                 nameof(Astral_Fire_Stacks),
                 nameof(Umbral_Hearts),
+                nameof(Astral_Soul_Stacks)
             };
 
             _progressFieldNames = new() {
@@ -70,6 +75,7 @@ namespace DelvCD.Helpers.DataSources.JobDataSources
                 nameof(Umbral_Ice_Stacks),
                 nameof(Astral_Fire_Stacks),
                 nameof(Umbral_Hearts),
+                nameof(Astral_Fire_Stacks)
             };
         }
     }

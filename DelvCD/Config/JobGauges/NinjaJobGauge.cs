@@ -3,6 +3,7 @@ using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
+using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using System.Collections.Generic;
 
 namespace DelvCD.Config.JobGauges
@@ -20,7 +21,7 @@ namespace DelvCD.Config.JobGauges
         protected override void InitializeConditions()
         {
             _names = new List<string>() {
-                "Huton Timer",
+                "Kazematoi",
                 "Ninki"
             };
 
@@ -30,17 +31,17 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override bool IsTriggered(bool preview)
+        public override unsafe bool IsTriggered(bool preview)
         {
-            NINGauge gauge = Singletons.Get<IJobGauges>().Get<NINGauge>();
+            NinjaGauge* gauge = (NinjaGauge*)Singletons.Get<IJobGauges>().Address;
 
-            _dataSource.Huton_Timer = gauge.HutonTimer / 1000f;
-            _dataSource.Ninki = gauge.Ninki;
+            _dataSource.Kazematoi = gauge->Kazematoi;
+            _dataSource.Ninki = gauge->Ninki;
 
             if (preview) { return true; }
 
             return
-                EvaluateCondition(0, _dataSource.Huton_Timer) &&
+                EvaluateCondition(0, _dataSource.Kazematoi) &&
                 EvaluateCondition(1, _dataSource.Ninki);
         }
     }

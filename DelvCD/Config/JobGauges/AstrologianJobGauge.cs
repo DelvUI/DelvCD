@@ -4,6 +4,7 @@ using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using System.Collections.Generic;
 
 namespace DelvCD.Config.JobGauges
@@ -21,12 +22,14 @@ namespace DelvCD.Config.JobGauges
         protected override void InitializeConditions()
         {
             _names = new List<string>() {
-                "Card",
-                "Crown Card",
-                "Astrosign"
+                "Card1",
+                "Card2",
+                "Card3",
+                "Crown Card"
             };
 
             _types = new List<TriggerConditionType>() {
+                TriggerConditionType.Combo,
                 TriggerConditionType.Combo,
                 TriggerConditionType.Combo,
                 TriggerConditionType.Combo
@@ -34,9 +37,10 @@ namespace DelvCD.Config.JobGauges
 
             _comboOptions = new Dictionary<int, string[]>()
             {
-                [0] = new string[] { "None", "Balance", "Bole", "Arrow", "Spear", "Ewer", "Spire" },
-                [1] = new string[] { "None", "Lord of Crowns", "Lady of Crowns" },
-                [2] = new string[] { "None", "Solar", "Lunar", "Celestial" },
+                [0] = new string[] { "None", "Balance", "Spear" },
+                [1] = new string[] { "None", "Arrow", "Bole" },
+                [2] = new string[] { "None", "Spire", "Ewer" },
+                [3] = new string[] { "None", "Lord of Crowns", "Lady of Crowns" }
             };
         }
 
@@ -44,43 +48,71 @@ namespace DelvCD.Config.JobGauges
         {
             ASTGauge gauge = Singletons.Get<IJobGauges>().Get<ASTGauge>();
 
-            _dataSource.Card = _comboOptions[0][_values[0]];
-            _dataSource.Crown_Card = _comboOptions[1][_values[1]];
-            _dataSource.Astrosign_Solar = gauge.ContainsSeal(SealType.SUN);
-            _dataSource.Astrosign_Lunar = gauge.ContainsSeal(SealType.MOON);
-            _dataSource.Astrosign_Celestial = gauge.ContainsSeal(SealType.CELESTIAL);
+            int card1 = GetCard1Index();
+            int card2 = GetCard2Index();
+            int card3 = GetCard3Index();
+            int minorArcana = GetCrownCardIndex();
+
+            _dataSource.Card1 = _comboOptions[0][card1];
+            _dataSource.Card2 = _comboOptions[1][card2];
+            _dataSource.Card3 = _comboOptions[2][card3];
+            _dataSource.Crown_Card = _comboOptions[3][minorArcana];
 
             if (preview) { return true; }
 
             return
-                EvaluateCondition(0, (int)gauge.DrawnCard) &&
-                EvaluateCrownCardCondition(gauge) &&
-                EvaluateAstrosignsCondition(gauge);
+                EvaluateCondition(0, card1) &&
+                EvaluateCondition(1, card2) &&
+                EvaluateCondition(2, card3) &&
+                EvaluateCondition(3, minorArcana);
         }
 
-        private bool EvaluateCrownCardCondition(ASTGauge gauge)
+        private unsafe int GetCard1Index()
         {
-            if (!ConditionEnabledforIndex(1)) { return true; }
+            uint play1 = ActionManager.Instance()->GetAdjustedActionId(37019);
+            bool theBalance = play1 == 37023;
+            bool theSpear = play1 == 37026;
 
-            return _values[1] switch
-            {
-                1 => gauge.DrawnCrownCard == CardType.LORD,
-                2 => gauge.DrawnCrownCard == CardType.LADY,
-                _ => gauge.DrawnCrownCard == CardType.NONE,
-            };
+            if (theBalance) { return 1; }
+            if (theSpear) { return 2; }
+
+            return 0;
         }
 
-        private bool EvaluateAstrosignsCondition(ASTGauge gauge)
+        private unsafe int GetCard2Index()
         {
-            if (!ConditionEnabledforIndex(2)) { return true; }
+            uint play2 = ActionManager.Instance()->GetAdjustedActionId(37020);
+            bool theArrow = play2 == 37024;
+            bool theBole = play2 == 37027;
 
-            return _values[2] switch
-            {
-                1 => gauge.ContainsSeal(SealType.SUN),
-                2 => gauge.ContainsSeal(SealType.MOON),
-                3 => gauge.ContainsSeal(SealType.CELESTIAL),
-                _ => gauge.Seals[0] == SealType.NONE && gauge.Seals[1] == SealType.NONE && gauge.Seals[2] == SealType.NONE
-            };
+            if (theArrow) { return 1; }
+            if (theBole) { return 2; }
+
+            return 0;
+        }
+
+        private unsafe int GetCard3Index()
+        {
+            uint play3 = ActionManager.Instance()->GetAdjustedActionId(37021);
+            bool theSpire = play3 == 37025;
+            bool theEwer = play3 == 37028;
+
+            if (theSpire) { return 1; }
+            if (theEwer) { return 2; }
+
+            return 0;
+        }
+
+        private unsafe int GetCrownCardIndex()
+        {
+            uint minorArcana = ActionManager.Instance()->GetAdjustedActionId(37022);
+            bool lord = minorArcana == 7444;
+            bool lady = minorArcana == 7445;
+
+            if (lord) { return 1; }
+            if (lady) { return 2; }
+
+            return 0;
         }
     }
 }

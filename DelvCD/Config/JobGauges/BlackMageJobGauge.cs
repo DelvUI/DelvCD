@@ -5,6 +5,7 @@ using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
+using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -29,7 +30,8 @@ namespace DelvCD.Config.JobGauges
                 "Umbral Ice Stacks",
                 "Astral Fire Stacks",
                 "Umbral Hearts",
-                "Paradox"
+                "Paradox",
+                "Astral Soul Stacks"
             };
 
             _types = new List<TriggerConditionType>() {
@@ -41,7 +43,8 @@ namespace DelvCD.Config.JobGauges
                 TriggerConditionType.Numeric,
                 TriggerConditionType.Numeric,
                 TriggerConditionType.Numeric,
-                TriggerConditionType.Boolean
+                TriggerConditionType.Boolean,
+                TriggerConditionType.Numeric
             };
 
             _comboOptions = new Dictionary<int, string[]>()
@@ -50,7 +53,7 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override bool IsTriggered(bool preview)
+        public override unsafe bool IsTriggered(bool preview)
         {
             BLMGauge gauge = Singletons.Get<IJobGauges>().Get<BLMGauge>();
 
@@ -64,8 +67,11 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Umbral_Hearts = gauge.UmbralHearts;
             _dataSource.Paradox = gauge.IsParadoxActive;
 
+            BlackMageGauge* internalGauge = (BlackMageGauge*)gauge.Address;
+            _dataSource.Astral_Soul_Stacks = ((int)internalGauge->EnochianFlags >> 2) & 7;
+
             IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
-            _dataSource.Max_Polyglot_Stacks = player == null ? 2 : (player.Level >= 80 ? 2 : 1);
+            _dataSource.Max_Polyglot_Stacks = player == null ? 2 : (player.Level < 80 ? 1 : ((player.Level < 98 ? 2 : 3)));
 
             if (preview) { return true; }
 
@@ -78,7 +84,8 @@ namespace DelvCD.Config.JobGauges
                 EvaluateCondition(5, _dataSource.Umbral_Ice_Stacks) &&
                 EvaluateCondition(6, _dataSource.Astral_Fire_Stacks) &&
                 EvaluateCondition(7, _dataSource.Umbral_Hearts) &&
-                EvaluateCondition(8, _dataSource.Paradox);
+                EvaluateCondition(8, _dataSource.Paradox) &&
+                EvaluateCondition(9, _dataSource.Astral_Soul_Stacks);
         }
 
         private bool EvaluateElementCondition(BLMGauge gauge)

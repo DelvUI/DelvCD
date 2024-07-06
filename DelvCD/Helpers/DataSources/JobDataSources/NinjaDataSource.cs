@@ -4,13 +4,13 @@
     {
         public new static string GetDisplayName() => "Ninja";
 
-        public float Huton_Timer;
+        public int Kazematoi;
         public int Ninki;
 
 
         public override float GetConditionValue(int index) => index switch
         {
-            0 => Huton_Timer,
+            0 => Kazematoi,
             1 => Ninki,
             _ => 0
         };
@@ -19,7 +19,7 @@
 
         public override float GetMaxValue(int index) => index switch
         {
-            0 => 60,
+            0 => 5,
             1 => 100,
             _ => 0
         };
@@ -27,7 +27,7 @@
         public NinjaDataSource()
         {
             _conditionFieldNames = new() {
-                nameof(Huton_Timer),
+                nameof(Kazematoi),
                 nameof(Ninki)
             };
 
