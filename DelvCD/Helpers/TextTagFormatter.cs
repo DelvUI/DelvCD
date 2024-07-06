@@ -157,6 +157,7 @@ namespace DelvCD.Helpers
                 typeof(SamuraiDataSource),
                 typeof(ScholarDataSource),
                 typeof(SummonerDataSource),
+                typeof(ViperDataSource),
                 typeof(WarriorDataSource),
                 typeof(WhiteMageDataSource)
             };
