@@ -161,18 +161,21 @@ namespace DelvCD.Helpers
             return result != 566; // 0 == in range, 565 == in range but not facing target, 566 == out of range, 562 == not in LoS
         }
 
-        public unsafe bool IsTargetInLos(IGameObject? player, IGameObject? target)
+        public unsafe bool IsTargetInLos(IGameObject? player, IGameObject? target, uint actionId)
         {
             if (target is null || player is null)
             {
                 return false;
             }
 
-            Vector3 delta = target.Position - player.Position;            
-            RaycastHit worldPos = default;
+            uint result = ActionManager.GetActionInRangeOrLoS(
+                actionId,
+                (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)player.Address,
+                (FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject*)target.Address);
+
+            Vector3 delta = target.Position - player.Position;
             Vector3 origin = new(player.Position.X, player.Position.Y + 2f, player.Position.Z);
-            int* flags = stackalloc int[3] { 0x4000, 0x4000, 0x0 };
-            return !BGCollisionModule.Raycast2(origin, Vector3.Normalize(delta), delta.Length(), &worldPos, flags);
+            return !BGCollisionModule.RaycastMaterialFilter(origin, Vector3.Normalize(delta), out RaycastHit hitInfo, delta.Length()) && result != 562;
         }
 
         public unsafe uint GetLastUsedActionId()
