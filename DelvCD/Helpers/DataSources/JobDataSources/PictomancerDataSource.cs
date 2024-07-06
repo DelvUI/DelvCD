@@ -1,11 +1,4 @@
-﻿using Dalamud.Game.ClientState.JobGauge.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DelvCD.Helpers.DataSources.JobDataSources
+﻿namespace DelvCD.Helpers.DataSources.JobDataSources
 {
     internal class PictomancerDataSource : DataSource
     {

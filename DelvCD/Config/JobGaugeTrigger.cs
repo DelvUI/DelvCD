@@ -212,6 +212,7 @@ namespace DelvCD.Config
             (int)Job.SAM,
             (int)Job.SCH,
             (int)Job.SMN,
+            (int)Job.VPR,
             (int)Job.WAR,
             (int)Job.WHM,
         };
@@ -237,6 +238,7 @@ namespace DelvCD.Config
             "Samurai",
             "Scholar",
             "Summoner",
+            "Viper",
             "Warrior",
             "White Mage"
         };
@@ -262,6 +264,7 @@ namespace DelvCD.Config
             typeof(SamuraiJobGauge),
             typeof(ScholarJobGauge),
             typeof(SummonerJobGauge),
+            typeof(ViperJobGauge),
             typeof(WarriorJobGauge),
             typeof(WhiteMageJobGauge),
         };
