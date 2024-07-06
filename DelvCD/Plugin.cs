@@ -45,7 +45,8 @@ namespace DelvCD
             ITargetManager targetManager,
             IPluginLog logger,
             ITextureProvider textureProvider,
-            ITextureSubstitutionProvider textureSubstitutionProvider
+            ITextureSubstitutionProvider textureSubstitutionProvider,
+            INotificationManager notificationManager
         )
         {
             Plugin.Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? Plugin.Version;
@@ -73,6 +74,7 @@ namespace DelvCD
             Singletons.Register(logger);
             Singletons.Register(textureProvider);
             Singletons.Register(textureSubstitutionProvider);
+            Singletons.Register(notificationManager);
             Singletons.Register(new TexturesCache());
             Singletons.Register(new ActionHelpers());
             Singletons.Register(new StatusHelpers());
