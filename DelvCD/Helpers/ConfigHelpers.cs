@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using Dalamud.Interface.ImGuiNotification;
+﻿using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Plugin.Services;
 using DelvCD.Config;
 using DelvCD.Helpers.DataSources;
@@ -12,6 +6,12 @@ using DelvCD.UIElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Text;
 
 namespace DelvCD.Helpers
 {
@@ -100,12 +100,14 @@ namespace DelvCD.Helpers
 
                 T? importedObj = JsonConvert.DeserializeObject<T>(decodedJsonString, _serializerSettings);
 
-                if (!decodedJsonString.Contains("\"Version\":"))
+                if (importedObj is UIElement element)
                 {
-                    if (importedObj is UIElement element)
+                    if (!decodedJsonString.Contains("\"Version\":"))
                     {
                         MigrateStyleConditions(element);
                     }
+
+                    MigrateComboIds(element);
                 }
 
                 return importedObj;
@@ -159,6 +161,12 @@ namespace DelvCD.Helpers
                         MigrateStyleConditions(config.ElementList.UIElements);
                         SaveConfig(config);
                     }
+
+                    // fix dragon comboos
+                    if (config != null && MigrateComboIds(config.ElementList.UIElements))
+                    {
+                        SaveConfig(config);
+                    }
                 }
             }
             catch (Exception ex)
@@ -181,6 +189,62 @@ namespace DelvCD.Helpers
             }
 
             return config ?? new DelvCDConfig();
+        }
+
+        public static bool MigrateComboIds(List<UIElement> elements)
+        {
+            bool changed = false;
+
+            foreach (UIElement element in elements)
+            {
+                changed |= MigrateComboIds(element);
+            }
+
+            return changed;
+        }
+
+        public static bool MigrateComboIds(UIElement element)
+        {
+            if (element is Group group)
+            {
+                return MigrateComboIds(group.ElementList.UIElements);
+            }
+
+            TriggerConfig? config = null;
+            if (element is Icon icon)
+            {
+                config = icon.TriggerConfig;
+            }
+            else if (element is Bar bar)
+            {
+                config = bar.TriggerConfig;
+            }
+
+            if (config == null)
+            {
+                return false;
+            }
+
+            bool changed = false;
+
+            foreach (TriggerOptions t in config.TriggerOptions)
+            {
+                if (t is not CooldownTrigger trigger) { continue; }
+                if (!trigger.Combo) { continue; }
+
+                foreach (TriggerData data in trigger.TriggerData)
+                {
+                    if (ActionHelpers.SpecialComboCases.TryGetValue(data.Id, out uint[]? ids) &&
+                        ids != null &&
+                        data.ComboId != ids)
+                    {
+                        data.ComboId = ids;
+                        changed = true;
+                    }
+                }
+            }
+
+            return changed;
         }
 
         public static void MigrateStyleConditions(List<UIElement> elements)

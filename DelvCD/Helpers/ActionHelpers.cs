@@ -336,7 +336,7 @@ namespace DelvCD.Helpers
             return actionList;
         }
 
-        private static Dictionary<uint, uint[]> _specialCases = new()
+        public static Dictionary<uint, uint[]> SpecialComboCases = new()
         {
             [88] = [87, 36955], // chaos thrust
             [25772] = [87, 36955], // chaotic spring
@@ -356,7 +356,7 @@ namespace DelvCD.Helpers
 
             // can't figure out lumina data, seems incorrect
             // hardcode away...
-            if (_specialCases.TryGetValue(action.RowId, out uint[]? ids) && ids != null)
+            if (SpecialComboCases.TryGetValue(action.RowId, out uint[]? ids) && ids != null)
             {
                 return ids;
             }
