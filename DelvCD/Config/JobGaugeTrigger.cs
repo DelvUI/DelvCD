@@ -64,7 +64,7 @@ namespace DelvCD.Config
 
         public override bool IsTriggered(bool preview)
         {
-            if (!TriggerData.Any() || _jobGauge == null)
+            if (_jobGauge == null)
             {
                 return false;
             }
