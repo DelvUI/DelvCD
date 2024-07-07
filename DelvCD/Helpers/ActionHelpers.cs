@@ -336,11 +336,29 @@ namespace DelvCD.Helpers
             return actionList;
         }
 
+        private static Dictionary<uint, uint[]> _specialCases = new()
+        {
+            [88] = [87, 36955], // chaos thrust
+            [25772] = [87, 36955], // chaotic spring
+            [84] = [78, 36954], // full thrust
+            [25771] = [78, 36954], // heavens thrust
+            [3556] = [88, 25772], // wheeling thrust
+            [36952] = [3554, 3556], // drakesbane
+            [3554] = [84, 25771] // fang and claw
+        };
+
         public static uint[] GetComboIds(LuminaAction? action)
         {
             if (action is null)
             {
                 return Array.Empty<uint>();
+            }
+
+            // can't figure out lumina data, seems incorrect
+            // hardcode away...
+            if (_specialCases.TryGetValue(action.RowId, out uint[]? ids) && ids != null)
+            {
+                return ids;
             }
 
             return GetComboIds(action.ActionCombo.Value?.RowId ?? 0);
