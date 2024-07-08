@@ -58,10 +58,11 @@ namespace DelvCD.UIElements
             }
         }
 
-        public override bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true, int index = 0, Vector2? offset = null)
+        public override bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
             bool visible = VisibilityConfig.IsVisible(parentVisible);
-            int localIdx = 0;
+            int dynamicIdx = 0;
+            int staticIdx = 0;
             foreach (UIElement element in ElementList.UIElements)
             {
                 if (!Preview && LastFrameWasPreview)
@@ -75,20 +76,18 @@ namespace DelvCD.UIElements
 
                 if (visible || Singletons.Get<PluginManager>().IsConfigOpen())
                 {
-                    Vector2? eleOffset = GroupConfig.IsDynamic ? (offset ?? GroupConfig.DynamicOffset) : null;
-                    Vector2 localPos = pos + GroupConfig.Position + (offset ?? Vector2.Zero) * index;
-                    if (eleOffset != null) {
-                        localPos += (Vector2)eleOffset * localIdx;
-                    }
+                    Vector2 eleOffset = GroupConfig.IsDynamic ? GroupConfig.DynamicOffset : Vector2.Zero;
+                    Vector2 localPos = pos + GroupConfig.Position + (GroupConfig.RedrawDyanmicElements ? dynamicIdx : staticIdx) * eleOffset;
                     if (element.Draw(localPos, null, visible))
                     {
-                        localIdx++;
+                        dynamicIdx++;
                     }
+                    staticIdx++;
                 }
             }
 
             LastFrameWasPreview = Preview;
-            return localIdx > 0;
+            return dynamicIdx > 0;
         }
 
         public void ResizeIcons(Vector2 size, bool recurse, bool conditions)
