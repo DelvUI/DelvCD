@@ -36,6 +36,7 @@ namespace DelvCD.UIElements
             }
         }
 
+
         [JsonIgnore] private StyleConditions<IconStyleConfig> _styleConditions = null!;
         public StyleConditions<IconStyleConfig> StyleConditions
         {
