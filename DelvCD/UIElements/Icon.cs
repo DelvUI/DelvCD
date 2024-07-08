@@ -1,5 +1,4 @@
-﻿using Dalamud.Logging;
-using DelvCD.Config;
+﻿using DelvCD.Config;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
@@ -18,7 +17,6 @@ namespace DelvCD.UIElements
         public IconStyleConfig IconStyleConfig { get; set; }
         public LabelListConfig LabelListConfig { get; set; }
         public VisibilityConfig VisibilityConfig { get; set; }
-
 
         [JsonIgnore] private TriggerConfig _triggerConfig = null!;
         public TriggerConfig TriggerConfig
@@ -119,17 +117,17 @@ namespace DelvCD.UIElements
             }
         }
 
-        public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
+        public override bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true, int index = -1, Vector2? offset = null)
         {
             if (!TriggerConfig.TriggerOptions.Any())
             {
-                return;
+                return false;
             }
 
             bool visible = VisibilityConfig.IsVisible(parentVisible);
             if (!visible && !Preview)
             {
-                return;
+                return false;
             }
 
             bool triggered = TriggerConfig.IsTriggered(Preview, out int triggeredIndex);
@@ -138,6 +136,10 @@ namespace DelvCD.UIElements
             IconStyleConfig style = StyleConditions.GetStyle(datas) ?? IconStyleConfig;
 
             Vector2 localPos = pos + style.Position;
+            if (index >= 0 && offset != null)
+            {
+                localPos += index * (Vector2)offset;
+            }
             Vector2 size = style.Size;
 
             if (Singletons.Get<PluginManager>().ShouldClip())
@@ -145,7 +147,7 @@ namespace DelvCD.UIElements
                 ClipRect? clipRect = Singletons.Get<ClipRectsHelper>().GetClipRectForArea(localPos, size);
                 if (clipRect.HasValue)
                 {
-                    return;
+                    return false;
                 }
             }
 
@@ -153,7 +155,7 @@ namespace DelvCD.UIElements
             {
                 StartData = null;
                 StartTime = null;
-                return;
+                return false;
             }
 
             UpdateStartData(data);
@@ -254,6 +256,7 @@ namespace DelvCD.UIElements
             }
 
             LastFrameWasPreview = Preview;
+            return true;
         }
 
         private static void DrawProgressSwipe(
@@ -322,14 +325,18 @@ namespace DelvCD.UIElements
             IconStyleConfig.Position *= scaleFactor;
 
             if (!positionOnly)
+            {
                 IconStyleConfig.Size *= scaleFactor;
+            }
 
             foreach (var condition in StyleConditions.Conditions)
             {
                 condition.Style.Position *= scaleFactor;
 
                 if (!positionOnly)
+                {
                     condition.Style.Size *= scaleFactor;
+                }
             }
         }
 

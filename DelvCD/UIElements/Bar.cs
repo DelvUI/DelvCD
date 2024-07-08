@@ -119,17 +119,17 @@ namespace DelvCD.UIElements
             }
         }
 
-        public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
+        public override bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true, int index = -1, Vector2? offset = null)
         {
             if (!TriggerConfig.TriggerOptions.Any())
             {
-                return;
+                return false;
             }
 
             bool visible = VisibilityConfig.IsVisible(parentVisible);
             if (!visible && !Preview)
             {
-                return;
+                return false;
             }
 
             bool triggered = TriggerConfig.IsTriggered(Preview, out int triggeredIndex);
@@ -145,7 +145,7 @@ namespace DelvCD.UIElements
                 ClipRect? clipRect = Singletons.Get<ClipRectsHelper>().GetClipRectForArea(localPos, size);
                 if (clipRect.HasValue)
                 {
-                    return;
+                    return false;
                 }
             }
 
@@ -155,7 +155,7 @@ namespace DelvCD.UIElements
             {
                 StartData = null;
                 StartTime = null;
-                return;
+                return false;
             }
 
             UpdateStartData(data);
@@ -302,6 +302,7 @@ namespace DelvCD.UIElements
                     label.Draw(localPos, size, visible);
                 }
             }
+            return true;
         }
 
         private BarData CalculateBar(Vector2 size, float progress, float max, BarDirection direction)
