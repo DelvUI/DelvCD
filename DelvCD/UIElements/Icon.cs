@@ -36,7 +36,7 @@ namespace DelvCD.UIElements
             }
         }
 
-        
+
         [JsonIgnore] private StyleConditions<IconStyleConfig> _styleConditions = null!;
         public StyleConditions<IconStyleConfig> StyleConditions
         {
@@ -272,7 +272,7 @@ namespace DelvCD.UIElements
             {
                 return;
             }
-            
+
             bool invert = style.InvertSwipe;
             float percent = (invert ? 0 : 1) - (startValue - triggeredValue) / startValue;
             uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
@@ -289,7 +289,7 @@ namespace DelvCD.UIElements
 
             ImGui.PushClipRect(pos, pos + size, false);
             drawList.PathArcTo(pos + size / 2, radius / 2, startAngle, endAngle, (int)(100f * Math.Abs(percent)));
-            
+
             drawList.PathStroke(progressAlpha, ImDrawFlags.None, radius);
             if (style.ShowSwipeLines)
             {
