@@ -138,6 +138,10 @@ namespace DelvCD.UIElements
             BarStyleConfig style = StyleConditions.GetStyle(datas) ?? BarStyleConfig;
 
             Vector2 localPos = pos + style.Position;
+            if (index >= 0 && offset != null)
+            {
+                localPos += index * (Vector2)offset;
+            }
             Vector2 size = style.Size;
 
             if (Singletons.Get<PluginManager>().ShouldClip())
