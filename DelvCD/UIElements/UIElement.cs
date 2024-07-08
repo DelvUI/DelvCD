@@ -36,7 +36,7 @@ namespace DelvCD.UIElements
 
         public abstract ElementType Type { get; }
 
-        public abstract bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true, int index = -1, Vector2? offset = null);
+        public abstract bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true);
 
         public abstract IEnumerable<IConfigPage> GetConfigPages();
 

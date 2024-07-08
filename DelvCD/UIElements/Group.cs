@@ -77,7 +77,10 @@ namespace DelvCD.UIElements
                 {
                     Vector2? eleOffset = GroupConfig.IsDynamic ? (offset ?? GroupConfig.DynamicOffset) : null;
                     Vector2 localPos = pos + GroupConfig.Position + (offset ?? Vector2.Zero) * index;
-                    if (element.Draw(localPos, null, visible, localIdx, eleOffset))
+                    if (eleOffset != null) {
+                        localPos += (Vector2)eleOffset * localIdx;
+                    }
+                    if (element.Draw(localPos, null, visible))
                     {
                         localIdx++;
                     }

@@ -117,7 +117,7 @@ namespace DelvCD.UIElements
             }
         }
 
-        public override bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true, int index = -1, Vector2? offset = null)
+        public override bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
             if (!TriggerConfig.TriggerOptions.Any())
             {
@@ -136,10 +136,6 @@ namespace DelvCD.UIElements
             IconStyleConfig style = StyleConditions.GetStyle(datas) ?? IconStyleConfig;
 
             Vector2 localPos = pos + style.Position;
-            if (index >= 0 && offset != null)
-            {
-                localPos += index * (Vector2)offset;
-            }
             Vector2 size = style.Size;
 
             if (Singletons.Get<PluginManager>().ShouldClip())
