@@ -7,7 +7,6 @@ namespace DelvCD.UIElements
 {
     public class Group : UIElement, IGroup
     {
-
         public override ElementType Type => ElementType.Group;
 
         public ElementListConfig ElementList { get; set; }
