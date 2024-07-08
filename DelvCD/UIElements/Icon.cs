@@ -1,4 +1,4 @@
-﻿using DelvCD.Config;
+using DelvCD.Config;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using ImGuiNET;
