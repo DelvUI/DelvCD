@@ -1,3 +1,7 @@
+# 1.1.0.1
+- Fixed charges and cooldowns not working properly for some abilities.
+- Fixed issues when drawing elements pointing to invalid icon ids.
+
 # 1.1.0.0
 - Added support for Dawntrail and Dalamud API 10.
 
