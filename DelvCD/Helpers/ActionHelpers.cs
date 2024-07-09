@@ -107,11 +107,9 @@ namespace DelvCD.Helpers
                 return;
             }
 
-            byte level = Singletons.Get<IClientState>().LocalPlayer?.Level ?? 100;
-
             recastInfo.RecastTime = recastDetail->Total;
             recastInfo.RecastTimeElapsed = recastDetail->Elapsed;
-            recastInfo.MaxCharges = ActionManager.GetMaxCharges(actionId, (uint)level);
+            recastInfo.MaxCharges = ActionManager.GetMaxCharges(actionId, 100);
             if (recastInfo.MaxCharges == 1)
             {
                 return;
