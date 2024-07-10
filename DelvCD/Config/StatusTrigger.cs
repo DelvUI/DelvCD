@@ -122,7 +122,7 @@ namespace DelvCD.Config
 
                         _dataSource.Name = trigger.Name;
 
-                        if (wasInactive)
+                        if (wasInactive || _dataSource.Max_Status_Timer < _dataSource.Status_Timer)
                         {
                             _dataSource.Max_Status_Timer = _dataSource.Status_Timer;
                         }
