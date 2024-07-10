@@ -14,7 +14,7 @@ namespace DelvCD.Config
         public string Name => "Group";
         public bool IsDynamic = false;
         public Vector2 DynamicOffset = new Vector2(0, 0);
-        public bool RedrawDyanmicElements = false;
+        public bool RedrawDynamicElements = false;
 
         public Vector2 Position = new Vector2(0, 0);
 
@@ -39,7 +39,7 @@ namespace DelvCD.Config
                 if (IsDynamic)
                 {
                     ImGui.DragFloat2("Dynamic Offset", ref DynamicOffset);
-                    ImGui.Checkbox("Dynamically redraw elements", ref RedrawDyanmicElements);
+                    ImGui.Checkbox("Dynamically redraw elements", ref RedrawDynamicElements);
                 }
 
                 ImGui.NewLine();
