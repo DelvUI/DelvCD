@@ -2,6 +2,7 @@
 - Added "Action Highlighted" condition to Cooldown Triggers.
 - Updated Monk's Job Gauge data.
 - Updated Summoner's Job Gauge data.
+- Fixed Samurai's Combo Ready not working for some actions.
 
 # 1.1.0.1
 - Fixed charges and cooldowns not working properly for some abilities.

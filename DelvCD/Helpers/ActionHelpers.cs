@@ -343,13 +343,20 @@ namespace DelvCD.Helpers
 
         public static Dictionary<uint, uint[]> SpecialComboCases = new()
         {
+            // DRG
             [88] = [87, 36955], // chaos thrust
             [25772] = [87, 36955], // chaotic spring
             [84] = [78, 36954], // full thrust
             [25771] = [78, 36954], // heavens thrust
             [3556] = [88, 25772], // wheeling thrust
             [36952] = [3554, 3556], // drakesbane
-            [3554] = [84, 25771] // fang and claw
+            [3554] = [84, 25771], // fang and claw
+
+            // SAM
+            [7478] = [7477, 36963], // jinpu
+            [7479] = [7477, 36963], // shifu
+            [7480] = [7477, 36963], // yukikaze
+            [7484] = [7477, 36963], // mangetsu
         };
 
         public static uint[] GetComboIds(LuminaAction? action)
