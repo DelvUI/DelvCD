@@ -146,6 +146,11 @@ namespace DelvCD.Helpers
             return _actionManager->GetActionStatus(type, actionId, targetId, false, true) == 0;
         }
 
+        public unsafe bool IsActionHighlighted(uint actionId, ActionType type = ActionType.Action)
+        {
+            return _actionManager->IsActionHighlighted(type, actionId);
+        }
+
         public unsafe bool GetActionInRange(uint actionId, IGameObject? player, IGameObject? target)
         {
             if (player is null || target is null)
