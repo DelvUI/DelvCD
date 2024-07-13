@@ -1,10 +1,12 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DelvCD.Config.JobGauges
 {
@@ -26,7 +28,11 @@ namespace DelvCD.Config.JobGauges
                 "Master's Gauge Chakra #2",
                 "Master's Gauge Chakra #3",
                 "Solar Nadi",
-                "Lunar Nadi"
+                "Lunar Nadi",
+                "Blitz Timer",
+                "Opoopo Stacks",
+                "Raptor Stacks",
+                "Coeurl Stacks"
             };
 
             _types = new List<TriggerConditionType>() {
@@ -35,7 +41,10 @@ namespace DelvCD.Config.JobGauges
                 TriggerConditionType.Combo,
                 TriggerConditionType.Combo,
                 TriggerConditionType.Boolean,
-                TriggerConditionType.Boolean
+                TriggerConditionType.Boolean,
+                TriggerConditionType.Numeric,
+                TriggerConditionType.Numeric,
+                TriggerConditionType.Numeric
             };
 
             string[] chakras = new string[] { "None", "Coeurl", "Opo-opo", "Raptor" };
@@ -57,6 +66,13 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Masters_Gauge_Chakra_3 = _comboOptions[3][_values[3]];
             _dataSource.Solar_Nadi = (gauge.Nadi & Nadi.SOLAR) != 0;
             _dataSource.Lunar_Nadi = (gauge.Nadi & Nadi.LUNAR) != 0;
+            _dataSource.Blitz_Timer = gauge.BlitzTimeRemaining / 1000f;
+            _dataSource.Opoopo_Stacks = gauge.OpoOpoFury;
+            _dataSource.Raptor_Stacks = gauge.RaptorFury;
+            _dataSource.Coeurl_Stacks = gauge.CoeurlFury;
+
+            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            _dataSource.Max_Chakra_Stacks = player?.StatusList.FirstOrDefault(s => s.StatusId is 1182 or 2174) != null ? 10 : 5;
 
             if (preview) { return true; }
 
@@ -66,7 +82,11 @@ namespace DelvCD.Config.JobGauges
                 EvaluateMastersGaugeChakraCondition(gauge, 1) &&
                 EvaluateMastersGaugeChakraCondition(gauge, 2) &&
                 EvaluateCondition(4, _dataSource.Solar_Nadi) &&
-                EvaluateCondition(5, _dataSource.Lunar_Nadi);
+                EvaluateCondition(5, _dataSource.Lunar_Nadi) &&
+                EvaluateCondition(6, _dataSource.Blitz_Timer) &&
+                EvaluateCondition(7, _dataSource.Opoopo_Stacks) &&
+                EvaluateCondition(8, _dataSource.Raptor_Stacks) &&
+                EvaluateCondition(9, _dataSource.Coeurl_Stacks);
         }
 
         private bool EvaluateMastersGaugeChakraCondition(MNKGauge gauge, int chakra)

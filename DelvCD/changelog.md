@@ -1,3 +1,7 @@
+# 1.1.0.2
+- Added "Action Highlighted" condition to Cooldown Triggers.
+- Updated Monk's Job Gauge data.
+
 # 1.1.0.1
 - Fixed charges and cooldowns not working properly for some abilities.
 - Fixed issues when drawing elements pointing to invalid icon ids.
