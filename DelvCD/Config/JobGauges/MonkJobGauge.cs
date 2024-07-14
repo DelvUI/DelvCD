@@ -44,6 +44,7 @@ namespace DelvCD.Config.JobGauges
                 TriggerConditionType.Boolean,
                 TriggerConditionType.Numeric,
                 TriggerConditionType.Numeric,
+                TriggerConditionType.Numeric,
                 TriggerConditionType.Numeric
             };
 

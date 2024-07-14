@@ -1,3 +1,7 @@
+# 1.1.0.3
+- Fixed Monk's Coeurl Stacks.
+- Fixed Dragoon's Life of the Dragon duration.
+
 # 1.1.0.2
 - Added "Action Highlighted" condition to Cooldown Triggers.
 - Updated Monk's Job Gauge data.
