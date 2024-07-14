@@ -125,7 +125,6 @@ namespace DelvCD.Config
             if (Combo && actionTrigger.ComboId.Length > 0)
             {
                 uint lastAction = helper.GetLastUsedActionId();
-                Singletons.Get<IPluginLog>().Debug(lastAction.ToString());
                 foreach (uint id in actionTrigger.ComboId)
                 {
                     if (id == lastAction)

@@ -81,7 +81,7 @@ namespace DelvCD.Config
             }
             catch (Exception e)
             {
-                Singletons.Get<IPluginLog>().Debug(e.Message);
+                Singletons.Get<IPluginLog>().Error(e.Message);
             }
 
             return false;
