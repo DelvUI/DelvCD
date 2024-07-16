@@ -1,3 +1,6 @@
+# 1.1.0.4
+- Updated Monk's Fury Stacks Bar for 7.01 patch changes.
+
 # 1.1.0.3
 - Fixed Monk's Coeurl Stacks.
 - Fixed Dragoon's Life of the Dragon duration.
