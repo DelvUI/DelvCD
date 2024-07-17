@@ -1,8 +1,10 @@
 using Dalamud.Interface.Utility;
 using DelvCD.UIElements;
+using DelvCD.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System.Numerics;
+using System.Collections.Generic;
 
 namespace DelvCD.Config
 {
@@ -16,6 +18,8 @@ namespace DelvCD.Config
         public Vector2 DynamicOffset = new Vector2(0, 0);
         public bool RedrawDynamicElements = false;
 
+        public int DynamicGrowthDir = 0;
+
         public Vector2 Position = new Vector2(0, 0);
 
         [JsonIgnore] private Vector2 _iconSize = new Vector2(40, 40);
@@ -24,6 +28,16 @@ namespace DelvCD.Config
         [JsonIgnore] private bool _recusiveResize = false;
         [JsonIgnore] private bool _conditionsResize = false;
         [JsonIgnore] private bool _positionOnly = false;
+        [JsonIgnore] private string[] _DirectionsOptionsValues = {
+            "Right and Down",
+            "Right and Up",
+            "Left and Down",
+            "Left and Up",
+            "Centered and Up",
+            "Centered and Down",
+            "Centered and Left",
+            "Centered and Right"
+        };
 
         public IConfigPage GetDefault() => new GroupConfig();
 
@@ -40,6 +54,11 @@ namespace DelvCD.Config
                 {
                     ImGui.DragFloat2("Dynamic Offset", ref DynamicOffset);
                     ImGui.Checkbox("Dynamically redraw elements", ref RedrawDynamicElements);
+                    if (RedrawDynamicElements) {
+                    ImGui.Combo(
+                        "Growth Direction", ref DynamicGrowthDir, _DirectionsOptionsValues, _DirectionsOptionsValues.Length
+                    );
+                    }
                 }
 
                 ImGui.NewLine();
