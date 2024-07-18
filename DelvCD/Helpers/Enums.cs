@@ -162,10 +162,10 @@ namespace DelvCD.Helpers
 
     public enum GrowthDirections
     {
-        Right = 0,
-        Left = 1,
-        Centered = 2,
-        Up = 3,
-        Down = 4
+        Up = 1,
+        Down = 2,
+        Left = 4,
+        Right = 8,
+        Centered = 16,
     }
 }

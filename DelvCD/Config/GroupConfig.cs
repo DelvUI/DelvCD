@@ -18,6 +18,8 @@ namespace DelvCD.Config
         public Vector2 DynamicOffset = new Vector2(0, 0);
         public bool RedrawDynamicElements = false;
 
+        public int DynamicMaxPerRow = 5;
+
         public int DynamicGrowthDir = 0;
 
         public Vector2 Position = new Vector2(0, 0);
@@ -28,7 +30,8 @@ namespace DelvCD.Config
         [JsonIgnore] private bool _recusiveResize = false;
         [JsonIgnore] private bool _conditionsResize = false;
         [JsonIgnore] private bool _positionOnly = false;
-        [JsonIgnore] private string[] _DirectionsOptionsValues = {
+        [JsonIgnore]
+        private string[] _DirectionsOptionsValues = {
             "Right and Down",
             "Right and Up",
             "Left and Down",
@@ -53,12 +56,12 @@ namespace DelvCD.Config
                 if (IsDynamic)
                 {
                     ImGui.DragFloat2("Dynamic Offset", ref DynamicOffset);
-                    ImGui.Checkbox("Dynamically redraw elements", ref RedrawDynamicElements);
-                    if (RedrawDynamicElements) {
                     ImGui.Combo(
-                        "Growth Direction", ref DynamicGrowthDir, _DirectionsOptionsValues, _DirectionsOptionsValues.Length
-                    );
-                    }
+    "Growth Direction", ref DynamicGrowthDir, _DirectionsOptionsValues, _DirectionsOptionsValues.Length
+);
+                    ImGui.DragInt("Max elements per row", ref DynamicMaxPerRow);
+                    ImGui.Checkbox("Dynamically redraw elements", ref RedrawDynamicElements);
+
                 }
 
                 ImGui.NewLine();

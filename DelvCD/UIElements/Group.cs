@@ -63,8 +63,10 @@ namespace DelvCD.UIElements
             bool visible = VisibilityConfig.IsVisible(parentVisible);
             int dynamicIdx = 0;
             int staticIdx = 0;
+            GrowthDirections growthDirections = LayoutHelper.GrowthDirectionsFromIndex(GroupConfig.DynamicGrowthDir);
             foreach (UIElement element in ElementList.UIElements)
             {
+
                 if (!Preview && LastFrameWasPreview)
                 {
                     element.Preview = false;
@@ -77,7 +79,7 @@ namespace DelvCD.UIElements
                 if (visible || Singletons.Get<PluginManager>().IsConfigOpen())
                 {
                     Vector2 eleOffset = GroupConfig.IsDynamic ? GroupConfig.DynamicOffset : Vector2.Zero;
-                    Vector2 localPos = pos + GroupConfig.Position + (GroupConfig.RedrawDynamicElements ? dynamicIdx : staticIdx) * eleOffset;
+                    Vector2 localPos = GroupConfig.Position + (GroupConfig.IsDynamic ? LayoutHelper.CalculateElementPosition(growthDirections, GroupConfig.IsDynamic ? GroupConfig.DynamicMaxPerRow : 1, GroupConfig.RedrawDynamicElements ? dynamicIdx : staticIdx, pos, eleOffset) : pos);
                     if (element.Draw(localPos, null, visible))
                     {
                         dynamicIdx++;
