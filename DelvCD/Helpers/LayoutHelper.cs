@@ -33,18 +33,18 @@ namespace DelvCD.Helpers
             int col)
         {
             Vector2 direction;
-           if ((growthDirections & GrowthDirections.Centered) != 0)
+            if ((growthDirections & GrowthDirections.Centered) != 0)
             {
                 // if axis is centered -> even elements right/down | odd elements left/up
                 if ((growthDirections & GrowthDirections.Up) != 0 || (growthDirections & GrowthDirections.Down) != 0)
                 {
-                    direction.X = col % 2 == 0 ? 1: -1;
+                    direction.X = col % 2 == 0 ? 1 : -1;
                     direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
                 }
                 else
                 {
                     direction.X = (growthDirections & GrowthDirections.Right) != 0 ? 1 : -1;
-                    direction.Y = row % 2 == 0 ? 1: -1;
+                    direction.Y = row % 2 == 0 ? 1 : -1;
                 }
             }
             else
@@ -55,14 +55,18 @@ namespace DelvCD.Helpers
             return direction;
         }
 
-        public static Vector2 GetOffsetMultiplier(GrowthDirections directions, int row, int col) {
+        public static Vector2 GetOffsetMultiplier(GrowthDirections directions, int row, int col)
+        {
             // determine if y or x axis is getting centered and scale by .5 for that axis
-            if ((directions & GrowthDirections.Centered) != 0) {
-                if ((directions & GrowthDirections.Up) != 0 || (directions & GrowthDirections.Down) != 0) {
+            if ((directions & GrowthDirections.Centered) != 0)
+            {
+                if ((directions & GrowthDirections.Up) != 0 || (directions & GrowthDirections.Down) != 0)
+                {
                     return new Vector2((float)Math.Ceiling(col / 2f), row);
                 }
-                else {
-                    return new Vector2(col, (float)Math.Ceiling(row/2f));
+                else
+                {
+                    return new Vector2(col, (float)Math.Ceiling(row / 2f));
                 }
             }
             return new Vector2(col, row);
@@ -77,7 +81,7 @@ namespace DelvCD.Helpers
         {
             List<Vector2> list = new List<Vector2>();
 
-            int row =  index / maxPerRow;
+            int row = index / maxPerRow;
             int col = index % maxPerRow;
 
             Vector2 direction = CalculateAxisDirections(
