@@ -79,7 +79,16 @@ namespace DelvCD.UIElements
                 if (visible || Singletons.Get<PluginManager>().IsConfigOpen())
                 {
                     Vector2 eleOffset = GroupConfig.IsDynamic ? GroupConfig.DynamicOffset : Vector2.Zero;
-                    Vector2 localPos = GroupConfig.Position + (GroupConfig.IsDynamic ? LayoutHelper.CalculateElementPosition(growthDirections, GroupConfig.IsDynamic ? GroupConfig.DynamicMaxPerRow : 1, GroupConfig.RedrawDynamicElements ? dynamicIdx : staticIdx, pos, eleOffset) : pos);
+                    Vector2 localPos = GroupConfig.Position;
+                    if (GroupConfig.IsDynamic)
+                    {
+                        int curIdx = GroupConfig.RedrawDynamicElements ? dynamicIdx : staticIdx;
+                        localPos += LayoutHelper.CalculateElementPosition(growthDirections, GroupConfig.DynamicMaxPerRow, curIdx, pos, eleOffset);
+                    }
+                    else
+                    {
+                        localPos += pos;
+                    }
                     if (element.Draw(localPos, null, visible))
                     {
                         dynamicIdx++;
