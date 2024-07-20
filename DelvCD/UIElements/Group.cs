@@ -15,6 +15,8 @@ namespace DelvCD.UIElements
 
         public VisibilityConfig VisibilityConfig { get; set; }
 
+        public override bool IsAlwaysHide => VisibilityConfig.AlwaysHide;
+
         // Constructor for deserialization
         public Group() : this(string.Empty) { }
 

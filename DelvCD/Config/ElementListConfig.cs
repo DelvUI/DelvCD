@@ -67,7 +67,7 @@ namespace DelvCD.Config
             }
         }
 
-        private void DrawUIElementTable(Vector2 size, float padX)
+        private unsafe void DrawUIElementTable(Vector2 size, float padX)
         {
             ImGuiTableFlags flags =
                 ImGuiTableFlags.RowBg |
@@ -104,12 +104,13 @@ namespace DelvCD.Config
                     }
 
                     ImGui.PushID(i.ToString());
+                    
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                     if (ImGui.TableSetColumnIndex(0))
                     {
                         ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 3f * _scale);
-                        ImGui.Text(element.Name);
+                        ImGui.TextColored(!element.IsAlwaysHide ? *ImGui.GetStyleColorVec4(ImGuiCol.Text) : *ImGui.GetStyleColorVec4(ImGuiCol.TextDisabled), element.Name);
                     }
 
                     if (ImGui.TableSetColumnIndex(1))

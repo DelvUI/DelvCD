@@ -35,6 +35,8 @@ namespace DelvCD.UIElements
         }
 
         public abstract ElementType Type { get; }
+        
+        public abstract bool IsAlwaysHide { get; }
 
         public abstract bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true);
 

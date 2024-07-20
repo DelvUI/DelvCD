@@ -109,7 +109,7 @@ namespace DelvCD.Helpers
 
             recastInfo.RecastTime = recastDetail->Total;
             recastInfo.RecastTimeElapsed = recastDetail->Elapsed;
-            recastInfo.MaxCharges = ActionManager.GetMaxCharges(actionId, 90);
+            recastInfo.MaxCharges = ActionManager.GetMaxCharges(actionId, 100);
             if (recastInfo.MaxCharges == 1)
             {
                 return;
@@ -144,6 +144,11 @@ namespace DelvCD.Helpers
         public unsafe bool CanUseAction(uint actionId, ActionType type = ActionType.Action, ulong targetId = 0xE000_0000)
         {
             return _actionManager->GetActionStatus(type, actionId, targetId, false, true) == 0;
+        }
+
+        public unsafe bool IsActionHighlighted(uint actionId, ActionType type = ActionType.Action)
+        {
+            return _actionManager->IsActionHighlighted(type, actionId);
         }
 
         public unsafe bool GetActionInRange(uint actionId, IGameObject? player, IGameObject? target)
@@ -338,13 +343,20 @@ namespace DelvCD.Helpers
 
         public static Dictionary<uint, uint[]> SpecialComboCases = new()
         {
+            // DRG
             [88] = [87, 36955], // chaos thrust
             [25772] = [87, 36955], // chaotic spring
             [84] = [78, 36954], // full thrust
             [25771] = [78, 36954], // heavens thrust
             [3556] = [88, 25772], // wheeling thrust
             [36952] = [3554, 3556], // drakesbane
-            [3554] = [84, 25771] // fang and claw
+            [3554] = [84, 25771], // fang and claw
+
+            // SAM
+            [7478] = [7477, 36963], // jinpu
+            [7479] = [7477, 36963], // shifu
+            [7480] = [7477, 36963], // yukikaze
+            [7484] = [7477, 36963], // mangetsu
         };
 
         public static uint[] GetComboIds(LuminaAction? action)

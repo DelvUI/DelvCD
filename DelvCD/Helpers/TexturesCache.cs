@@ -26,7 +26,12 @@ namespace DelvCD.Helpers
         {
             if (!greyScale)
             {
-                return Singletons.Get<ITextureProvider>().GetFromGameIcon(iconId + stackCount).GetWrapOrDefault();
+                try
+                {
+                    return Singletons.Get<ITextureProvider>().GetFromGameIcon(iconId + stackCount).GetWrapOrDefault();
+                } catch {
+                    return null;
+                }
             }
 
             if (_desaturatedCache.TryGetValue(iconId + stackCount, out IDalamudTextureWrap? t))

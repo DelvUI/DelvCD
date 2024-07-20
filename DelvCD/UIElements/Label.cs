@@ -20,6 +20,8 @@ namespace DelvCD.UIElements
         public StyleConditions<LabelStyleConfig> StyleConditions { get; set; }
         public VisibilityConfig VisibilityConfig { get; set; }
 
+        public override bool IsAlwaysHide => VisibilityConfig.AlwaysHide;
+
         // Constuctor for deserialization
         public Label() : this(string.Empty) { }
 

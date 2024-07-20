@@ -20,6 +20,7 @@ namespace DelvCD.Config
         [JsonIgnore] private static readonly string[] _usableOptions = new[] { "Usable", "Not Usable" };
         [JsonIgnore] private static readonly string[] _rangeOptions = new[] { "In Range", "Not in Range" };
         [JsonIgnore] private static readonly string[] _losOptions = new[] { "In LoS", "Not in LoS" };
+        [JsonIgnore] private static readonly string[] _highlightOptions = new[] { "Highlighted", "Not Highlighted" };
         [JsonIgnore] private static readonly string[] _combatTypeOptions = new[] { "PvE", "PvP" };
 
         [JsonIgnore] private string _triggerNameInput = string.Empty;
@@ -50,6 +51,9 @@ namespace DelvCD.Config
 
         public bool LosCheck;
         public int LosValue;
+        
+        public bool HighlightCheck;
+        public int HighlightValue;
 
         public override TriggerType Type => TriggerType.Cooldown;
         public override TriggerSource Source => TriggerSource.Player;
@@ -96,6 +100,7 @@ namespace DelvCD.Config
             bool usable = false;
             bool inRange = false;
             bool inLos = false;
+            bool isHighlighted = false;
 
             if (Usable)
             {
@@ -112,10 +117,14 @@ namespace DelvCD.Config
                 inLos = helper.IsTargetInLos(Singletons.Get<IClientState>().LocalPlayer, Utils.FindTarget(), actionId);
             }
 
+            if (HighlightCheck)
+            {
+                isHighlighted = helper.IsActionHighlighted(actionId);
+            }
+
             if (Combo && actionTrigger.ComboId.Length > 0)
             {
                 uint lastAction = helper.GetLastUsedActionId();
-                Singletons.Get<IPluginLog>().Debug(lastAction.ToString());
                 foreach (uint id in actionTrigger.ComboId)
                 {
                     if (id == lastAction)
@@ -139,6 +148,7 @@ namespace DelvCD.Config
                 (!Usable || (UsableValue == 0 ? usable : !usable)) &&
                 (!RangeCheck || (RangeValue == 0 ? inRange : !inRange)) &&
                 (!LosCheck || (LosValue == 0 ? inLos : !inLos)) &&
+                (!HighlightCheck || (HighlightValue == 0 ? isHighlighted : !isHighlighted)) &&
                 (!Cooldown || Utils.GetResult(_dataSource.Cooldown_Timer, CooldownOp, CooldownValue)) &&
                 (!ChargeCount || Utils.GetResult(_dataSource.Cooldown_Stacks, ChargeCountOp, ChargeCountValue));
         }
@@ -293,6 +303,23 @@ namespace DelvCD.Config
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
                 ImGui.PushItemWidth(optionsWidth);
                 ImGui.Combo("##UsableCombo", ref UsableValue, _usableOptions, _usableOptions.Length);
+                ImGui.PopItemWidth();
+            }
+
+            DrawHelpers.DrawNestIndicator(1);
+            ImGui.Checkbox("Action Highlighted", ref HighlightCheck);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Highlighted means when the icon is glowing / has combo ants on the hotbar.");
+            }
+
+            if (HighlightCheck)
+            {
+                ImGui.SameLine();
+                padWidth = ImGui.CalcItemWidth() - ImGui.GetCursorPosX() - optionsWidth + padX;
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padWidth);
+                ImGui.PushItemWidth(optionsWidth);
+                ImGui.Combo("##HightlightCombo", ref HighlightValue, _highlightOptions, _highlightOptions.Length);
                 ImGui.PopItemWidth();
             }
 
