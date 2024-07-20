@@ -61,8 +61,7 @@ namespace DelvCD.UIElements
         public override bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
             bool visible = VisibilityConfig.IsVisible(parentVisible);
-            int dynamicIdx = 0;
-            int staticIdx = 0;
+            int idx = 0;
             GrowthDirections growthDirections = LayoutHelper.GrowthDirectionsFromIndex(GroupConfig.DynamicGrowthDir);
             foreach (UIElement element in ElementList.UIElements)
             {
@@ -82,8 +81,7 @@ namespace DelvCD.UIElements
                     Vector2 localPos = GroupConfig.Position;
                     if (GroupConfig.IsDynamic)
                     {
-                        int curIdx = GroupConfig.RedrawDynamicElements ? dynamicIdx : staticIdx;
-                        localPos += LayoutHelper.CalculateElementPosition(growthDirections, GroupConfig.DynamicMaxPerRow, curIdx, pos, eleOffset);
+                        localPos += LayoutHelper.CalculateElementPosition(growthDirections, GroupConfig.DynamicMaxPerRow, idx, pos, eleOffset);
                     }
                     else
                     {
@@ -91,14 +89,13 @@ namespace DelvCD.UIElements
                     }
                     if (element.Draw(localPos, null, visible))
                     {
-                        dynamicIdx++;
+                        idx++;
                     }
-                    staticIdx++;
                 }
             }
 
             LastFrameWasPreview = Preview;
-            return dynamicIdx > 0;
+            return idx > 0;
         }
 
         public void ResizeIcons(Vector2 size, bool recurse, bool conditions)

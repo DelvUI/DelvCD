@@ -80,9 +80,9 @@ namespace DelvCD.Helpers
             Vector2 offset)
         {
             List<Vector2> list = new List<Vector2>();
-
-            int row = index / maxPerRow;
-            int col = index % maxPerRow;
+            int actualMaxPerRow = maxPerRow > 0 ? maxPerRow : 1;
+            int row = index / actualMaxPerRow;
+            int col = index % actualMaxPerRow;
 
             Vector2 direction = CalculateAxisDirections(
                 directions,

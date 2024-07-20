@@ -16,7 +16,6 @@ namespace DelvCD.Config
         public string Name => "Group";
         public bool IsDynamic = false;
         public Vector2 DynamicOffset = new Vector2(0, 0);
-        public bool RedrawDynamicElements = false;
 
         public int DynamicMaxPerRow = 5;
 
@@ -59,8 +58,7 @@ namespace DelvCD.Config
                     ImGui.Combo(
     "Growth Direction", ref DynamicGrowthDir, _DirectionsOptionsValues, _DirectionsOptionsValues.Length
 );
-                    ImGui.DragInt("Max elements per row", ref DynamicMaxPerRow);
-                    ImGui.Checkbox("Dynamically redraw elements", ref RedrawDynamicElements);
+                    ImGui.DragInt("Max elements per row", ref DynamicMaxPerRow, 1, 1, 32);
 
                 }
 
