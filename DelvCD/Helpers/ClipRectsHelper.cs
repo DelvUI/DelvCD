@@ -139,6 +139,12 @@ namespace DelvCD.Helpers
 
         private List<ClipRect> _clipRects = new List<ClipRect>();
 
+
+        private static List<string> _ignoredAddonNames = new List<string>()
+        {
+            "_FocusTargetInfo",
+        };
+
         public unsafe void Update()
         {
             _clipRects.Clear();
@@ -162,8 +168,8 @@ namespace DelvCD.Helpers
                         continue;
                     }
 
-                    string? name = addon->NameString;
-                    if (name == null || !AddonNames.Contains(name))
+                    string name = addon->NameString;
+                    if (_ignoredAddonNames.Contains(name))
                     {
                         continue;
                     }
@@ -171,15 +177,26 @@ namespace DelvCD.Helpers
                     var margin = 5 * addon->Scale;
                     var bottomMargin = 13 * addon->Scale;
 
-                    var clipRect = new ClipRect(
-                        new Vector2(addon->X + margin, addon->Y + margin),
-                        new Vector2(
-                            addon->X + addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
-                            addon->Y + addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
-                        )
+                    Vector2 pos = new Vector2(addon->X + margin, addon->Y + margin);
+                    Vector2 size = new Vector2(
+                        addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
+                        addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
                     );
+                    
+                    // special case for duty finder
+                    if (name == "ContentsFinder")
+                    {
+                        size.X += size.X + (16 * addon->Scale);
+                        size.Y += (30 * addon->Scale);
+                    }
+                    
+                    if (name == "Journal")
+                    {
+                        size.X += size.X + (16 * addon->Scale);
+                    }
 
                     // just in case this causes weird issues / crashes (doubt it though...)
+                    ClipRect clipRect = new ClipRect(pos, pos + size);
                     if (clipRect.Max.X < clipRect.Min.X || clipRect.Max.Y < clipRect.Min.Y)
                     {
                         continue;
