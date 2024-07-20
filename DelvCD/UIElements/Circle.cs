@@ -185,38 +185,28 @@ namespace DelvCD.UIElements
                         style.Position = localPos - pos;
                     }
                 }
-                
-                // controls how smooth the arc looks
+
                 const int segments = 100;
                 float startAngle = (float)(-Math.PI / 2f + style.StartAngle * (Math.PI / 180f));
                 float endAngle = (float)(-Math.PI / 2f + style.EndAngle * (Math.PI / 180f));
 
-                List<CircleData> circles;
-                circles = new List<CircleData>() { CalculateCircle(startAngle, endAngle, progressValue, progressMaxValue, style.Direction) };
+                CircleData circle = CalculateCircle(startAngle, endAngle, progressValue, progressMaxValue, style.Direction);
 
-                foreach (CircleData circle in circles)
+                ConfigColor fillColor = circle.FillColor ?? style.FillColor;
+
+                // Draw the background arc
+                drawList.PathArcTo(localPos, style.Radius, startAngle, endAngle, segments);
+                drawList.PathStroke(ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector), ImDrawFlags.None, style.Thickness);
+
+                // Draw the filled arc
+                drawList.PathArcTo(localPos, style.Radius, circle.StartAngle, circle.EndAngle, segments);
+                drawList.PathStroke(ImGui.ColorConvertFloat4ToU32(fillColor.Vector), ImDrawFlags.None, style.Thickness);
+
+                if (style.Glow)
                 {
-                    // fill
-                    ConfigColor fillColor = circle.FillColor ?? style.FillColor;
-
-                    // Draw background arc first
-                    if (circle.EndAngle != startAngle)
-                    {
-                        drawList.PathArcTo(localPos, style.Radius, circle.StartAngle, endAngle, segments);
-                        drawList.PathStroke(ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector), ImDrawFlags.None, style.Thickness);
-                    }
-
-                    // Draw fill arc on top
-                    drawList.PathArcTo(localPos, style.Radius, circle.StartAngle, circle.EndAngle, segments);
-                    drawList.PathStroke(ImGui.ColorConvertFloat4ToU32(fillColor.Vector), ImDrawFlags.None, style.Thickness);
-                    
-                    
-                    if (style.Glow)
-                    {
-                        DrawHelpers.DrawGlowCircle(localPos, style.Radius, style.Thickness, style.GlowPadding, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
-                    }
-                    
+                    DrawHelpers.DrawGlowCircle(localPos, style.Radius, style.Thickness, style.GlowPadding, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
                 }
+
                 if (style.ShowBorder)
                 {
                     drawList.PathArcTo(localPos, style.Radius - style.Thickness / 2f, startAngle, endAngle, segments);
@@ -245,6 +235,7 @@ namespace DelvCD.UIElements
                 }
             }
         }
+
         
         private CircleData CalculateCircle(float startAngle, float endAngle, float progress, float max, CircleDirection direction)
         {
@@ -253,27 +244,18 @@ namespace DelvCD.UIElements
             float fillPercent = max == 0 ? 1f : Math.Clamp(progress / max, 0f, 1f);
             float angleRange = endAngle - startAngle;
 
-            if (direction == CircleDirection.AntiClockwise)
-            {
-                // If anticlockwise, the angle range needs to be reversed
-                angleRange = startAngle - endAngle;
-            }
-
             float fillAngle = angleRange * fillPercent;
 
-            // Adjusting for direction
-            float relativeAngle;
             if (direction == CircleDirection.Clockwise)
             {
-                relativeAngle = startAngle + fillAngle;
+                circle.StartAngle = startAngle;
+                circle.EndAngle = startAngle + fillAngle;
             }
-            else // Anticlockwise
+            else
             {
-                relativeAngle = startAngle - fillAngle;
+                circle.StartAngle = -(startAngle + (float)Math.PI);
+                circle.EndAngle = -(startAngle + (float)Math.PI);
             }
-
-            circle.StartAngle = startAngle;
-            circle.EndAngle = relativeAngle;
 
             return circle;
         }
@@ -323,7 +305,6 @@ namespace DelvCD.UIElements
     {
         public float StartAngle;
         public float EndAngle;
-        public Vector2 FillSize;
 
         public ConfigColor? FillColor;
     }

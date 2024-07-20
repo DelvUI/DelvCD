@@ -35,7 +35,7 @@ namespace DelvCD.Config
         public int Thickness = 10;
         public int StartAngle = 0;
         public int EndAngle = 360;
-        public CircleDirection Direction = CircleDirection.AntiClockwise;
+        public CircleDirection Direction = CircleDirection.Clockwise;
         public ConfigColor FillColor = new ConfigColor(1, 0.5f, 0.5f, 1);
         public ConfigColor BackgroundColor = new ConfigColor(0, 0, 0, 0.5f);
 
