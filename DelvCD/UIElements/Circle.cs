@@ -9,6 +9,7 @@ using System.Numerics;
 using System.Text.Json.Serialization;
 using System.Threading;
 using Dalamud.Logging;
+using Dalamud.Plugin.Services;
 
 namespace DelvCD.UIElements
 {
@@ -189,46 +190,32 @@ namespace DelvCD.UIElements
                 const int segments = 100;
                 float startAngle = (float)(-Math.PI / 2f + style.StartAngle * (Math.PI / 180f));
                 float endAngle = (float)(-Math.PI / 2f + style.EndAngle * (Math.PI / 180f));
-                
-                if (style.Direction == CircleDirection.AntiClockwise)
-                {
-                    startAngle *= -1;
-                    endAngle *= -1;
-                }
-                
 
                 List<CircleData> circles;
-                if (!style.Chunked)
-                {
-                    circles = new List<CircleData>() { CalculateCircle(startAngle, endAngle, progressValue, progressMaxValue, style.Direction) };
-                }
-                else
-                {
-                    int chunkCount = style.ChunkedStacksFromTrigger ? (int)progressMaxValue : style.ChunkCount;
-                    circles = CalculateChunkedCircles(startAngle, endAngle, progressValue, progressMaxValue, chunkCount, style.ChunkPadding, style.Direction, style.IncompleteChunkColor);
-                }
+                circles = new List<CircleData>() { CalculateCircle(startAngle, endAngle, progressValue, progressMaxValue, style.Direction) };
 
                 foreach (CircleData circle in circles)
                 {
-                    
-                    //PluginLog.Information($"{startAngle}|{endAngle}|{circle.StartAngle}|{circle.EndAngle}");
-
                     // fill
                     ConfigColor fillColor = circle.FillColor ?? style.FillColor;
-                    
+
+                    // Draw background arc first
+                    if (circle.EndAngle != startAngle)
+                    {
+                        drawList.PathArcTo(localPos, style.Radius, circle.StartAngle, endAngle, segments);
+                        drawList.PathStroke(ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector), ImDrawFlags.None, style.Thickness);
+                    }
+
+                    // Draw fill arc on top
                     drawList.PathArcTo(localPos, style.Radius, circle.StartAngle, circle.EndAngle, segments);
                     drawList.PathStroke(ImGui.ColorConvertFloat4ToU32(fillColor.Vector), ImDrawFlags.None, style.Thickness);
                     
-                    // anything that remains is background
-                    drawList.PathArcTo(localPos, style.Radius, circle.EndAngle, endAngle, segments);
-                    drawList.PathStroke(ImGui.ColorConvertFloat4ToU32(style.BackgroundColor.Vector), ImDrawFlags.None, style.Thickness);
                     
-                    /*
                     if (style.Glow)
                     {
-                        DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                        DrawHelpers.DrawGlowCircle(localPos, style.Radius, style.Thickness, style.GlowPadding, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
                     }
-                    */
+                    
                 }
                 if (style.ShowBorder)
                 {
@@ -258,65 +245,37 @@ namespace DelvCD.UIElements
                 }
             }
         }
-
+        
         private CircleData CalculateCircle(float startAngle, float endAngle, float progress, float max, CircleDirection direction)
         {
             CircleData circle = new();
-            /*
+
             float fillPercent = max == 0 ? 1f : Math.Clamp(progress / max, 0f, 1f);
-            float fillAngle = max == 0 ? endAngle : Math.Clamp(progress / max, startAngle, endAngle);
-            */
-            float current = progress / max;
             float angleRange = endAngle - startAngle;
-            float relativeAngle = startAngle + (angleRange * current);
-            
-            circle.StartAngle = startAngle;
-            circle.EndAngle = relativeAngle;
-            
-            return circle;
-        }
 
-        private List<CircleData> CalculateChunkedCircles(float startAngle, float endAngle, float progress, float max, int count, int padding, CircleDirection direction, ConfigColor incompleteColor)
-        {
-            
-            return new List<CircleData>() { CalculateCircle(startAngle, endAngle, progress, 1, direction) };
-            
-            /*
-
-            int paddingCount = count - 1;
-            int chunkLength = horizontal ?
-                (int)((size.X - (paddingCount * padding)) / count) :
-                (int)((size.Y - (paddingCount * padding)) / count);
-
-            Vector2 chunkSize = horizontal ?
-                new(chunkLength, size.Y) :
-                new(size.X, chunkLength);
-
-            float chunkProgressSize = max / count;
-
-            Vector2 pos = Vector2.Zero;
-            List<CircleData> bars = new(count);
-
-            for (int i = 0; i < count; i++)
+            if (direction == CircleDirection.AntiClockwise)
             {
-                int index = reversed ? count - i - 1 : i;
-                float chunkProgress = Math.Min(progress - (chunkProgressSize * index), chunkProgressSize);
-                CircleData bar = CalculateCircle(pos, chunkSize, chunkProgress, chunkProgressSize, direction);
-
-                pos = horizontal ?
-                    new Vector2(pos.X + padding + chunkLength, pos.Y) :
-                    new Vector2(pos.X, pos.Y + padding + chunkLength);
-
-                if (chunkProgress < chunkProgressSize)
-                {
-                    circle.FillColor = incompleteColor;
-                }
-
-                circles.Add(circle);
+                // If anticlockwise, the angle range needs to be reversed
+                angleRange = startAngle - endAngle;
             }
 
-            return circles;
-            */
+            float fillAngle = angleRange * fillPercent;
+
+            // Adjusting for direction
+            float relativeAngle;
+            if (direction == CircleDirection.Clockwise)
+            {
+                relativeAngle = startAngle + fillAngle;
+            }
+            else // Anticlockwise
+            {
+                relativeAngle = startAngle - fillAngle;
+            }
+
+            circle.StartAngle = startAngle;
+            circle.EndAngle = relativeAngle;
+
+            return circle;
         }
 
         public void Resize(Vector2 size, bool conditions)

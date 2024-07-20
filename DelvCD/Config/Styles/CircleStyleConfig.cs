@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Dalamud.Interface.Utility;
 
 namespace DelvCD.Config
 {
@@ -34,7 +35,7 @@ namespace DelvCD.Config
         public int Thickness = 10;
         public int StartAngle = 0;
         public int EndAngle = 360;
-        public CircleDirection Direction = CircleDirection.Clockwise;
+        public CircleDirection Direction = CircleDirection.AntiClockwise;
         public ConfigColor FillColor = new ConfigColor(1, 0.5f, 0.5f, 1);
         public ConfigColor BackgroundColor = new ConfigColor(0, 0, 0, 0.5f);
 
@@ -42,15 +43,18 @@ namespace DelvCD.Config
         public int BorderThickness = 1;
         public ConfigColor BorderColor = new ConfigColor(0, 0, 0, 1);
 
+        /*
         public bool Chunked = false;
         public bool ChunkedStacksFromTrigger = true;
         public int ChunkCount = 5;
         public int ChunkPadding = 2;
         public ConfigColor IncompleteChunkColor = new ConfigColor(0.6f, 0.6f, 0.6f, 1);
+        */
 
         public bool Glow = false;
         public int GlowThickness = 2;
-        public int GlowSegments = 8;
+        public int GlowSegments = 20;
+        public int GlowPadding = 5;
         public float GlowSpeed = 1f;
         public ConfigColor GlowColor = new ConfigColor(230f / 255f, 150f / 255f, 0f / 255f, 1f);
         public ConfigColor GlowColor2 = new ConfigColor(0f / 255f, 0f / 255f, 0f / 255f, 0f);
@@ -151,6 +155,7 @@ namespace DelvCD.Config
                     }
                 }
 
+                /*
                 // chunked
                 ImGui.NewLine();
                 ImGui.Checkbox("Draw in Chunks", ref Chunked);
@@ -189,6 +194,7 @@ namespace DelvCD.Config
                         IncompleteChunkColor.Vector = vector;
                     }
                 }
+                */
 
                 // glow
                 ImGui.NewLine();
@@ -199,7 +205,10 @@ namespace DelvCD.Config
                     ImGui.DragInt("Thickness##Glow", ref GlowThickness, 1, 1, 16);
 
                     DrawHelpers.DrawNestIndicator(1);
-                    ImGui.DragInt("Glow Segments##Glow", ref GlowSegments, 1, 2, 16);
+                    ImGui.DragInt("Glow Segments##Glow", ref GlowSegments, 1, 2, 40);
+                    
+                    DrawHelpers.DrawNestIndicator(1);
+                    ImGui.DragInt("Glow Padding##Glow", ref GlowPadding, 1, 2, 200);
 
                     DrawHelpers.DrawNestIndicator(1);
                     ImGui.DragFloat("Animation Speed##Glow", ref GlowSpeed, 0.05f, 0, 2f);
