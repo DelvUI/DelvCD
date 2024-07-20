@@ -10,134 +10,12 @@ namespace DelvCD.Helpers
 {
     public class ClipRectsHelper
     {
-        // these are ordered by priority, if 2 game windows are on top of a DelvUI element
-        // the one that comes first in this list is the one that will be clipped around
-        internal static List<string> AddonNames = new List<string>()
-        {
-            "ContextMenu",
-            "ItemDetail", // tooltip
-            "ActionDetail", // tooltip
-            "AreaMap",
-            "JournalAccept",
-            "Talk",
-            "Teleport",
-            "ActionMenu",
-            "Character",
-            "CharacterInspect",
-            "CharacterTitle",
-            "Tryon",
-            "ArmouryBoard",
-            "RecommendList",
-            "GearSetList",
-            "MiragePrismMiragePlate",
-            "ItemSearch",
-            "RetainerList",
-            "Bank",
-            "RetainerSellList",
-            "RetainerSell",
-            "SelectString",
-            "Shop",
-            "ShopExchangeCurrency",
-            "ShopExchangeItem",
-            "CollectablesShop",
-            "MateriaAttach",
-            "Repair",
-            "Inventory",
-            "InventoryLarge",
-            "InventoryExpansion",
-            "InventoryEvent",
-            "InventoryBuddy",
-            "Buddy",
-            "BuddyEquipList",
-            "BuddyInspect",
-            "Currency",
-            "Macro",
-            "PcSearchDetail",
-            "Social",
-            "SocialDetailA",
-            "SocialDetailB",
-            "LookingForGroupSearch",
-            "LookingForGroupCondition",
-            "LookingForGroupDetail",
-            "LookingForGroup",
-            "ReadyCheck",
-            "Marker",
-            "FieldMarker",
-            "CountdownSettingDialog",
-            "CircleFinder",
-            "CircleList",
-            "CircleNameInputString",
-            "Emote",
-            "FreeCompany",
-            "FreeCompanyProfile",
-            "HousingSubmenu",
-            "HousingSignBoard",
-            "HousingMenu",
-            "CharaCard",
-            "CharaCardDesignSetting",
-            "CharaCardProfileSetting",
-            "CharaCardPermissionSetting",
-            "BannerList",
-            "BannerEditor",
-            "SelectString",
-            "Description",
-            "McGuffin",
-            "AkatsukiNote",
-            "DescriptionYTC",
-            "MYCWarResultNoteBook",
-            "CrossWorldLinkshell",
-            "ContactList",
-            "CircleBookInputString",
-            "CircleBookQuestion",
-            "CircleBookGroupSetting",
-            "MultipleHelpWindow",
-            "CircleFinderSetting",
-            "CircleBook",
-            "CircleBookWriteMessage",
-            "ColorantColoring",
-            "MonsterNote",
-            "RecipeNote",
-            "GatheringNote",
-            "ContentsNote",
-            "SpearFishing",
-            "Orchestrion",
-            "MountNoteBook",
-            "MinionNoteBook",
-            "AetherCurrent",
-            "MountSpeed",
-            "FateProgress",
-            "SystemMenu",
-            "ConfigCharacter",
-            "ConfigSystem",
-            "ConfigKeybind",
-            "AOZNotebook",
-            "AOZActiveSetInputString",
-            "PvpProfile",
-            "GoldSaucerInfo",
-            "Achievement",
-            "RecommendList",
-            "JournalDetail",
-            "Journal",
-            "ContentsFinder",
-            "ContentsFinderSetting",
-            "ContentsFinderMenu",
-            "ContentsInfo",
-            "Dawn",
-            "DawnStory",
-            "DawnStoryMemberSelect",
-            "BeginnersMansionProblem",
-            "BeginnersMansionProblemCompList",
-            "SupportDesk",
-            "HowToList",
-            "HudLayout",
-            "LinkShell",
-            "ChatConfig",
-            "ColorPicker",
-            "PlayGuide",
-            "SelectYesno"
-        };
-
         private List<ClipRect> _clipRects = new List<ClipRect>();
+
+        private static List<string> _ignoredAddonNames = new List<string>()
+        {
+            "_FocusTargetInfo",
+        };
 
         public unsafe void Update()
         {
@@ -162,8 +40,8 @@ namespace DelvCD.Helpers
                         continue;
                     }
 
-                    string? name = addon->NameString;
-                    if (name == null || !AddonNames.Contains(name))
+                    string name = addon->NameString;
+                    if (_ignoredAddonNames.Contains(name))
                     {
                         continue;
                     }
@@ -171,15 +49,26 @@ namespace DelvCD.Helpers
                     var margin = 5 * addon->Scale;
                     var bottomMargin = 13 * addon->Scale;
 
-                    var clipRect = new ClipRect(
-                        new Vector2(addon->X + margin, addon->Y + margin),
-                        new Vector2(
-                            addon->X + addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
-                            addon->Y + addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
-                        )
+                    Vector2 pos = new Vector2(addon->X + margin, addon->Y + margin);
+                    Vector2 size = new Vector2(
+                        addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
+                        addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
                     );
+                    
+                    // special case for duty finder
+                    if (name == "ContentsFinder")
+                    {
+                        size.X += size.X + (16 * addon->Scale);
+                        size.Y += (30 * addon->Scale);
+                    }
+                    
+                    if (name == "Journal")
+                    {
+                        size.X += size.X + (16 * addon->Scale);
+                    }
 
                     // just in case this causes weird issues / crashes (doubt it though...)
+                    ClipRect clipRect = new ClipRect(pos, pos + size);
                     if (clipRect.Max.X < clipRect.Min.X || clipRect.Max.Y < clipRect.Min.Y)
                     {
                         continue;
