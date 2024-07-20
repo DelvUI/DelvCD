@@ -34,7 +34,7 @@ namespace DelvCD.Config
 
         public bool HideIfLevel = false;
         public TriggerDataOp HideIfLevelOp = TriggerDataOp.LessThan;
-        public int HideIfLevelValue = 90;
+        public int HideIfLevelValue = 100;
 
         public JobType ShowForJobTypes = JobType.All;
         public string CustomJobString = string.Empty;
