@@ -19,6 +19,8 @@ namespace DelvCD.UIElements
         public LabelListConfig LabelListConfig { get; set; }
         public VisibilityConfig VisibilityConfig { get; set; }
 
+        public override bool IsAlwaysHide => VisibilityConfig.AlwaysHide;
+
 
         [JsonIgnore] private TriggerConfig _triggerConfig = null!;
         public TriggerConfig TriggerConfig
