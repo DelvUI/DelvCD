@@ -137,6 +137,7 @@ namespace DelvCD.Config
 
             _dataSource.Id = actionId;
             _dataSource.Cooldown_Timer = cooldown;
+            _dataSource.Value = cooldown;
             _dataSource.Max_Cooldown_Timer = chargeTime;
             _dataSource.Cooldown_Stacks = stacks;
             _dataSource.Max_Cooldown_Stacks = recastInfo.MaxCharges;
