@@ -26,7 +26,10 @@ namespace DelvCD.Config.JobGauges
                 "Master's Gauge Chakra #2",
                 "Master's Gauge Chakra #3",
                 "Solar Nadi",
-                "Lunar Nadi"
+                "Lunar Nadi",
+                "Opo-Opo's Fury",
+                "Raptor's Fury",
+                "Coeurl's Fury",
             };
 
             _types = new List<TriggerConditionType>() {
@@ -35,7 +38,10 @@ namespace DelvCD.Config.JobGauges
                 TriggerConditionType.Combo,
                 TriggerConditionType.Combo,
                 TriggerConditionType.Boolean,
-                TriggerConditionType.Boolean
+                TriggerConditionType.Boolean,
+                TriggerConditionType.Numeric,
+                TriggerConditionType.Numeric,
+                TriggerConditionType.Numeric,
             };
 
             string[] chakras = new string[] { "None", "Coeurl", "Opo-opo", "Raptor" };
@@ -57,6 +63,9 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Masters_Gauge_Chakra_3 = _comboOptions[3][_values[3]];
             _dataSource.Solar_Nadi = (gauge.Nadi & Nadi.SOLAR) != 0;
             _dataSource.Lunar_Nadi = (gauge.Nadi & Nadi.LUNAR) != 0;
+            _dataSource.OpoOpoFury = gauge.OpoOpoFury;
+            _dataSource.RaptorFury = gauge.RaptorFury;
+            _dataSource.CoeurlFury = gauge.CoeurlFury;
 
             if (preview) { return true; }
 
@@ -66,7 +75,10 @@ namespace DelvCD.Config.JobGauges
                 EvaluateMastersGaugeChakraCondition(gauge, 1) &&
                 EvaluateMastersGaugeChakraCondition(gauge, 2) &&
                 EvaluateCondition(4, _dataSource.Solar_Nadi) &&
-                EvaluateCondition(5, _dataSource.Lunar_Nadi);
+                EvaluateCondition(5, _dataSource.Lunar_Nadi) &&
+                EvaluateCondition(6, _dataSource.OpoOpoFury) &&
+                EvaluateCondition(7, _dataSource.OpoOpoFury) &&
+                EvaluateCondition(8, _dataSource.OpoOpoFury);
         }
 
         private bool EvaluateMastersGaugeChakraCondition(MNKGauge gauge, int chakra)

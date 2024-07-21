@@ -1,3 +1,6 @@
+# 1.1.0.1
+- Add support for new MNK Fury gauge
+
 # 1.1.0.0
 - Added support for Dawntrail and Dalamud API 10.
 
