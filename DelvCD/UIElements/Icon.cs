@@ -271,11 +271,10 @@ namespace DelvCD.UIElements
             {
                 return;
             }
-
-            bool invert = style.InvertSwipe;
-            float completion = invert ? 1 - (triggeredValue / startValue) : (triggeredValue / startValue) ;
+            
+            float completion = style.InvertSwipe ? 1 - (triggeredValue / startValue) : (triggeredValue / startValue) ;
             uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
-
+            
             if (completion == 1)
             {
                 drawList.AddRectFilled(pos, pos + size, progressAlpha);
@@ -284,10 +283,7 @@ namespace DelvCD.UIElements
 
             int segments = (int)Math.Ceiling(completion * 4);
             Vector2 center = pos + size / 2;
-            
-            float thickness = style.ProgressLineThickness;
-            Vector4 swipeLineColor = style.ProgressLineColor.Vector.AddTransparency(alpha);
-            uint color = ImGui.ColorConvertFloat4ToU32(swipeLineColor);
+            uint swipeLineColor = ImGui.ColorConvertFloat4ToU32(style.ProgressLineColor.Vector.AddTransparency(alpha));
             
             // Define vertices for top, left, bottom, and right points relative to the center.
             Vector2[] vertices =
@@ -319,9 +315,9 @@ namespace DelvCD.UIElements
                 
                 if (style.ShowSwipeLines && i == segments - 1)
                 {   // Draw swipe lines if enabled & on last segment, must be here due to draw order.
-                    drawList.AddLine(center, v3, color, thickness);
-                    drawList.AddLine(center, vertices[0], color, thickness);
-                    drawList.AddCircleFilled(center, thickness / 2, color);
+                    drawList.AddLine(center, v3, swipeLineColor, style.ProgressLineThickness);
+                    drawList.AddLine(center, vertices[0], swipeLineColor, style.ProgressLineThickness);
+                    drawList.AddCircleFilled(center, style.ProgressLineThickness / 2, swipeLineColor);
                 }
             }
             ImGui.PopClipRect();
