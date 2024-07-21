@@ -56,11 +56,11 @@ namespace DelvCD.UIElements
             }
         }
 
-        public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
+        public override bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
             if (!VisibilityConfig.IsVisible(parentVisible) && !Preview)
             {
-                return;
+                return false;
             }
 
             Vector2 size = parentSize.HasValue ? parentSize.Value : ImGui.GetMainViewport().Size;
@@ -85,6 +85,7 @@ namespace DelvCD.UIElements
                     style.ShowOutline,
                     style.OutlineColor.Base);
             }
+            return true;
         }
 
         public void UpdateDataSources(DataSource[] data)

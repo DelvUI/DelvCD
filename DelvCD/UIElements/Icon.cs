@@ -1,4 +1,3 @@
-﻿using Dalamud.Logging;
 using DelvCD.Config;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
@@ -40,7 +39,7 @@ namespace DelvCD.UIElements
             }
         }
 
-        
+
         [JsonIgnore] private StyleConditions<IconStyleConfig> _styleConditions = null!;
         public StyleConditions<IconStyleConfig> StyleConditions
         {
@@ -121,17 +120,17 @@ namespace DelvCD.UIElements
             }
         }
 
-        public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
+        public override bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
             if (!TriggerConfig.TriggerOptions.Any())
             {
-                return;
+                return false;
             }
 
             bool visible = VisibilityConfig.IsVisible(parentVisible);
             if (!visible && !Preview)
             {
-                return;
+                return false;
             }
 
             bool triggered = TriggerConfig.IsTriggered(Preview, out int triggeredIndex);
@@ -147,7 +146,7 @@ namespace DelvCD.UIElements
                 ClipRect? clipRect = Singletons.Get<ClipRectsHelper>().GetClipRectForArea(localPos, size);
                 if (clipRect.HasValue)
                 {
-                    return;
+                    return false;
                 }
             }
 
@@ -155,7 +154,7 @@ namespace DelvCD.UIElements
             {
                 StartData = null;
                 StartTime = null;
-                return;
+                return false;
             }
 
             UpdateStartData(data);
@@ -256,6 +255,7 @@ namespace DelvCD.UIElements
             }
 
             LastFrameWasPreview = Preview;
+            return true;
         }
 
         private static void DrawProgressSwipe(
@@ -271,7 +271,7 @@ namespace DelvCD.UIElements
             {
                 return;
             }
-            
+
             bool invert = style.InvertSwipe;
             float percent = (invert ? 0 : 1) - (startValue - triggeredValue) / startValue;
             uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
@@ -288,7 +288,7 @@ namespace DelvCD.UIElements
 
             ImGui.PushClipRect(pos, pos + size, false);
             drawList.PathArcTo(pos + size / 2, radius / 2, startAngle, endAngle, (int)(100f * Math.Abs(percent)));
-            
+
             drawList.PathStroke(progressAlpha, ImDrawFlags.None, radius);
             if (style.ShowSwipeLines)
             {
