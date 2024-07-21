@@ -322,14 +322,18 @@ namespace DelvCD.UIElements
             IconStyleConfig.Position *= scaleFactor;
 
             if (!positionOnly)
+            {
                 IconStyleConfig.Size *= scaleFactor;
+            }
 
             foreach (var condition in StyleConditions.Conditions)
             {
                 condition.Style.Position *= scaleFactor;
 
                 if (!positionOnly)
+                {
                     condition.Style.Size *= scaleFactor;
+                }
             }
         }
 
