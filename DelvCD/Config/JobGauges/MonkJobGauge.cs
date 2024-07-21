@@ -24,9 +24,9 @@ namespace DelvCD.Config.JobGauges
         {
             _names = new List<string>() {
                 "Chakra Stacks",
-                "Master's Gauge Chakra #1",
-                "Master's Gauge Chakra #2",
-                "Master's Gauge Chakra #3",
+                "Master's Gauge Opo-opo Count",
+                "Master's Gauge Raptor Count",
+                "Master's Gauge Coeurl Count",
                 "Solar Nadi",
                 "Lunar Nadi",
                 "Blitz Timer",
@@ -37,23 +37,15 @@ namespace DelvCD.Config.JobGauges
 
             _types = new List<TriggerConditionType>() {
                 TriggerConditionType.Numeric,
-                TriggerConditionType.Combo,
-                TriggerConditionType.Combo,
-                TriggerConditionType.Combo,
+                TriggerConditionType.Numeric,
+                TriggerConditionType.Numeric,
+                TriggerConditionType.Numeric,
                 TriggerConditionType.Boolean,
                 TriggerConditionType.Boolean,
                 TriggerConditionType.Numeric,
                 TriggerConditionType.Numeric,
                 TriggerConditionType.Numeric,
                 TriggerConditionType.Numeric
-            };
-
-            string[] chakras = new string[] { "None", "Coeurl", "Opo-opo", "Raptor" };
-            _comboOptions = new Dictionary<int, string[]>()
-            {
-                [1] = chakras,
-                [2] = chakras,
-                [3] = chakras,
             };
         }
 
@@ -62,9 +54,26 @@ namespace DelvCD.Config.JobGauges
             MNKGauge gauge = Singletons.Get<IJobGauges>().Get<MNKGauge>();
 
             _dataSource.Chakra_Stacks = gauge.Chakra;
-            _dataSource.Masters_Gauge_Chakra_1 = _comboOptions[1][_values[1]];
-            _dataSource.Masters_Gauge_Chakra_2 = _comboOptions[2][_values[2]];
-            _dataSource.Masters_Gauge_Chakra_3 = _comboOptions[3][_values[3]];
+
+            _dataSource.Masters_Gauge_Opo_Count = 0;
+            _dataSource.Masters_Gauge_Raptor_Count = 0;
+            _dataSource.Masters_Gauge_Coeurl_Count = 0;
+            foreach (var chakra in gauge.BeastChakra)
+            {
+                switch (chakra)
+                {
+                    case BeastChakra.OPOOPO:
+                        _dataSource.Masters_Gauge_Opo_Count++;
+                        break;
+                    case BeastChakra.RAPTOR:
+                        _dataSource.Masters_Gauge_Raptor_Count++;
+                        break;
+                    case BeastChakra.COEURL:
+                        _dataSource.Masters_Gauge_Coeurl_Count++;
+                        break;
+                }
+            }
+
             _dataSource.Solar_Nadi = (gauge.Nadi & Nadi.SOLAR) != 0;
             _dataSource.Lunar_Nadi = (gauge.Nadi & Nadi.LUNAR) != 0;
             _dataSource.Blitz_Timer = gauge.BlitzTimeRemaining / 1000f;
@@ -79,22 +88,15 @@ namespace DelvCD.Config.JobGauges
 
             return
                 EvaluateCondition(0, _dataSource.Chakra_Stacks) &&
-                EvaluateMastersGaugeChakraCondition(gauge, 0) &&
-                EvaluateMastersGaugeChakraCondition(gauge, 1) &&
-                EvaluateMastersGaugeChakraCondition(gauge, 2) &&
+                EvaluateCondition(1, _dataSource.Masters_Gauge_Opo_Count) &&
+                EvaluateCondition(2, _dataSource.Masters_Gauge_Raptor_Count) &&
+                EvaluateCondition(3, _dataSource.Masters_Gauge_Coeurl_Count) &&
                 EvaluateCondition(4, _dataSource.Solar_Nadi) &&
                 EvaluateCondition(5, _dataSource.Lunar_Nadi) &&
                 EvaluateCondition(6, _dataSource.Blitz_Timer) &&
                 EvaluateCondition(7, _dataSource.Opoopo_Stacks) &&
                 EvaluateCondition(8, _dataSource.Raptor_Stacks) &&
                 EvaluateCondition(9, _dataSource.Coeurl_Stacks);
-        }
-
-        private bool EvaluateMastersGaugeChakraCondition(MNKGauge gauge, int chakra)
-        {
-            if (!ConditionEnabledforIndex(1 + chakra)) { return true; }
-
-            return (int)gauge.BeastChakra[chakra] == _values[1 + chakra];
         }
     }
 }
