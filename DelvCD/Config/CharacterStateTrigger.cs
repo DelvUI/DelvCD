@@ -86,7 +86,7 @@ namespace DelvCD.Config
                 _dataSource.MaxCp = 100;
                 _dataSource.Gp = 50;
                 _dataSource.MaxGp = 100;
-                _dataSource.Level = 90;
+                _dataSource.Level = 100;
                 _dataSource.Shield = 25000;
                 _dataSource.MaxShield = 100000;
                 _dataSource.ShieldPercent = 25;

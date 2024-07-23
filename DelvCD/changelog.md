@@ -1,3 +1,20 @@
+# 1.1.0.4
+- Updated Monk's Fury Stacks Bar for 7.01 patch changes.
+
+# 1.1.0.3
+- Fixed Monk's Coeurl Stacks.
+- Fixed Dragoon's Life of the Dragon duration.
+
+# 1.1.0.2
+- Added "Action Highlighted" condition to Cooldown Triggers.
+- Updated Monk's Job Gauge data.
+- Updated Summoner's Job Gauge data.
+- Fixed Samurai's Combo Ready not working for some actions.
+
+# 1.1.0.1
+- Fixed charges and cooldowns not working properly for some abilities.
+- Fixed issues when drawing elements pointing to invalid icon ids.
+
 # 1.1.0.0
 - Added support for Dawntrail and Dalamud API 10.
 

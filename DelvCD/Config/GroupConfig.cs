@@ -1,8 +1,10 @@
 using Dalamud.Interface.Utility;
 using DelvCD.UIElements;
+using DelvCD.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System.Numerics;
+using System.Collections.Generic;
 
 namespace DelvCD.Config
 {
@@ -12,6 +14,12 @@ namespace DelvCD.Config
         [JsonIgnore] private static Vector2 _screenSize => ImGui.GetMainViewport().Size;
 
         public string Name => "Group";
+        public bool IsDynamic = false;
+        public Vector2 DynamicOffset = new Vector2(0, 0);
+
+        public int DynamicMaxPerRow = 5;
+
+        public int DynamicGrowthDir = 0;
 
         public Vector2 Position = new Vector2(0, 0);
 
@@ -21,6 +29,17 @@ namespace DelvCD.Config
         [JsonIgnore] private bool _recusiveResize = false;
         [JsonIgnore] private bool _conditionsResize = false;
         [JsonIgnore] private bool _positionOnly = false;
+        [JsonIgnore]
+        private string[] _DirectionsOptionsValues = {
+            "Right and Down",
+            "Right and Up",
+            "Left and Down",
+            "Left and Up",
+            "Centered and Up",
+            "Centered and Down",
+            "Centered and Left",
+            "Centered and Right"
+        };
 
         public IConfigPage GetDefault() => new GroupConfig();
 
@@ -29,6 +48,19 @@ namespace DelvCD.Config
             if (ImGui.BeginChild("##GroupConfig", new Vector2(size.X, size.Y), true))
             {
                 ImGui.DragFloat2("Group Position", ref Position);
+
+                ImGui.NewLine();
+                ImGui.Checkbox("Dynamic Grouping", ref IsDynamic);
+
+                if (IsDynamic)
+                {
+                    ImGui.DragFloat2("Dynamic Offset", ref DynamicOffset, 1, 0, _screenSize.X);
+                    ImGui.Combo(
+    "Growth Direction", ref DynamicGrowthDir, _DirectionsOptionsValues, _DirectionsOptionsValues.Length
+);
+                    ImGui.DragInt("Max elements per row", ref DynamicMaxPerRow, 1, 1, 32);
+
+                }
 
                 ImGui.NewLine();
                 ImGui.Text("Resize Icons");

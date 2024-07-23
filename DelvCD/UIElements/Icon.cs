@@ -1,4 +1,3 @@
-﻿using Dalamud.Logging;
 using DelvCD.Config;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
@@ -19,6 +18,8 @@ namespace DelvCD.UIElements
         public LabelListConfig LabelListConfig { get; set; }
         public VisibilityConfig VisibilityConfig { get; set; }
 
+        public override bool IsAlwaysHide => VisibilityConfig.AlwaysHide;
+
 
         [JsonIgnore] private TriggerConfig _triggerConfig = null!;
         public TriggerConfig TriggerConfig
@@ -38,7 +39,7 @@ namespace DelvCD.UIElements
             }
         }
 
-        
+
         [JsonIgnore] private StyleConditions<IconStyleConfig> _styleConditions = null!;
         public StyleConditions<IconStyleConfig> StyleConditions
         {
@@ -119,17 +120,17 @@ namespace DelvCD.UIElements
             }
         }
 
-        public override void Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
+        public override bool Draw(Vector2 pos, Vector2? parentSize = null, bool parentVisible = true)
         {
             if (!TriggerConfig.TriggerOptions.Any())
             {
-                return;
+                return false;
             }
 
             bool visible = VisibilityConfig.IsVisible(parentVisible);
             if (!visible && !Preview)
             {
-                return;
+                return false;
             }
 
             bool triggered = TriggerConfig.IsTriggered(Preview, out int triggeredIndex);
@@ -145,7 +146,7 @@ namespace DelvCD.UIElements
                 ClipRect? clipRect = Singletons.Get<ClipRectsHelper>().GetClipRectForArea(localPos, size);
                 if (clipRect.HasValue)
                 {
-                    return;
+                    return false;
                 }
             }
 
@@ -153,7 +154,7 @@ namespace DelvCD.UIElements
             {
                 StartData = null;
                 StartTime = null;
-                return;
+                return false;
             }
 
             UpdateStartData(data);
@@ -254,6 +255,7 @@ namespace DelvCD.UIElements
             }
 
             LastFrameWasPreview = Preview;
+            return true;
         }
 
         private static void DrawProgressSwipe(
@@ -270,38 +272,54 @@ namespace DelvCD.UIElements
                 return;
             }
             
-            bool invert = style.InvertSwipe;
-            float percent = (invert ? 0 : 1) - (startValue - triggeredValue) / startValue;
+            float completion = style.InvertSwipe ? 1 - (triggeredValue / startValue) : (triggeredValue / startValue) ;
             uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
-
-            if (percent == 1)
+            
+            if (completion == 1)
             {
                 drawList.AddRectFilled(pos, pos + size, progressAlpha);
                 return;
             }
 
-            float radius = (float)Math.Sqrt(Math.Pow(Math.Max(size.X, size.Y), 2) * 2) / 2f;
-            float startAngle = (-(float)Math.PI / 2) + 0.03f;
-            float endAngle = startAngle - 2f * (float)Math.PI * percent;
-
-            ImGui.PushClipRect(pos, pos + size, false);
-            drawList.PathArcTo(pos + size / 2, radius / 2, startAngle, endAngle, (int)(100f * Math.Abs(percent)));
+            int segments = (int)Math.Ceiling(completion * 4);
+            Vector2 center = pos + size / 2;
+            uint swipeLineColor = ImGui.ColorConvertFloat4ToU32(style.ProgressLineColor.Vector.AddTransparency(alpha));
             
-            drawList.PathStroke(progressAlpha, ImDrawFlags.None, radius);
-            if (style.ShowSwipeLines)
+            // Define vertices for top, left, bottom, and right points relative to the center.
+            Vector2[] vertices =
+            [
+                center with {Y = center.Y - size.Y}, // Top
+                center with {X = center.X - size.X}, // Left
+                center with {Y = center.Y + size.Y}, // Bottom
+                center with {X = center.X + size.X}  // Right
+            ];
+            
+            ImGui.PushClipRect(pos, pos + size, false);
+            for (int i = 0; i < segments; i++)
             {
-                Vector2 vec = new Vector2((float)Math.Cos(endAngle), (float)Math.Sin(endAngle));
-                Vector2 start = pos + size / 2;
-                Vector2 end = start + vec * radius;
-                float thickness = style.ProgressLineThickness;
-                Vector4 swipeLineColor = style.ProgressLineColor.Vector.AddTransparency(alpha);
-                uint color = ImGui.ColorConvertFloat4ToU32(swipeLineColor);
+                Vector2 v2 = vertices[i % 4];
+                Vector2 v3 = vertices[(i + 1) % 4];
+                
+                
+                if (i == segments - 1)
+                {   // If drawing the last segment, adjust the second vertex based on the cooldown.
+                    float angle = 2 * MathF.PI * (1 - completion);
+                    float cos = MathF.Cos(angle);
+                    float sin = MathF.Sin(angle);
 
-                drawList.AddLine(start, end, color, thickness);
-                drawList.AddLine(start, new(pos.X + size.X / 2, pos.Y), color, thickness);
-                drawList.AddCircleFilled(start + new Vector2(thickness / 4, thickness / 4), thickness / 2, color);
+                    v3 = center + Vector2.Multiply(new Vector2(sin,-cos), size);
+                    
+                }
+
+                drawList.AddTriangleFilled(center, v3, v2, progressAlpha);
+                
+                if (style.ShowSwipeLines && i == segments - 1)
+                {   // Draw swipe lines if enabled & on last segment, must be here due to draw order.
+                    drawList.AddLine(center, v3, swipeLineColor, style.ProgressLineThickness);
+                    drawList.AddLine(center, vertices[0], swipeLineColor, style.ProgressLineThickness);
+                    drawList.AddCircleFilled(center, style.ProgressLineThickness / 2, swipeLineColor);
+                }
             }
-
             ImGui.PopClipRect();
         }
         public void Resize(Vector2 size, bool conditions)
@@ -322,14 +340,18 @@ namespace DelvCD.UIElements
             IconStyleConfig.Position *= scaleFactor;
 
             if (!positionOnly)
+            {
                 IconStyleConfig.Size *= scaleFactor;
+            }
 
             foreach (var condition in StyleConditions.Conditions)
             {
                 condition.Style.Position *= scaleFactor;
 
                 if (!positionOnly)
+                {
                     condition.Style.Size *= scaleFactor;
+                }
             }
         }
 

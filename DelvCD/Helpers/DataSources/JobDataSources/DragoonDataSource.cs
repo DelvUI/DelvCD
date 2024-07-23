@@ -21,7 +21,7 @@
 
         public override float GetMaxValue(int index) => index switch
         {
-            0 => 30,
+            0 => 20,
             1 => 2,
             2 => 2,
             _ => 0

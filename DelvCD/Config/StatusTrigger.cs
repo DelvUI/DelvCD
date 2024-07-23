@@ -109,6 +109,7 @@ namespace DelvCD.Config
                         active = true;
                         _dataSource.Id = status.StatusId;
                         _dataSource.Status_Timer = Math.Abs(status.RemainingTime);
+                        _dataSource.Value = Math.Abs(status.RemainingTime);
                         _dataSource.Status_Stacks = status.StackCount;
                         _dataSource.Max_Status_Stacks = trigger.MaxStacks;
 
@@ -122,7 +123,7 @@ namespace DelvCD.Config
 
                         _dataSource.Name = trigger.Name;
 
-                        if (wasInactive)
+                        if (wasInactive || _dataSource.Max_Status_Timer < _dataSource.Status_Timer)
                         {
                             _dataSource.Max_Status_Timer = _dataSource.Status_Timer;
                         }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Collections.Generic;
 
 namespace DelvCD.Helpers.DataSources
 {
@@ -14,7 +11,7 @@ namespace DelvCD.Helpers.DataSources
 
         public float PreviewValue;
         public float PreviewMaxValue => 100;
-
+        public float Value;
 
         // condition fields
         protected List<string> _conditionFieldNames = new();

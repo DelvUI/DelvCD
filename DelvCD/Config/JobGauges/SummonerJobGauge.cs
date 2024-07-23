@@ -3,6 +3,8 @@ using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
+using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
+using System;
 using System.Collections.Generic;
 
 namespace DelvCD.Config.JobGauges
@@ -20,6 +22,7 @@ namespace DelvCD.Config.JobGauges
         private const int NONE_INDEX = 0;
         private const int BAHAMUT_INDEX = 1;
         private const int PHOENIX_INDEX = 2;
+        private const int SOLAR_BAHAMUT_INDEX = 3;
 
         private const int IFRIT_INDEX = 1;
         private const int TITAN_INDEX = 2;
@@ -53,7 +56,7 @@ namespace DelvCD.Config.JobGauges
                 TriggerConditionType.Numeric
             };
 
-            string[] summons = new string[] { "None", "Bahamut", "Phoenix" };
+            string[] summons = new string[] { "None", "Bahamut", "Phoenix", "Solar Bahamut" };
             _comboOptions = new Dictionary<int, string[]>()
             {
                 [1] = summons,
@@ -80,7 +83,7 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Active_Attunement = _comboOptions[7][attunement];
 
             _dataSource.Attunement_Timer = gauge.AttunmentTimerRemaining / 1000f;
-            _dataSource.Attunement_Stacks = gauge.Attunement;
+            _dataSource.Attunement_Stacks = ActiveAttunementStacks(gauge);
             _dataSource.Max_Attunement_Stacks = MaxAttunement(attunement);
 
             if (preview) { return true; }
@@ -100,7 +103,11 @@ namespace DelvCD.Config.JobGauges
 
         private int NextSummon(SMNGauge gauge)
         {
-            return gauge.IsPhoenixReady ? PHOENIX_INDEX : BAHAMUT_INDEX;
+            bool isSolarBahamutReady = gauge.AetherFlags.HasFlag(AetherFlags.None + 0x8) ||
+                                       gauge.AetherFlags.HasFlag(AetherFlags.None + 0xC);
+            bool isPhoenixReady = gauge.AetherFlags.HasFlag(AetherFlags.None + 0x4);
+
+            return isSolarBahamutReady ? SOLAR_BAHAMUT_INDEX : (isPhoenixReady ? PHOENIX_INDEX : BAHAMUT_INDEX);
         }
 
         private int ActiveSummon(SMNGauge gauge)
@@ -110,22 +117,16 @@ namespace DelvCD.Config.JobGauges
             return NextSummon(gauge);
         }
 
-        private int ActiveAttunement(SMNGauge gauge)
+        private unsafe int ActiveAttunement(SMNGauge gauge)
         {
-            if (gauge.IsIfritAttuned)
-            {
-                return IFRIT_INDEX;
-            }
-            else if (gauge.IsTitanAttuned)
-            {
-                return TITAN_INDEX;
-            }
-            else if (gauge.IsGarudaAttuned)
-            {
-                return GARUDA_INDEX;
-            }
+            byte value = *((byte*)(new IntPtr(gauge.Address) + 0xE));
+            return (value & 3);
+        }
 
-            return NONE_INDEX;
+        private unsafe int ActiveAttunementStacks(SMNGauge gauge)
+        {
+            byte value = *((byte*)(new IntPtr(gauge.Address) + 0xE));
+            return ((value >> 2) & 7);
         }
 
         private int MaxAttunement(int attunement) => attunement switch
