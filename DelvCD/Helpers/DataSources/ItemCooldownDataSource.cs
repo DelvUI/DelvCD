@@ -8,6 +8,8 @@
         public float Max_Item_Cooldown_Timer;
         public int Item_Cooldown_Stacks;
         public int Max_Item_Cooldown_Stacks;
+        public string? Item_Keybind = string.Empty;
+        public string? Item_Keybind_Formatted = string.Empty;
 
         public override float GetConditionValue(int index) => index switch
         {

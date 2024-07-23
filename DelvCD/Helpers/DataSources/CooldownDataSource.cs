@@ -9,6 +9,8 @@
         public float Max_Cooldown_Timer;
         public int Cooldown_Stacks;
         public int Max_Cooldown_Stacks;
+        public string? Keybind = string.Empty;
+        public string? Keybind_Formatted = string.Empty;
 
         public override float GetConditionValue(int index) => index switch
         {
