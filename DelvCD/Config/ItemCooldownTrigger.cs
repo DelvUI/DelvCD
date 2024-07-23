@@ -58,6 +58,14 @@ namespace DelvCD.Config
 
             _dataSource.Item_Cooldown_Stacks = GetQuantity(actionTrigger.Id);
             _dataSource.Max_Item_Cooldown_Stacks = _dataSource.Item_Cooldown_Stacks;
+            
+            KeybindHelper keybindHelper = Singletons.Get<KeybindHelper>();
+            // TODO: Needs to be moved to some place/event that only gets triggered on either job swap or when someone updates their hotbar
+            // AgentUpdateFlags ActionBarUpdate is no good because that will trigger by using actions as well apparently
+            keybindHelper.UpdateKeybindHints();
+            
+            _dataSource.Item_Keybind = keybindHelper.GetKeybindHint(actionTrigger.Id, KeybindHelper.KeybindType.Item);
+            _dataSource.Item_Keybind_Formatted = keybindHelper.GetKeybindHintFormatted(actionTrigger.Id, KeybindHelper.KeybindType.Item);
 
             return !Cooldown || Utils.GetResult(_dataSource.Item_Cooldown_Timer, CooldownOp, CooldownValue);
         }

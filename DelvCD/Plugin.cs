@@ -87,6 +87,7 @@ namespace DelvCD
             Singletons.Register(new ActionHelpers());
             Singletons.Register(new StatusHelpers());
             Singletons.Register(new ClipRectsHelper());
+            Singletons.Register(new KeybindHelper());
 
             // Load Icon
             Plugin.IconTexture = LoadIconTexture(textureProvider);

@@ -143,6 +143,15 @@ namespace DelvCD.Config
             _dataSource.Max_Cooldown_Stacks = recastInfo.MaxCharges;
             _dataSource.Icon = Adjust ? helper.GetIconIdForAction(actionId) : actionTrigger.Icon;
             _dataSource.Name = Adjust ? helper.GetAdjustedActionName(actionId) : actionTrigger.Name;
+            
+            
+            KeybindHelper keybindHelper = Singletons.Get<KeybindHelper>();
+            // TODO: Needs to be moved to some place/event that only gets triggered on either job swap or when someone updates their hotbar
+            // AgentUpdateFlags ActionBarUpdate is no good because that will trigger by using actions as well apparently
+            keybindHelper.UpdateKeybindHints();
+            
+            _dataSource.Keybind = keybindHelper.GetKeybindHint(actionTrigger.Id, KeybindHelper.KeybindType.Action);
+            _dataSource.Keybind_Formatted = keybindHelper.GetKeybindHintFormatted(actionTrigger.Id, KeybindHelper.KeybindType.Action);
 
             return
                 (!Combo || (ComboValue == 0 ? comboActive : !comboActive)) &&
