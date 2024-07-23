@@ -54,7 +54,7 @@ namespace DelvCD.Config
 
                 if (IsDynamic)
                 {
-                    ImGui.DragFloat2("Dynamic Offset", ref DynamicOffset);
+                    ImGui.DragFloat2("Dynamic Offset", ref DynamicOffset, 1, 0, _screenSize.X);
                     ImGui.Combo(
     "Growth Direction", ref DynamicGrowthDir, _DirectionsOptionsValues, _DirectionsOptionsValues.Length
 );
