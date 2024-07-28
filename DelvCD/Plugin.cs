@@ -52,7 +52,15 @@ namespace DelvCD
             Plugin.Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? Plugin.Version;
             Plugin.ConfigFileDir = pluginInterface.GetPluginConfigDirectory();
             Plugin.ConfigFilePath = Path.Combine(pluginInterface.GetPluginConfigDirectory(), Plugin.ConfigFileName);
-            Plugin.AssemblyFileDir = pluginInterface.AssemblyLocation.DirectoryName ?? "";
+            
+            if (pluginInterface.AssemblyLocation.DirectoryName != null)
+            {
+                AssemblyFileDir = pluginInterface.AssemblyLocation.DirectoryName + "\\";
+            }
+            else
+            {
+                AssemblyFileDir = Assembly.GetExecutingAssembly().Location;
+            }
 
             ConfigHelpers.CheckVersion();
 

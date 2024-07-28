@@ -1,6 +1,7 @@
 ﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Dalamud.Interface;
 using Dalamud.Interface.ManagedFontAtlas;
@@ -75,8 +76,22 @@ namespace DelvCD.Helpers
 
             foreach (var font in fontData)
             {
-                var fontPath = $"{fontDir}{font.Name}.ttf";
-                if (!File.Exists(fontPath))
+                // Check for both .ttf and .otf files
+                var fontPathTtf = $"{fontDir}{font.Name}.ttf";
+                var fontPathOtf = $"{fontDir}{font.Name}.otf";
+                var fontPath = string.Empty;
+
+                if (File.Exists(fontPathTtf))
+                {
+                    fontPath = fontPathTtf;
+                }
+                else if (File.Exists(fontPathOtf))
+                {
+                    fontPath = fontPathOtf;
+                }
+
+                // If neither file exists, continue to the next font
+                if (string.IsNullOrEmpty(fontPath))
                 {
                     continue;
                 }
@@ -223,7 +238,10 @@ namespace DelvCD.Helpers
             string[] pluginFonts;
             try
             {
-                pluginFonts = Directory.GetFiles(pluginFontPath, "*.ttf");
+                string[] ttfFonts = Directory.GetFiles(pluginFontPath, "*.ttf");
+                string[] otfFonts = Directory.GetFiles(pluginFontPath, "*.otf");
+
+                pluginFonts = ttfFonts.Concat(otfFonts).Order().ToArray();
             }
             catch
             {
@@ -253,7 +271,7 @@ namespace DelvCD.Helpers
 
         public static string GetPluginFontPath()
         {
-            string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string? path = Path.GetDirectoryName(Plugin.AssemblyFileDir);
 
             if (path is not null)
             {
@@ -278,7 +296,9 @@ namespace DelvCD.Helpers
             string[] fonts;
             try
             {
-                fonts = Directory.GetFiles(path, "*.ttf");
+                string[] ttfFonts = Directory.GetFiles(path, "*.ttf");
+                string[] otfFonts = Directory.GetFiles(path, "*.otf");
+                fonts = ttfFonts.Concat(otfFonts).Order().ToArray();
             }
             catch
             {
@@ -289,7 +309,8 @@ namespace DelvCD.Helpers
             {
                 fonts[i] = fonts[i]
                     .Replace(path, string.Empty)
-                    .Replace(".ttf", string.Empty, StringComparison.OrdinalIgnoreCase);
+                    .Replace(".ttf", string.Empty, StringComparison.OrdinalIgnoreCase)
+                    .Replace(".otf", string.Empty, StringComparison.OrdinalIgnoreCase);
             }
 
             return fonts;
