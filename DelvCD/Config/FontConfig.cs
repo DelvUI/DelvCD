@@ -168,6 +168,10 @@ namespace DelvCD.Config
 
         private void AddFont(int fontIndex, int size)
         {
+            if (_fonts.Length == 0)
+            {
+                return;
+            }
             FontData newFont = new FontData(_fonts[fontIndex], size + 1, _chinese, _korean);
             AddFont(newFont);
         }
