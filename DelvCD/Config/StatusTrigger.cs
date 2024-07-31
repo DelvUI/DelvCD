@@ -164,7 +164,7 @@ namespace DelvCD.Config
                 _triggerNameInput = TriggerName;
             }
 
-            if (ImGui.InputTextWithHint("Status", "Status Name or ID", ref _triggerNameInput, 32))
+            if (ImGui.InputTextWithHint("Status", "Status Name or ID", ref _triggerNameInput, 64))
             {
                 TriggerData.Clear();
                 if (!string.IsNullOrEmpty(_triggerNameInput))

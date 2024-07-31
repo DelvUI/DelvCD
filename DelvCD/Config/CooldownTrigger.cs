@@ -162,7 +162,7 @@ namespace DelvCD.Config
             }
 
             ImGui.Combo("Combat Type", ref Unsafe.As<CombatType, int>(ref CombatType), _combatTypeOptions, _combatTypeOptions.Length);
-            if (ImGui.InputTextWithHint("Action", "Action Name or ID", ref _triggerNameInput, 32))
+            if (ImGui.InputTextWithHint("Action", "Action Name or ID", ref _triggerNameInput, 64))
             {
                 TriggerData.Clear();
                 if (!string.IsNullOrEmpty(_triggerNameInput))

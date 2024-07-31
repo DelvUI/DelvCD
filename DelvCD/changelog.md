@@ -1,3 +1,9 @@
+# 1.1.1.0
+- Added Dynamic Groups that automatically layout their elements.
+- Updated Monk's Job Gauge triggers.
+- Fixed fonts sometimes not loading.
+- Fixed input text for items, status and cooldown triggers being limited to 32 characters.
+
 # 1.1.0.4
 - Updated Monk's Fury Stacks Bar for 7.01 patch changes.
 

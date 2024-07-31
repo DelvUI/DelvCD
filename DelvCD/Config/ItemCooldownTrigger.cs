@@ -100,7 +100,7 @@ namespace DelvCD.Config
                 _triggerNameInput = TriggerName;
             }
 
-            if (ImGui.InputTextWithHint("Item", "Item Name or ID", ref _triggerNameInput, 32, ImGuiInputTextFlags.EnterReturnsTrue))
+            if (ImGui.InputTextWithHint("Item", "Item Name or ID", ref _triggerNameInput, 64, ImGuiInputTextFlags.EnterReturnsTrue))
             {
                 TriggerData.Clear();
                 if (!string.IsNullOrEmpty(_triggerNameInput))
