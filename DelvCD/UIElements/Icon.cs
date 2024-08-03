@@ -272,7 +272,7 @@ namespace DelvCD.UIElements
                 return;
             }
             
-            float completion = style.InvertSwipe ? 1 - (triggeredValue / startValue) : (triggeredValue / startValue) ;
+            float completion = triggeredValue / startValue;
             uint progressAlpha = (uint)(style.ProgressSwipeOpacity * 255 * alpha) << 24;
             
             if (completion == 1)
@@ -280,8 +280,9 @@ namespace DelvCD.UIElements
                 drawList.AddRectFilled(pos, pos + size, progressAlpha);
                 return;
             }
-
-            int segments = (int)Math.Ceiling(completion * 4);
+            
+            float segInvert = style.InvertSwipe ? 1 - completion : completion;
+            int segments = (int)Math.Ceiling(segInvert*4);
             Vector2 center = pos + size / 2;
             uint swipeLineColor = ImGui.ColorConvertFloat4ToU32(style.ProgressLineColor.Vector.AddTransparency(alpha));
             
@@ -291,8 +292,16 @@ namespace DelvCD.UIElements
                 center with {Y = center.Y - size.Y}, // Top
                 center with {X = center.X - size.X}, // Left
                 center with {Y = center.Y + size.Y}, // Bottom
-                center with {X = center.X + size.X}  // Right
+                center with {X = center.X + size.X} // Right
             ];
+
+            if (style.InvertSwipe)
+            {
+                vertices = vertices.Select((v, i) => new { v, i })
+                                   .OrderBy(x => new[] { 0, 3, 2, 1 }.ToList().IndexOf(x.i))
+                                   .Select(x => x.v)
+                                   .ToArray();
+            }
             
             ImGui.PushClipRect(pos, pos + size, false);
             for (int i = 0; i < segments; i++)
@@ -300,28 +309,31 @@ namespace DelvCD.UIElements
                 Vector2 v2 = vertices[i % 4];
                 Vector2 v3 = vertices[(i + 1) % 4];
                 
-                
                 if (i == segments - 1)
                 {   // If drawing the last segment, adjust the second vertex based on the cooldown.
                     float angle = 2 * MathF.PI * (1 - completion);
                     float cos = MathF.Cos(angle);
                     float sin = MathF.Sin(angle);
-
+                    
                     v3 = center + Vector2.Multiply(new Vector2(sin,-cos), size);
                     
                 }
 
+                if (style.InvertSwipe) //account for winding visual issues
+                    (v2, v3) = (v3, v2);
                 drawList.AddTriangleFilled(center, v3, v2, progressAlpha);
                 
                 if (style.ShowSwipeLines && i == segments - 1)
                 {   // Draw swipe lines if enabled & on last segment, must be here due to draw order.
-                    drawList.AddLine(center, v3, swipeLineColor, style.ProgressLineThickness);
+                    var inv = style.InvertSwipe ? v2 : v3;
+                    drawList.AddLine(center, inv, swipeLineColor, style.ProgressLineThickness);
                     drawList.AddLine(center, vertices[0], swipeLineColor, style.ProgressLineThickness);
                     drawList.AddCircleFilled(center, style.ProgressLineThickness / 2, swipeLineColor);
                 }
             }
             ImGui.PopClipRect();
         }
+        
         public void Resize(Vector2 size, bool conditions)
         {
             IconStyleConfig.Size = size;
