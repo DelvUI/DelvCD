@@ -72,7 +72,7 @@ namespace DelvCD
             );
 
             ClientState.Logout += OnLogout;
-            ClientState.Logout += OnLogin;
+            ClientState.Login += OnLogin;
             PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUi;
             PluginInterface.UiBuilder.Draw += Draw;
         }
