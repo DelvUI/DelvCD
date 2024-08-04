@@ -299,6 +299,41 @@ namespace DelvCD.Helpers
             DrawSegmentedLineHorizontal(drawList, c3.AddY(-thickness), -size.X, thickness, prog, segments, col1, col2);
             DrawSegmentedLineVertical(drawList, c4, thickness, -size.Y, prog, segments, col1, col2);
         }
+        
+        public static void DrawGlowCircle(Vector2 center, float radius, float thickness, float padding, int segments, float speed, ConfigColor col1, ConfigColor col2, ImDrawListPtr drawList)
+        {
+            speed = Math.Abs(speed);
+            int mod = speed == 0 ? 1 : (int)(250 / speed);
+            float prog = (float)(DateTimeOffset.Now.ToUnixTimeMilliseconds() % mod) / mod;
+
+            float angleStep = (float)(Math.PI * 2 / segments);
+            float startAngle = -MathF.PI / 2f;
+
+            for (int i = 0; i < segments; i++)
+            {
+                float currentAngle = startAngle + i * angleStep;
+                float nextAngle = currentAngle + angleStep;
+
+                // Calculate the color gradient
+                float t = ((float)i / segments + prog) % 1;
+                Vector4 color = new Vector4(
+                    col1.Vector.X * (1 - t) + col2.Vector.X * t,
+                    col1.Vector.Y * (1 - t) + col2.Vector.Y * t,
+                    col1.Vector.Z * (1 - t) + col2.Vector.Z * t,
+                    col1.Vector.W * (1 - t) + col2.Vector.W * t
+                );
+
+                uint colorUint = ImGui.ColorConvertFloat4ToU32(color);
+
+                // Draw the glowing segment around the outer edge with padding
+                drawList.PathArcTo(center, radius + thickness / 2 + padding, currentAngle, nextAngle, 2);
+                drawList.PathStroke(colorUint, ImDrawFlags.None, thickness / 2);
+
+                // Draw the glowing segment around the inner edge with padding
+                drawList.PathArcTo(center, radius - thickness / 2 - padding, currentAngle, nextAngle, 2);
+                drawList.PathStroke(colorUint, ImDrawFlags.None, thickness / 2);
+            }
+        }
 
         public static void DrawGlowNGon(Vector2 center, float radius, int thickness, int sides, int segments, float speed, ConfigColor col1, ConfigColor col2, ImDrawListPtr drawList)
         {
