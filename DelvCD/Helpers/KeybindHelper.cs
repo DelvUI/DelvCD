@@ -19,6 +19,7 @@ public unsafe class KeybindHelper
     
     public KeybindHelper()
     {
+        Singletons.Get<IClientState>().ClassJobChanged += OnJobChanged;
     }
 
     public static void Initialize() { Instance = new KeybindHelper(); }
@@ -126,6 +127,12 @@ public unsafe class KeybindHelper
         keybindHint = keybindHint.Replace("ª", "a");      // Alt
         keybindHint = keybindHint.Replace("º", "n");      // Numpad
         return keybindHint;
+    }
+    
+    private void OnJobChanged(uint _)
+    {
+        // Update the action bar when the job changes
+        UpdateKeybindHints();
     }
     
     public uint StripFirstTwoDigits(uint number)

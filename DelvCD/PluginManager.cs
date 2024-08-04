@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Utility;
@@ -72,6 +72,7 @@ namespace DelvCD
             );
 
             ClientState.Logout += OnLogout;
+            ClientState.Logout += OnLogin;
             PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUi;
             PluginInterface.UiBuilder.Draw += Draw;
         }
@@ -141,6 +142,11 @@ namespace DelvCD
             {
                 ConfigRoot.PushConfig(Config);
             }
+        }
+
+        private void OnLogin()
+        {
+            Singletons.Get<KeybindHelper>().UpdateKeybindHints();
         }
 
         private void OnLogout(int type, int code)
