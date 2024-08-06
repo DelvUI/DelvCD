@@ -108,7 +108,7 @@ namespace DelvCD.Helpers
                     "[value:k.1]  =>       1.2k\n\n" +
                     "[name]                   =>    Firstname Lastname\n" +
                     "[name:upper]       =>    FIRSTNAME LASTNAME\n" +
-                    "[name:lower]        =>    firstname lastname\n" +
+                    "[name:lower]       =>    firstname lastname\n" +
                     "[name_first.5]    =>    First\n" +
                     "[name_last.1]     =>    L";
         }
