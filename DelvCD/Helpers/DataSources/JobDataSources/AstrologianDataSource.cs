@@ -1,5 +1,4 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using Lumina.Excel.GeneratedSheets;
 
 namespace DelvCD.Helpers.DataSources.JobDataSources
 {

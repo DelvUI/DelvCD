@@ -7,9 +7,9 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
-using LuminaAction = Lumina.Excel.GeneratedSheets.Action;
+using LuminaAction = Lumina.Excel.Sheets.Action;
 
 namespace DelvCD.Helpers
 {
@@ -69,7 +69,7 @@ namespace DelvCD.Helpers
                 return _actionIdToIconId[actionId];
             }
 
-            ushort icon = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>()?.GetRow(actionId)?.Icon ?? 0;
+            ushort icon = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>()?.GetRow(actionId).Icon ?? 0;
             if (icon != 0)
             {
                 _actionIdToIconId.Add(actionId, icon);
@@ -85,7 +85,7 @@ namespace DelvCD.Helpers
 
         public string? GetNameForAction(uint actionId)
         {
-            string name = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>()?.GetRow(actionId)?.Name ?? string.Empty;
+            string name = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>()?.GetRow(actionId).Name.ExtractText() ?? string.Empty;
 
             return name;
         }
@@ -192,7 +192,7 @@ namespace DelvCD.Helpers
         {
             ExcelSheet<Item>? sheet = Singletons.Get<IDataManager>().GetExcelSheet<Item>();
 
-            if (!string.IsNullOrEmpty(input) && sheet is not null)
+            if (!string.IsNullOrEmpty(input))
             {
                 List<TriggerData> itemList = new List<TriggerData>();
 
@@ -201,10 +201,9 @@ namespace DelvCD.Helpers
                 {
                     if (value > 0)
                     {
-                        Item? item = sheet.GetRow(value);
-                        if (item is not null)
+                        if (sheet.GetRow(value) is Item item)
                         {
-                            itemList.Add(new TriggerData(item.Name, item.RowId, item.Icon, 0));
+                            itemList.Add(new TriggerData(item.Name.ExtractText(), item.RowId, item.Icon, 0));
                         }
                     }
                 }
@@ -214,7 +213,7 @@ namespace DelvCD.Helpers
                 {
                     itemList.AddRange(
                         sheet.Where(item => input.ToLower().Equals(item.Name.ToString().ToLower()))
-                            .Select(item => new TriggerData(item.Name, item.RowId, item.Icon, 0)));
+                            .Select(item => new TriggerData(item.Name.ExtractText(), item.RowId, item.Icon, 0)));
                 }
 
                 return itemList;
@@ -252,10 +251,9 @@ namespace DelvCD.Helpers
             {
                 if (value > 0)
                 {
-                    LuminaAction? action = actionSheet.GetRow(value);
-                    if (action is not null && (action.IsPlayerAction || action.IsRoleAction))
+                    if (actionSheet.GetRow(value) is LuminaAction action && (action.IsPlayerAction || action.IsRoleAction))
                     {
-                        actionList.Add(new TriggerData(action.Name, action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
+                        actionList.Add(new TriggerData(action.Name.ExtractText(), action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
                     }
                 }
             }
@@ -267,7 +265,7 @@ namespace DelvCD.Helpers
                 {
                     if (input.ToLower().Equals(action.Name.ToString().ToLower()) && (action.IsPlayerAction || action.IsRoleAction))
                     {
-                        actionList.Add(new TriggerData(action.Name, action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
+                        actionList.Add(new TriggerData(action.Name.ExtractText(), action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
                     }
                 }
             }
@@ -290,10 +288,9 @@ namespace DelvCD.Helpers
             {
                 foreach (ActionIndirection iAction in actionIndirectionSheet)
                 {
-                    LuminaAction? action = iAction.Name.Value;
-                    if (action is not null && action.RowId == value)
+                    if (iAction.Name.Value is LuminaAction action && action.RowId == value)
                     {
-                        actionList.Add(new TriggerData(action.Name, action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
+                        actionList.Add(new TriggerData(action.Name.ExtractText(), action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
                         break;
                     }
                 }
@@ -304,10 +301,9 @@ namespace DelvCD.Helpers
             {
                 foreach (ActionIndirection indirectAction in actionIndirectionSheet)
                 {
-                    LuminaAction? action = indirectAction.Name.Value;
-                    if (action is not null && input.ToLower().Equals(action.Name.ToString().ToLower()))
+                    if (indirectAction.Name.Value is LuminaAction action && input.ToLower().Equals(action.Name.ToString().ToLower()))
                     {
-                        actionList.Add(new TriggerData(action.Name, action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
+                        actionList.Add(new TriggerData(action.Name.ExtractText(), action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
                     }
                 }
             }
@@ -330,10 +326,9 @@ namespace DelvCD.Helpers
             {
                 foreach (GeneralAction generalAction in generalSheet)
                 {
-                    LuminaAction? action = generalAction.Action.Value;
-                    if (action is not null && input.ToLower().Equals(generalAction.Name.ToString().ToLower()))
+                    if (generalAction.Action.Value is LuminaAction action && input.ToLower().Equals(generalAction.Name.ToString().ToLower()))
                     {
-                        actionList.Add(new TriggerData(generalAction.Name, action.RowId, (ushort)generalAction.Icon, action.MaxCharges));
+                        actionList.Add(new TriggerData(generalAction.Name.ExtractText(), action.RowId, (ushort)generalAction.Icon, action.MaxCharges));
                     }
                 }
             }
@@ -361,19 +356,19 @@ namespace DelvCD.Helpers
 
         public static uint[] GetComboIds(LuminaAction? action)
         {
-            if (action is null)
+            if (action is not LuminaAction)
             {
                 return Array.Empty<uint>();
             }
 
             // can't figure out lumina data, seems incorrect
             // hardcode away...
-            if (SpecialComboCases.TryGetValue(action.RowId, out uint[]? ids) && ids != null)
+            if (SpecialComboCases.TryGetValue(action.Value.RowId, out uint[]? ids) && ids != null)
             {
                 return ids;
             }
 
-            return GetComboIds(action.ActionCombo.Value?.RowId ?? 0);
+            return GetComboIds(action.Value.ActionCombo.RowId);
         }
 
         public static uint[] GetComboIds(uint baseComboId)
@@ -395,9 +390,9 @@ namespace DelvCD.Helpers
             {
                 LuminaAction? upgradedAction = indirectAction.Name.Value;
                 LuminaAction? prevAction = indirectAction.PreviousComboAction.Value;
-                if (upgradedAction is not null && prevAction is not null && baseComboId == prevAction.RowId)
+                if (upgradedAction is not null && prevAction is not null && baseComboId == prevAction.Value.RowId)
                 {
-                    comboIds.Add(upgradedAction.RowId);
+                    comboIds.Add(upgradedAction.Value.RowId);
                 }
             }
 

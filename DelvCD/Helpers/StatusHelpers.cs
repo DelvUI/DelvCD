@@ -8,7 +8,7 @@ using Dalamud.Plugin.Services;
 using Lumina.Excel;
 
 using DalamudStatus = Dalamud.Game.ClientState.Statuses.Status;
-using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
+using LuminaStatus = Lumina.Excel.Sheets.Status;
 
 namespace DelvCD.Helpers
 {
@@ -83,7 +83,7 @@ namespace DelvCD.Helpers
 
         public static List<TriggerData> FindStatusEntries(string input)
         {
-            ExcelSheet<LuminaStatus>? sheet = Singletons.Get<IDataManager>().GetExcelSheet<LuminaStatus>();
+            ExcelSheet<LuminaStatus> sheet = Singletons.Get<IDataManager>().GetExcelSheet<LuminaStatus>();
             List<TriggerData> statusList = new List<TriggerData>();
 
             if (string.IsNullOrEmpty(input) || sheet is null) { return statusList; }
@@ -93,10 +93,9 @@ namespace DelvCD.Helpers
             {
                 if (value > 0)
                 {
-                    LuminaStatus? status = sheet.GetRow(value);
-                    if (status is not null)
+                    if (sheet.GetRow(value) is LuminaStatus status)
                     {
-                        statusList.Add(new TriggerData(status.Name, status.RowId, status.Icon, status.MaxStacks));
+                        statusList.Add(new TriggerData(status.Name.ExtractText(), status.RowId, status.Icon, status.MaxStacks));
                     }
                 }
             }
@@ -106,7 +105,7 @@ namespace DelvCD.Helpers
             {
                 statusList.AddRange(
                     sheet.Where(status => input.ToLower().Equals(status.Name.ToString().ToLower()))
-                        .Select(status => new TriggerData(status.Name, status.RowId, status.Icon, status.MaxStacks)));
+                        .Select(status => new TriggerData(status.Name.ExtractText(), status.RowId, status.Icon, status.MaxStacks)));
             }
 
             return statusList;

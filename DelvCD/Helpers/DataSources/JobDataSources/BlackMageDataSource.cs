@@ -1,6 +1,4 @@
-﻿using Lumina.Excel.GeneratedSheets;
-
-namespace DelvCD.Helpers.DataSources.JobDataSources
+﻿namespace DelvCD.Helpers.DataSources.JobDataSources
 {
     public class BlackMageDataSource : DataSource
     {
