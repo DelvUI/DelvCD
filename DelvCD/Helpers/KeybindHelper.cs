@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -51,21 +51,21 @@ public unsafe class KeybindHelper
     private readonly string?[] _actionBars = ["_ActionBar09", "_ActionBar", "_ActionBar01", "_ActionBar02", "_ActionBar03", "_ActionBar04", "_ActionBar05", "_ActionBar06", "_ActionBar07", "_ActionBar08"];
     
     private void ActionBarUpdateRequested(AddonActionBarX* addon) {
-        var barId = addon->AddonActionBarBase.RaptureHotbarId;
+        byte barId = addon->AddonActionBarBase.RaptureHotbarId;
         if (barId == 9)
         {
             _keybindActionHints.Clear(); // Relies on the game updating action bars in reverse order
             _keybindItemHints.Clear(); // Relies on the game updating action bars in reverse order
         }
 
-        for (var slotIndex = (byte)(addon->AddonActionBarBase.SlotCount - 1); slotIndex < addon->AddonActionBarBase.SlotCount; slotIndex--) {
-            var slot = RaptureHotbarModule.Instance()->GetSlotById(barId, slotIndex);
+        for (byte slotIndex = (byte)(addon->AddonActionBarBase.SlotCount - 1); slotIndex < addon->AddonActionBarBase.SlotCount; slotIndex--) {
+            RaptureHotbarModule.HotbarSlot* slot = RaptureHotbarModule.Instance()->GetSlotById(barId, slotIndex);
             if (slot->CommandType == RaptureHotbarModule.HotbarSlotType.Empty)
             {
                 continue;
             }
 
-            var str = slot->KeybindHintString;
+            string? str = slot->KeybindHintString;
             if (string.IsNullOrWhiteSpace(str)) {
                 continue;
             }
@@ -73,20 +73,20 @@ public unsafe class KeybindHelper
             if (slot->CommandType == RaptureHotbarModule.HotbarSlotType.Item)
             {
                 // For some reason the first 2 digits for items (well or some items) is 10?
-                var itemId = StripFirstTwoDigits(slot->CommandId);
+                uint itemId = StripFirstTwoDigits(slot->CommandId);
                 _keybindItemHints[itemId] = str;
                 continue;
             }
             
-            var actionId = ActionManager.Instance()->GetAdjustedActionId(slot->CommandId);
+            uint actionId = ActionManager.Instance()->GetAdjustedActionId(slot->CommandId);
             _keybindActionHints[actionId] = str;
         }
     }
     
     public void UpdateKeybindHints() {
-        var gameGui = Singletons.Get<IGameGui>();
+        IGameGui gameGui = Singletons.Get<IGameGui>();
 
-        foreach (var addonName in _actionBars) {
+        foreach (string? addonName in _actionBars) {
             string? nameToUse = addonName;
 
             AddonActionBarX* addon = !string.IsNullOrEmpty(nameToUse) 
@@ -101,14 +101,14 @@ public unsafe class KeybindHelper
 
     public string GetKeybindHint(uint id, KeybindType type)
     {
-        var dictionary = type switch
+        Dictionary<uint, string> dictionary = type switch
         {
             KeybindType.Item => _keybindItemHints,
             KeybindType.Action => _keybindActionHints,
             _ => _keybindActionHints
         };
 
-        return dictionary.TryGetValue(id, out var keybindHint) ? keybindHint : string.Empty;
+        return dictionary.TryGetValue(id, out string? keybindHint) ? keybindHint : string.Empty;
     }
 
     public string GetKeybindHintFormatted(uint id, KeybindType type)
@@ -130,8 +130,8 @@ public unsafe class KeybindHelper
     
     public uint StripFirstTwoDigits(uint number)
     {
-        var numberStr = number.ToString();
-        return numberStr.Length > 2 && uint.TryParse(numberStr.Substring(2), out var result) ? result : 0;
+        string numberStr = number.ToString();
+        return numberStr.Length > 2 && uint.TryParse(numberStr.Substring(2), out uint result) ? result : 0;
     }
 
     public enum KeybindType
