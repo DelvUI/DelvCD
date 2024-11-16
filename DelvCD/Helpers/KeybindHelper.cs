@@ -7,7 +7,6 @@ using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
-using Lumina.Data.Parsing;
 
 namespace DelvCD.Helpers;
 
@@ -88,13 +87,6 @@ public unsafe class KeybindHelper
 
         foreach (var addonName in _actionBars) {
             string? nameToUse = addonName;
-        
-            if (string.IsNullOrEmpty(addonName)) {
-                var attr = (Addon)typeof(AddonActionBarX).GetCustomAttribute(typeof(Addon))!;
-                if (attr != null) {
-                    nameToUse = attr.AddonIdentifiers.FirstOrDefault();
-                }
-            }
 
             AddonActionBarX* addon = !string.IsNullOrEmpty(nameToUse) 
                 ? (AddonActionBarX*)gameGui.GetAddonByName(nameToUse, 1) 
