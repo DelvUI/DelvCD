@@ -179,6 +179,7 @@ namespace DelvCD
                 // Don't modify order
                 PluginInterface.UiBuilder.Draw -= Draw;
                 PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
+                ClientState.Login -= OnLogin;
                 ClientState.Logout -= OnLogout;
                 CommandManager.RemoveHandler("/delvcd");
                 CommandManager.RemoveHandler("/dcd");
