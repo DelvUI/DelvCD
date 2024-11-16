@@ -22,7 +22,7 @@
         public override float GetMaxValue(int index) => index switch
         {
             0 => 100,
-            1 => 30,
+            1 => 60,
             2 => 20,
             _ => 0
         };
