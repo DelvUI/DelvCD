@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Objects.Types;
+﻿using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
-
-using LuminaAction = Lumina.Excel.GeneratedSheets.Action;
+using Lumina.Excel.Sheets;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using LuminaAction = Lumina.Excel.Sheets.Action;
 
 namespace DelvCD.Helpers
 {
@@ -69,7 +68,13 @@ namespace DelvCD.Helpers
                 return _actionIdToIconId[actionId];
             }
 
-            ushort icon = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>()?.GetRow(actionId)?.Icon ?? 0;
+            ushort icon = 0;
+            ExcelSheet<LuminaAction> sheet = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>();
+            if (sheet.TryGetRow(actionId, out LuminaAction row))
+            {
+                icon = row.Icon;
+            }
+
             if (icon != 0)
             {
                 _actionIdToIconId.Add(actionId, icon);
@@ -85,9 +90,13 @@ namespace DelvCD.Helpers
 
         public string? GetNameForAction(uint actionId)
         {
-            string name = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>()?.GetRow(actionId)?.Name ?? string.Empty;
+            var sheet = Singletons.Get<IDataManager>().GetExcelSheet<LuminaAction>();
+            if (sheet.TryGetRow(actionId, out LuminaAction row))
+            {
+                return row.Name.ToString();
+            }
 
-            return name;
+            return null;
         }
 
         public unsafe string GetAdjustedActionName(uint actionId)
@@ -202,9 +211,9 @@ namespace DelvCD.Helpers
                     if (value > 0)
                     {
                         Item? item = sheet.GetRow(value);
-                        if (item is not null)
+                        if (item is not null && item.HasValue)
                         {
-                            itemList.Add(new TriggerData(item.Name, item.RowId, item.Icon, 0));
+                            itemList.Add(new TriggerData(item.Value.Name.ToString(), item.Value.RowId, item.Value.Icon, 0));
                         }
                     }
                 }
@@ -214,7 +223,7 @@ namespace DelvCD.Helpers
                 {
                     itemList.AddRange(
                         sheet.Where(item => input.ToLower().Equals(item.Name.ToString().ToLower()))
-                            .Select(item => new TriggerData(item.Name, item.RowId, item.Icon, 0)));
+                            .Select(item => new TriggerData(item.Name.ToString(), item.RowId, item.Icon, 0)));
                 }
 
                 return itemList;
@@ -253,9 +262,18 @@ namespace DelvCD.Helpers
                 if (value > 0)
                 {
                     LuminaAction? action = actionSheet.GetRow(value);
-                    if (action is not null && (action.IsPlayerAction || action.IsRoleAction))
+                    if (action is not null && action.HasValue && (action.Value.IsPlayerAction || action.Value.IsRoleAction))
                     {
-                        actionList.Add(new TriggerData(action.Name, action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
+                        actionList.Add(
+                            new TriggerData(
+                                action.Value.Name.ToString(),
+                                action.Value.RowId,
+                                action.Value.Icon,
+                                action.Value.MaxCharges,
+                                GetComboIds(action),
+                                action.Value.IsPvP ? CombatType.PvP : CombatType.PvE
+                            )
+                        );
                     }
                 }
             }
@@ -267,7 +285,16 @@ namespace DelvCD.Helpers
                 {
                     if (input.ToLower().Equals(action.Name.ToString().ToLower()) && (action.IsPlayerAction || action.IsRoleAction))
                     {
-                        actionList.Add(new TriggerData(action.Name, action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
+                        actionList.Add(
+                            new TriggerData(
+                                action.Name.ToString(),
+                                action.RowId,
+                                action.Icon,
+                                action.MaxCharges,
+                                GetComboIds(action),
+                                action.IsPvP ? CombatType.PvP : CombatType.PvE
+                            )
+                        );
                     }
                 }
             }
@@ -291,9 +318,18 @@ namespace DelvCD.Helpers
                 foreach (ActionIndirection iAction in actionIndirectionSheet)
                 {
                     LuminaAction? action = iAction.Name.Value;
-                    if (action is not null && action.RowId == value)
+                    if (action is not null && action.HasValue && action.Value.RowId == value)
                     {
-                        actionList.Add(new TriggerData(action.Name, action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
+                        actionList.Add(
+                            new TriggerData(
+                                action.Value.Name.ToString(),
+                                action.Value.RowId,
+                                action.Value.Icon,
+                                action.Value.MaxCharges,
+                                GetComboIds(action),
+                                action.Value.IsPvP ? CombatType.PvP : CombatType.PvE
+                            )
+                        );
                         break;
                     }
                 }
@@ -305,9 +341,18 @@ namespace DelvCD.Helpers
                 foreach (ActionIndirection indirectAction in actionIndirectionSheet)
                 {
                     LuminaAction? action = indirectAction.Name.Value;
-                    if (action is not null && input.ToLower().Equals(action.Name.ToString().ToLower()))
+                    if (action is not null && action.HasValue && input.ToLower().Equals(action.Value.Name.ToString().ToLower()))
                     {
-                        actionList.Add(new TriggerData(action.Name, action.RowId, action.Icon, action.MaxCharges, GetComboIds(action), action.IsPvP ? CombatType.PvP : CombatType.PvE));
+                        actionList.Add(
+                            new TriggerData(
+                                action.Value.Name.ToString(), 
+                                action.Value.RowId, 
+                                action.Value.Icon, 
+                                action.Value.MaxCharges, 
+                                GetComboIds(action), 
+                                action.Value.IsPvP ? CombatType.PvP : CombatType.PvE
+                            )
+                        );
                     }
                 }
             }
@@ -331,9 +376,9 @@ namespace DelvCD.Helpers
                 foreach (GeneralAction generalAction in generalSheet)
                 {
                     LuminaAction? action = generalAction.Action.Value;
-                    if (action is not null && input.ToLower().Equals(generalAction.Name.ToString().ToLower()))
+                    if (action is not null && action.HasValue && input.ToLower().Equals(generalAction.Name.ToString().ToLower()))
                     {
-                        actionList.Add(new TriggerData(generalAction.Name, action.RowId, (ushort)generalAction.Icon, action.MaxCharges));
+                        actionList.Add(new TriggerData(generalAction.Name.ToString(), action.Value.RowId, (ushort)generalAction.Icon, action.Value.MaxCharges));
                     }
                 }
             }
@@ -368,12 +413,12 @@ namespace DelvCD.Helpers
 
             // can't figure out lumina data, seems incorrect
             // hardcode away...
-            if (SpecialComboCases.TryGetValue(action.RowId, out uint[]? ids) && ids != null)
+            if (SpecialComboCases.TryGetValue(action.Value.RowId, out uint[]? ids) && ids != null)
             {
                 return ids;
             }
 
-            return GetComboIds(action.ActionCombo.Value?.RowId ?? 0);
+            return GetComboIds(action.Value.ActionCombo.Value.RowId);
         }
 
         public static uint[] GetComboIds(uint baseComboId)
@@ -395,9 +440,10 @@ namespace DelvCD.Helpers
             {
                 LuminaAction? upgradedAction = indirectAction.Name.Value;
                 LuminaAction? prevAction = indirectAction.PreviousComboAction.Value;
-                if (upgradedAction is not null && prevAction is not null && baseComboId == prevAction.RowId)
+                if (upgradedAction is not null && upgradedAction.HasValue && 
+                    prevAction is not null && prevAction.HasValue && baseComboId == prevAction.Value.RowId)
                 {
-                    comboIds.Add(upgradedAction.RowId);
+                    comboIds.Add(upgradedAction.Value.RowId);
                 }
             }
 

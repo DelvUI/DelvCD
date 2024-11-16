@@ -1,3 +1,7 @@
+# 1.2.0.0
+- Added support for Patch 7.1 and Dalamud API 11.
+- Fixed inverted swipe.
+
 # 1.1.1.0
 - Added Dynamic Groups that automatically layout their elements.
 - Updated Monk's Job Gauge triggers.

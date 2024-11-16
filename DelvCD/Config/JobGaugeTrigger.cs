@@ -70,7 +70,7 @@ namespace DelvCD.Config
             }
 
             IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
-            if (player == null || player.ClassJob.Id != (uint)_jobGauge.Job)
+            if (player == null || player.ClassJob.RowId != (uint)_jobGauge.Job)
             {
                 return false;
             }

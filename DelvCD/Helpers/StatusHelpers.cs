@@ -8,7 +8,7 @@ using Dalamud.Plugin.Services;
 using Lumina.Excel;
 
 using DalamudStatus = Dalamud.Game.ClientState.Statuses.Status;
-using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
+using LuminaStatus = Lumina.Excel.Sheets.Status;
 
 namespace DelvCD.Helpers
 {
@@ -94,9 +94,9 @@ namespace DelvCD.Helpers
                 if (value > 0)
                 {
                     LuminaStatus? status = sheet.GetRow(value);
-                    if (status is not null)
+                    if (status is not null && status.HasValue)
                     {
-                        statusList.Add(new TriggerData(status.Name, status.RowId, status.Icon, status.MaxStacks));
+                        statusList.Add(new TriggerData(status.Value.Name.ToString(), status.Value.RowId, status.Value.Icon, status.Value.MaxStacks));
                     }
                 }
             }
@@ -106,7 +106,7 @@ namespace DelvCD.Helpers
             {
                 statusList.AddRange(
                     sheet.Where(status => input.ToLower().Equals(status.Name.ToString().ToLower()))
-                        .Select(status => new TriggerData(status.Name, status.RowId, status.Icon, status.MaxStacks)));
+                        .Select(status => new TriggerData(status.Name.ToString(), status.RowId, status.Icon, status.MaxStacks)));
             }
 
             return statusList;

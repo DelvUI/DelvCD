@@ -143,7 +143,7 @@ namespace DelvCD
             }
         }
 
-        private void OnLogout()
+        private void OnLogout(int type, int code)
         {
             ConfigHelpers.SaveConfig();
         }
