@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -40,6 +40,7 @@ public unsafe class KeybindHelper
             return;
         }
 
+        Singletons.Get<IClientState>().ClassJobChanged -= OnJobChanged;
         Instance = null!;
     }
     
