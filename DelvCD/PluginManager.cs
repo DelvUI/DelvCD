@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Utility;
@@ -72,6 +72,7 @@ namespace DelvCD
             );
 
             ClientState.Logout += OnLogout;
+            ClientState.Login += OnLogin;
             PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUi;
             PluginInterface.UiBuilder.Draw += Draw;
         }
@@ -143,6 +144,11 @@ namespace DelvCD
             }
         }
 
+        private void OnLogin()
+        {
+            Singletons.Get<KeybindHelper>().UpdateKeybindHints();
+        }
+
         private void OnLogout(int type, int code)
         {
             ConfigHelpers.SaveConfig();
@@ -173,6 +179,7 @@ namespace DelvCD
                 // Don't modify order
                 PluginInterface.UiBuilder.Draw -= Draw;
                 PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
+                ClientState.Login -= OnLogin;
                 ClientState.Logout -= OnLogout;
                 CommandManager.RemoveHandler("/delvcd");
                 CommandManager.RemoveHandler("/dcd");

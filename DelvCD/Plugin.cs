@@ -87,6 +87,7 @@ namespace DelvCD
             Singletons.Register(new ActionHelpers());
             Singletons.Register(new StatusHelpers());
             Singletons.Register(new ClipRectsHelper());
+            Singletons.Register(new KeybindHelper());
 
             // Load Icon
             Plugin.IconTexture = LoadIconTexture(textureProvider);
@@ -107,6 +108,9 @@ namespace DelvCD
 
             // Start the plugin
             Singletons.Register(new PluginManager(clientState, commandManager, pluginInterface, config));
+            
+            // Update Keybind Hints
+            Singletons.Get<KeybindHelper>().UpdateKeybindHints();
         }
 
         private static IDalamudTextureWrap? LoadIconTexture(ITextureProvider textureProvider)

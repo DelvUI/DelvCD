@@ -58,6 +58,10 @@ namespace DelvCD.Config
 
             _dataSource.Item_Cooldown_Stacks = GetQuantity(actionTrigger.Id);
             _dataSource.Max_Item_Cooldown_Stacks = _dataSource.Item_Cooldown_Stacks;
+            
+            KeybindHelper keybindHelper = Singletons.Get<KeybindHelper>();
+            _dataSource.Item_Keybind = keybindHelper.GetKeybindHint(actionTrigger.Id, KeybindHelper.KeybindType.Item);
+            _dataSource.Item_Keybind_Formatted = keybindHelper.GetKeybindHintFormatted(actionTrigger.Id, KeybindHelper.KeybindType.Item);
 
             return !Cooldown || Utils.GetResult(_dataSource.Item_Cooldown_Timer, CooldownOp, CooldownValue);
         }

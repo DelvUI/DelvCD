@@ -11,7 +11,7 @@ namespace DelvCD.Helpers
 {
     public class TextTagFormatter
     {
-        public static Regex TextTagRegex { get; } = new Regex(@"\[(\w*)(:\w)?\.?(\d+)?\]", RegexOptions.Compiled);
+        public static Regex TextTagRegex { get; } = new Regex(@"\[(\w*)(:\w+)?\.?(\d+)?\]", RegexOptions.Compiled);
 
         private static Dictionary<Type, Dictionary<string, FieldInfo>> _fieldsMap = new();
         
@@ -79,7 +79,17 @@ namespace DelvCD.Helpers
                         int.TryParse(m.Groups[3].Value, out int trim) &&
                         trim < value.Length)
                     {
-                        value = propValue?.ToString().AsSpan(0, trim).ToString();
+                        value = value.AsSpan(0, trim).ToString();
+                    }
+
+                    if (value != null)
+                    {
+                        value = m.Groups[2].Value switch
+                        {
+                            ":upper" => value.ToUpper(),
+                            ":lower" => value.ToLower(),
+                            _ => value
+                        };
                     }
                 }
             }
