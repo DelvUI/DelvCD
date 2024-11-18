@@ -39,18 +39,22 @@ namespace DelvCD.Helpers
                 return t;
             }
 
-            string? path = Singletons.Get<ITextureProvider>().GetIconPath(new GameIconLookup(iconId: iconId, hiRes: hdIcon));
-            if (path != null)
+            try
             {
-                path = Singletons.Get<ITextureSubstitutionProvider>().GetSubstitutedPath(path);
-                IDalamudTextureWrap ? texture = GetDesaturatedTextureWrap(path);
-                if (texture != null)
+                string? path = Singletons.Get<ITextureProvider>().GetIconPath(new GameIconLookup(iconId: iconId, hiRes: hdIcon));
+                if (path != null)
                 {
-                    _desaturatedCache.Add(iconId + stackCount, texture);
-                }
+                    path = Singletons.Get<ITextureSubstitutionProvider>().GetSubstitutedPath(path);
+                    IDalamudTextureWrap? texture = GetDesaturatedTextureWrap(path);
+                    if (texture != null)
+                    {
+                        _desaturatedCache.Add(iconId + stackCount, texture);
+                    }
 
-                return texture;
+                    return texture;
+                }
             }
+            catch { }
 
             return null;
         }
