@@ -98,7 +98,4 @@
     <ItemGroup>
         <PackageReference Include="DalamudPackager" Version="11.0.0" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Config\Styles\" />
-    </ItemGroup>
 </Project>
