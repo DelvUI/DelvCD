@@ -78,11 +78,11 @@ namespace DelvCD.Config.JobGauges
             // none?
             if (value == 0)
             {
-                return gauge.Coda[0] == Song.NONE && gauge.Coda[1] == Song.NONE && gauge.Coda[2] == Song.NONE;
+                return gauge.Coda[0] == Song.None && gauge.Coda[1] == Song.None && gauge.Coda[2] == Song.None;
             }
             else if (value < 4)
             {
-                return gauge.Coda[value - 1] != Song.NONE;
+                return gauge.Coda[value - 1] != Song.None;
             }
 
             return true;
@@ -90,8 +90,8 @@ namespace DelvCD.Config.JobGauges
 
         private int MaxRepertoireStacks(Song song) => song switch
         {
-            Song.ARMY => 4,
-            Song.WANDERER => 3,
+            Song.Army => 4,
+            Song.Wanderer => 3,
             _ => 0
         };
     }

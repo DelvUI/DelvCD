@@ -82,7 +82,7 @@ namespace DelvCD.Config.JobGauges
             int attunement = ActiveAttunement(gauge);
             _dataSource.Active_Attunement = _comboOptions[7][attunement];
 
-            _dataSource.Attunement_Timer = gauge.AttunmentTimerRemaining / 1000f;
+            _dataSource.Attunement_Timer = gauge.AttunementTimerRemaining / 1000f;
             _dataSource.Attunement_Stacks = ActiveAttunementStacks(gauge);
             _dataSource.Max_Attunement_Stacks = MaxAttunement(attunement);
 

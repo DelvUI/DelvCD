@@ -1,3 +1,6 @@
+# 1.3.0.0
+- Added support for Patch 7.2 and Dalamud API 12.
+
 # 1.2.0.1
 - Added keybind label tag for Actions and Items.
 - Fixed Dark Knight's Darkside duration.

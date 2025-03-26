@@ -62,20 +62,20 @@ namespace DelvCD.Config.JobGauges
             {
                 switch (chakra)
                 {
-                    case BeastChakra.OPOOPO:
+                    case BeastChakra.OpoOpo:
                         _dataSource.Masters_Gauge_Opo_Count++;
                         break;
-                    case BeastChakra.RAPTOR:
+                    case BeastChakra.Raptor:
                         _dataSource.Masters_Gauge_Raptor_Count++;
                         break;
-                    case BeastChakra.COEURL:
+                    case BeastChakra.Coeurl:
                         _dataSource.Masters_Gauge_Coeurl_Count++;
                         break;
                 }
             }
 
-            _dataSource.Solar_Nadi = (gauge.Nadi & Nadi.SOLAR) != 0;
-            _dataSource.Lunar_Nadi = (gauge.Nadi & Nadi.LUNAR) != 0;
+            _dataSource.Solar_Nadi = (gauge.Nadi & Nadi.Solar) != 0;
+            _dataSource.Lunar_Nadi = (gauge.Nadi & Nadi.Lunar) != 0;
             _dataSource.Blitz_Timer = gauge.BlitzTimeRemaining / 1000f;
             _dataSource.Opoopo_Stacks = gauge.OpoOpoFury;
             _dataSource.Raptor_Stacks = gauge.RaptorFury;

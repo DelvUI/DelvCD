@@ -110,7 +110,7 @@ namespace DelvCD.Config
                         _dataSource.Id = status.StatusId;
                         _dataSource.Status_Timer = Math.Abs(status.RemainingTime);
                         _dataSource.Value = Math.Abs(status.RemainingTime);
-                        _dataSource.Status_Stacks = status.StackCount;
+                        _dataSource.Status_Stacks = status.Param;
                         _dataSource.Max_Status_Stacks = trigger.MaxStacks;
 
                         if (_dataSource.Max_Status_Stacks > 0) { 
