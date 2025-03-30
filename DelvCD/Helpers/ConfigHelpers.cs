@@ -536,12 +536,14 @@ namespace DelvCD.Helpers
         private static List<Type> _configTypes = new List<Type>()
         {
             typeof(Bar),
+            typeof(Circle),
             typeof(Group),
             typeof(Icon),
             typeof(Label),
             typeof(UIElement),
             typeof(ElementListConfig),
             typeof(BarStyleConfig),
+            typeof(CircleStyleConfig),
             typeof(CooldownTrigger),
             typeof(ConfigColor),
             typeof(FontConfig),
