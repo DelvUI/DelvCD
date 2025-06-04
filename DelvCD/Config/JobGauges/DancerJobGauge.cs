@@ -71,6 +71,8 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Esprit = gauge.Esprit;
             _dataSource.Dancing = gauge.IsDancing;
             _dataSource.Completed_Steps = gauge.CompletedSteps;
+            
+            int nextStep = gauge is { IsDancing: true, CompletedSteps: < 4 } ? (int)gauge.NextStep : 15998;
 
             if (preview) { return true; }
 
@@ -78,7 +80,7 @@ namespace DelvCD.Config.JobGauges
                 EvaluateCondition(0, _dataSource.Feather_Stacks) &&
                 EvaluateCondition(1, _dataSource.Esprit) &&
                 EvaluateCondition(2, _dataSource.Dancing) &&
-                EvaluateCondition(3, (int)gauge.NextStep - (int)DNCStep.None) &&
+                EvaluateCondition(3, nextStep - (int)DNCStep.None) &&
                 EvaluateStepCondition(gauge, 0) &&
                 EvaluateStepCondition(gauge, 1) &&
                 EvaluateStepCondition(gauge, 2) &&
