@@ -232,7 +232,7 @@ namespace DelvCD.UIElements
 
                 if (style.Glow)
                 {
-                    DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList);
+                    DrawHelpers.DrawGlow(localPos, size, style.GlowThickness, style.GlowSegments, style.GlowSpeed, style.GlowColor, style.GlowColor2, drawList, style.GlowClockwise);
                 }
             });
 

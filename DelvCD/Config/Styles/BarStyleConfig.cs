@@ -55,6 +55,7 @@ namespace DelvCD.Config
         public int GlowThickness = 2;
         public int GlowSegments = 8;
         public float GlowSpeed = 1f;
+        public bool GlowClockwise = true;
         public ConfigColor GlowColor = new ConfigColor(230f / 255f, 150f / 255f, 0f / 255f, 1f);
         public ConfigColor GlowColor2 = new ConfigColor(0f / 255f, 0f / 255f, 0f / 255f, 0f);
 
@@ -256,6 +257,9 @@ namespace DelvCD.Config
                     {
                         GlowColor2.Vector = vector;
                     }
+                        
+                    DrawHelpers.DrawNestIndicator(1);
+                    ImGui.Checkbox("Glow rotates Clockwise", ref GlowClockwise);
                 }
             }
 
