@@ -5,7 +5,7 @@ using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Interface.Utility;
 using DelvCD.Helpers;
 using DelvCD.UIElements;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 
 namespace DelvCD.Config

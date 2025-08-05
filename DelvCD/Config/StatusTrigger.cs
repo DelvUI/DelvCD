@@ -12,7 +12,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DelvCD.Config
 {

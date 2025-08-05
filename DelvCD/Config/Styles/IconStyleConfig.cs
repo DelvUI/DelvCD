@@ -1,7 +1,7 @@
 ﻿using Dalamud.Interface.Utility;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

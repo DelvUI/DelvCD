@@ -3,7 +3,7 @@ using Dalamud.Plugin.Services;
 using DelvCD.Config;
 using DelvCD.Helpers.DataSources;
 using DelvCD.UIElements;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;

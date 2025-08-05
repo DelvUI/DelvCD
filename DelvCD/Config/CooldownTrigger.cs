@@ -3,7 +3,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Linq;
 using System.Numerics;

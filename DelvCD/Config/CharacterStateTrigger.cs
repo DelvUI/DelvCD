@@ -8,7 +8,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 using CharacterStruct = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 

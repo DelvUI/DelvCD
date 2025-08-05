@@ -13,9 +13,9 @@ namespace DelvCD.Helpers;
 public unsafe class KeybindHelper
 {
     // Referenced https://github.com/Caraxi/SimpleTweaksPlugin/blob/main/Tweaks/UiAdjustment/ControlHintMirroring.cs for a lot of this code.
-    
+
     #region Singleton
-    
+
     public KeybindHelper()
     {
         Singletons.Get<IClientState>().ClassJobChanged += OnJobChanged;
@@ -43,13 +43,13 @@ public unsafe class KeybindHelper
         Singletons.Get<IClientState>().ClassJobChanged -= OnJobChanged;
         Instance = null!;
     }
-    
+
     #endregion
-    
+
     private readonly Dictionary<uint, string> _keybindActionHints = new();
     private readonly Dictionary<uint, string> _keybindItemHints = new();
     private readonly string?[] _actionBars = ["_ActionBar09", "_ActionBar", "_ActionBar01", "_ActionBar02", "_ActionBar03", "_ActionBar04", "_ActionBar05", "_ActionBar06", "_ActionBar07", "_ActionBar08"];
-    
+
     private void ActionBarUpdateRequested(AddonActionBarX* addon) {
         byte barId = addon->AddonActionBarBase.RaptureHotbarId;
         if (barId == 9)
@@ -77,20 +77,20 @@ public unsafe class KeybindHelper
                 _keybindItemHints[itemId] = str;
                 continue;
             }
-            
+
             uint actionId = ActionManager.Instance()->GetAdjustedActionId(slot->CommandId);
             _keybindActionHints[actionId] = str;
         }
     }
-    
+
     public void UpdateKeybindHints() {
         IGameGui gameGui = Singletons.Get<IGameGui>();
 
         foreach (string? addonName in _actionBars) {
             string? nameToUse = addonName;
 
-            AddonActionBarX* addon = !string.IsNullOrEmpty(nameToUse) 
-                ? (AddonActionBarX*)gameGui.GetAddonByName(nameToUse, 1) 
+            AddonActionBarX* addon = !string.IsNullOrEmpty(nameToUse)
+                ? (AddonActionBarX*)gameGui.GetAddonByName(nameToUse, 1).Address
                 : null;
 
             if (addon != null) {
@@ -121,13 +121,13 @@ public unsafe class KeybindHelper
         keybindHint = keybindHint.Replace("º", "n");      // Numpad
         return keybindHint;
     }
-    
+
     private void OnJobChanged(uint _)
     {
         // Update the action bar when the job changes
         UpdateKeybindHints();
     }
-    
+
     public uint StripFirstTwoDigits(uint number)
     {
         string numberStr = number.ToString();

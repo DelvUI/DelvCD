@@ -9,7 +9,7 @@ using DelvCD.Config;
 using DelvCD.Helpers;
 using DelvCD.UIElements;
 using DelvCD.Windows;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DelvCD
 {
