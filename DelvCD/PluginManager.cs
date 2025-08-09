@@ -49,7 +49,7 @@ namespace DelvCD
             PluginInterface = pluginInterface;
             Config = config;
 
-            ConfigRoot = new ConfigWindow("ConfigRoot", ImGui.GetMainViewport().Size / 2, _configSize);
+            ConfigRoot = new ConfigWindow("DelvCD ConfigRoot", ImGui.GetMainViewport().Size / 2, _configSize);
             WindowSystem = new WindowSystem("DelvCD");
             WindowSystem.AddWindow(ConfigRoot);
 

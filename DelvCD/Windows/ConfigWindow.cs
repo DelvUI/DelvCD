@@ -17,8 +17,10 @@ namespace DelvCD.Windows
 
         private bool _back = false;
         private bool _home = false;
+        private bool _firstOpen = true;
         private string _name = string.Empty;
         private Vector2 _windowSize;
+        private Vector2 _windowPos;
         private Stack<IConfigurable> _configStack;
         private float _scale => ImGuiHelpers.GlobalScale;
 
@@ -39,6 +41,7 @@ namespace DelvCD.Windows
             };
 
             _windowSize = size;
+            _windowPos = position;
             _configStack = new Stack<IConfigurable>();
         }
 
@@ -46,6 +49,7 @@ namespace DelvCD.Windows
         {
             _configStack.Push(configItem);
             _name = configItem.Name;
+            _firstOpen = true;
             IsOpen = true;
         }
 
@@ -64,7 +68,12 @@ namespace DelvCD.Windows
             if (_configStack.Any())
             {
                 WindowName = GetWindowTitle();
-                ImGui.SetNextWindowSize(_windowSize);
+                
+                if (_firstOpen)
+                {
+                    ImGui.SetNextWindowSize(_windowSize, ImGuiCond.Always);
+                    ImGui.SetNextWindowPos(_windowPos, ImGuiCond.Always);
+                }
             }
         }
 
@@ -109,6 +118,7 @@ namespace DelvCD.Windows
 
             Position = ImGui.GetWindowPos();
             _windowSize = ImGui.GetWindowSize();
+            _firstOpen = false;
         }
 
         private void DrawNavBar(IConfigPage? openPage, Vector2 size, float padX)
