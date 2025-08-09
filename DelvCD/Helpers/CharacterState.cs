@@ -89,8 +89,8 @@ namespace DelvCD.Helpers
             }
 
             var gameGui = Singletons.Get<IGameGui>();
-            var parameterWidget = (AtkUnitBase*)gameGui.GetAddonByName("_ParameterWidget", 1);
-            var fadeMiddleWidget = (AtkUnitBase*)gameGui.GetAddonByName("FadeMiddle", 1);
+            var parameterWidget = (AtkUnitBase*)gameGui.GetAddonByName("_ParameterWidget", 1).Address;
+            var fadeMiddleWidget = (AtkUnitBase*)gameGui.GetAddonByName("FadeMiddle", 1).Address;
             var paramenterVisible = parameterWidget != null && parameterWidget->IsVisible;
             var fadeMiddleVisible = fadeMiddleWidget != null && fadeMiddleWidget->IsVisible;
             return paramenterVisible && !fadeMiddleVisible;

@@ -8,7 +8,7 @@ using Dalamud.Plugin.Services;
 using DelvCD.Config.JobGauges;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 
 namespace DelvCD.Config

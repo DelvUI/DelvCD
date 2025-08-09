@@ -5,7 +5,7 @@ using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Plugin.Services;
 using DelvCD.Config;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DelvCD.Helpers
 {
@@ -95,7 +95,7 @@ namespace DelvCD.Helpers
             (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(tex, size, cropIcon);
 
             uint alpha = (uint)(opacity * 255) << 24 | 0x00FFFFFF;
-            drawList.AddImage(tex.ImGuiHandle, position, position + size, uv0, uv1, alpha);
+            drawList.AddImage(tex.Handle, position, position + size, uv0, uv1, alpha);
         }
 
         public static (Vector2, Vector2) GetTexCoordinates(IDalamudTextureWrap texture, Vector2 size, bool cropIcon = true)
