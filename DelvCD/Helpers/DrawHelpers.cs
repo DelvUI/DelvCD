@@ -282,12 +282,17 @@ namespace DelvCD.Helpers
             drawList.AddRectFilled(start, start + last, colors[1]);
         }
 
-        public static void DrawGlow(Vector2 pos, Vector2 size, int thickness, int segments, float speed, ConfigColor col1, ConfigColor col2, ImDrawListPtr drawList)
+        public static void DrawGlow(Vector2 pos, Vector2 size, int thickness, int segments, float speed, ConfigColor col1, ConfigColor col2, ImDrawListPtr drawList, bool clockwise = true)
         {
             speed = Math.Abs(speed);
             int mod = speed == 0 ? 1 : (int)(250 / speed);
             float prog = (float)(DateTimeOffset.Now.ToUnixTimeMilliseconds() % mod) / mod;
 
+            if (!clockwise)
+            {
+                prog = 1.0f - prog;
+            }
+            
             float offset = thickness / 2 + thickness % 2;
             Vector2 c1 = new Vector2(pos.X, pos.Y);
             Vector2 c2 = new Vector2(pos.X + size.X, pos.Y);
