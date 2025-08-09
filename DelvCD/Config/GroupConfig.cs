@@ -104,10 +104,9 @@ namespace DelvCD.Config
                         group.ScaleResolution(new(_mX, _mY), _positionOnly);
                     }
                 }
-
-
-                ImGui.EndChild();
             }
+
+            ImGui.EndChild();
         }
     }
 }

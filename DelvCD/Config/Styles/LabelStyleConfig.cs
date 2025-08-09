@@ -100,6 +100,7 @@ namespace DelvCD.Config
                     OutlineColor.Vector = outlineColor;
                 }
             }
+
             ImGui.EndChild();
         }
 
@@ -121,9 +122,8 @@ namespace DelvCD.Config
                             _selectedTextTagCategory = i;
                         }
                     }
-
-                    ImGui.EndChild();
                 }
+                ImGui.EndChild();
 
                 ImGui.SetCursorPos(new Vector2(200 * _scale, 8 * _scale));
                 if (ImGui.BeginChild("##DelvCD_TextTags_List", new Vector2(180 * _scale, 284 * _scale), true))
@@ -136,9 +136,8 @@ namespace DelvCD.Config
                             selectedTag = tag;
                         }
                     }
-
-                    ImGui.EndChild();
                 }
+                ImGui.EndChild();
 
                 ImGui.EndPopup();
             }

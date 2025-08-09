@@ -181,9 +181,9 @@ namespace DelvCD.Config
                     DrawHelpers.DrawSpacing();
                     ImGui.Checkbox("Enable Window Clipping", ref Clip);
                 }
-
-                ImGui.EndChild();
             }
+
+            ImGui.EndChild();
         }
     }
 }

@@ -164,22 +164,25 @@ namespace DelvCD.Config
                     }
                     ImGui.PopItemWidth();
 
-                    if (_iconSearchResults.Any() && ImGui.BeginChild("##IconPicker", new Vector2(size.X - padX * 2, 60 * _scale), true))
+                    if (_iconSearchResults.Any())
                     {
-                        List<uint> icons = _iconSearchResults.Select(t => t.Icon).Distinct().ToList();
-                        for (int i = 0; i < icons.Count; i++)
+                        if (ImGui.BeginChild("##IconPicker", new Vector2(size.X - padX * 2, 60 * _scale), true))
                         {
-                            Vector2 iconPos = ImGui.GetWindowPos().AddX(10 * _scale) + new Vector2(i * (40 * _scale + padX), padY);
-                            Vector2 iconSize = new Vector2(40 * _scale, 40 * _scale);
-                            DrawIconPreview(iconPos, iconSize, icons[i], CropIcon, false, true);
-
-                            if (ImGui.IsMouseHoveringRect(iconPos, iconPos + iconSize))
+                            List<uint> icons = _iconSearchResults.Select(t => t.Icon).Distinct().ToList();
+                            for (int i = 0; i < icons.Count; i++)
                             {
-                                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                Vector2 iconPos = ImGui.GetWindowPos().AddX(10 * _scale) + new Vector2(i * (40 * _scale + padX), padY);
+                                Vector2 iconSize = new Vector2(40 * _scale, 40 * _scale);
+                                DrawIconPreview(iconPos, iconSize, icons[i], CropIcon, false, true);
+
+                                if (ImGui.IsMouseHoveringRect(iconPos, iconPos + iconSize))
                                 {
-                                    CustomIcon = icons[i];
-                                    _iconSearchResults.Clear();
-                                    _iconSearchInput = string.Empty;
+                                    if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                                    {
+                                        CustomIcon = icons[i];
+                                        _iconSearchResults.Clear();
+                                        _iconSearchInput = string.Empty;
+                                    }
                                 }
                             }
                         }

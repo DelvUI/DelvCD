@@ -196,19 +196,19 @@ namespace DelvCD.Config
 
                     for (int i = 0; i < Conditions.Count; i++)
                     {
-                        ImGui.PushID(i.ToString());
+                        ImGui.PushID($"##Conditions_Table_Row_{i}");
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                         DrawStyleConditionRow(i);
                     }
 
-                    ImGui.PushID(Conditions.Count.ToString());
+                    ImGui.PushID($"##Conditions_Table_Row_{Conditions.Count}");
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
                     ImGui.TableSetColumnIndex(5);
                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => Conditions.Add(new StyleCondition<T>(_defaultStyle)), "New Condition", buttonSize);
-                }
 
-                ImGui.EndTable();
+                    ImGui.EndTable();
+                }
 
                 if (_swapX < Conditions.Count && _swapX >= 0 &&
                     _swapY < Conditions.Count && _swapY >= 0)
@@ -221,7 +221,6 @@ namespace DelvCD.Config
                     _swapY = -1;
                 }
             }
-
 
             ImGui.EndChild();
         }

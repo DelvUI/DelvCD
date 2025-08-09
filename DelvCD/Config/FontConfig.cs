@@ -103,7 +103,7 @@ namespace DelvCD.Config
 
                         for (int i = 0; i < Fonts.Keys.Count; i++)
                         {
-                            ImGui.PushID(i.ToString());
+                            ImGui.PushID($"##Font_Table_Row_{i}");
                             ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                             string key = Fonts.Keys.ElementAt(i);

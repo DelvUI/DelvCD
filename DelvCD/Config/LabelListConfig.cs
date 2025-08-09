@@ -88,7 +88,7 @@ namespace DelvCD.Config
                 int i = 0;
                 for (; i < Labels.Count; i++)
                 {
-                    ImGui.PushID(i.ToString());
+                    ImGui.PushID($"##Label_Table_Row_{i}");
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                     Label label = Labels[i];
@@ -112,7 +112,7 @@ namespace DelvCD.Config
                     }
                 }
 
-                ImGui.PushID((i + 1).ToString());
+                ImGui.PushID($"##Label_Table_Row_{i + 1}");
                 ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
                 if (ImGui.TableSetColumnIndex(0))
                 {

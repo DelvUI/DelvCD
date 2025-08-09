@@ -32,8 +32,8 @@ namespace DelvCD.Config
                         drawList.AddImage(Plugin.IconTexture.Handle, pos, pos + iconSize);
                         Vector2 textPos = ImGui.GetWindowPos().AddX(size.X / 2 - textSize.X / 2).AddY(iconSize.Y);
                         drawList.AddText(textPos, 0xFFFFFFFF, versionText);
-                        ImGui.End();
                     }
+                    ImGui.EndChild();
                 }
 
                 ImGui.SetCursorPosY(ImGui.GetCursorPosY() + headerSize.Y);
@@ -44,8 +44,8 @@ namespace DelvCD.Config
                 if (ImGui.BeginChild("##Changelog", changeLogSize, true))
                 {
                     ImGui.Text(Plugin.Changelog);
-                    ImGui.EndChild();
                 }
+                ImGui.EndChild();
             }
 
             ImGui.EndChild();

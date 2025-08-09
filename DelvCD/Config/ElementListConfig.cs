@@ -62,9 +62,9 @@ namespace DelvCD.Config
                 ImGui.SameLine();
                 DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Download, () => ImportUIElement(), "Import new Element or Group from Clipboard", buttonSize);
                 ImGui.PopItemWidth();
-
-                ImGui.EndChild();
             }
+
+            ImGui.EndChild();
         }
 
         private unsafe void DrawUIElementTable(Vector2 size, float padX)
@@ -103,7 +103,7 @@ namespace DelvCD.Config
                         continue;
                     }
 
-                    ImGui.PushID(i.ToString());
+                    ImGui.PushID($"##UIElements_Table_Row_{i}");
                     
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 

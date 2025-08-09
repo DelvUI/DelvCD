@@ -17,10 +17,8 @@ namespace DelvCD.Windows
 
         private bool _back = false;
         private bool _home = false;
-        private bool _firstOpen = true;
         private string _name = string.Empty;
         private Vector2 _windowSize;
-        private Vector2 _windowPos;
         private Stack<IConfigurable> _configStack;
         private float _scale => ImGuiHelpers.GlobalScale;
 
@@ -29,19 +27,18 @@ namespace DelvCD.Windows
             Flags =
                 ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoCollapse |
-                ImGuiWindowFlags.NoScrollWithMouse |
-                ImGuiWindowFlags.NoSavedSettings;
+                ImGuiWindowFlags.NoScrollWithMouse;
 
-            Position = position - size / 2;
-            PositionCondition = ImGuiCond.Appearing;
             SizeConstraints = new WindowSizeConstraints()
             {
                 MinimumSize = new(size.X, 160 * _scale),
                 MaximumSize = ImGui.GetMainViewport().Size
             };
 
+            Size = size;
+            SizeCondition = ImGuiCond.FirstUseEver;
             _windowSize = size;
-            _windowPos = position;
+
             _configStack = new Stack<IConfigurable>();
         }
 
@@ -49,7 +46,6 @@ namespace DelvCD.Windows
         {
             _configStack.Push(configItem);
             _name = configItem.Name;
-            _firstOpen = true;
             IsOpen = true;
         }
 
@@ -68,12 +64,6 @@ namespace DelvCD.Windows
             if (_configStack.Any())
             {
                 WindowName = GetWindowTitle();
-                
-                if (_firstOpen)
-                {
-                    ImGui.SetNextWindowSize(_windowSize, ImGuiCond.Always);
-                    ImGui.SetNextWindowPos(_windowPos, ImGuiCond.Always);
-                }
             }
         }
 
@@ -116,9 +106,7 @@ namespace DelvCD.Windows
                 DrawNavBar(openPage, size, spacing.X);
             }
 
-            Position = ImGui.GetWindowPos();
             _windowSize = ImGui.GetWindowSize();
-            _firstOpen = false;
         }
 
         private void DrawNavBar(IConfigPage? openPage, Vector2 size, float padX)

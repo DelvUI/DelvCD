@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace DelvCD.Config
 {
@@ -146,13 +147,13 @@ namespace DelvCD.Config
 
                     for (int i = 0; i < TriggerOptions.Count; i++)
                     {
-                        ImGui.PushID(i.ToString());
+                        ImGui.PushID($"##Conditions_Table_Row_{i}");
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                         DrawTriggerRow(i);
                     }
 
-                    ImGui.PushID(TriggerOptions.Count.ToString());
+                    ImGui.PushID($"##Conditions_Table_Row_{TriggerOptions.Count}");
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
                     ImGui.TableSetColumnIndex(3);
                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => AddTrigger(), "New Trigger", buttonSize);
