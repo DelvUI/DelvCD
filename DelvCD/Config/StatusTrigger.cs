@@ -68,7 +68,7 @@ namespace DelvCD.Config
                 return true;
             }
 
-            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            IPlayerCharacter? player = Singletons.Get<IObjectTable>().LocalPlayer;
             if (player is null)
             {
                 return false;

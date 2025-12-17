@@ -58,7 +58,7 @@ namespace DelvCD.Helpers
 
         public static Job GetCharacterJob()
         {
-            var player = Singletons.Get<IClientState>().LocalPlayer;
+            var player = Singletons.Get<IObjectTable>().LocalPlayer;
             if (player is null)
             {
                 return Job.UKN;
@@ -72,18 +72,18 @@ namespace DelvCD.Helpers
 
         public static int GetCharacterLevel()
         {
-            return Singletons.Get<IClientState>().LocalPlayer?.Level ?? 0;
+            return Singletons.Get<IObjectTable>().LocalPlayer?.Level ?? 0;
         }
 
         public static bool IsWeaponDrawn()
         {
-            var player = Singletons.Get<IClientState>().LocalPlayer;
+            var player = Singletons.Get<IObjectTable>().LocalPlayer;
             return player != null && player.StatusFlags.HasFlag(StatusFlags.WeaponOut);
         }
 
         public static unsafe bool ShouldBeVisible()
         {
-            if (Singletons.Get<IClientState>().LocalPlayer == null || IsCharacterBusy())
+            if (Singletons.Get<IObjectTable>().LocalPlayer == null || IsCharacterBusy())
             {
                 return false;
             }

@@ -81,7 +81,7 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Raptor_Stacks = gauge.RaptorFury;
             _dataSource.Coeurl_Stacks = gauge.CoeurlFury;
 
-            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            IPlayerCharacter? player = Singletons.Get<IObjectTable>().LocalPlayer;
             _dataSource.Max_Chakra_Stacks = player?.StatusList.FirstOrDefault(s => s.StatusId is 1182 or 2174) != null ? 10 : 5;
 
             if (preview) { return true; }

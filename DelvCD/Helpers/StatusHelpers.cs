@@ -44,7 +44,7 @@ namespace DelvCD.Helpers
                 dict.Clear();
             }
 
-            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            IPlayerCharacter? player = Singletons.Get<IObjectTable>().LocalPlayer;
             if (player is null)
             {
                 return;
