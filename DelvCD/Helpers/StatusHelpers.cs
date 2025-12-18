@@ -7,7 +7,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using Lumina.Excel;
 
-using DalamudStatus = Dalamud.Game.ClientState.Statuses.Status;
+using DalamudStatus = Dalamud.Game.ClientState.Statuses.IStatus;
 using LuminaStatus = Lumina.Excel.Sheets.Status;
 
 namespace DelvCD.Helpers
@@ -44,7 +44,7 @@ namespace DelvCD.Helpers
                 dict.Clear();
             }
 
-            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            IPlayerCharacter? player = Singletons.Get<IObjectTable>().LocalPlayer;
             if (player is null)
             {
                 return;

@@ -71,7 +71,7 @@ namespace DelvCD.Config.JobGauges
             _dataSource.Paradox = gauge->ParadoxActive;
             _dataSource.Astral_Soul_Stacks = gauge->AstralSoulStacks;
 
-            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            IPlayerCharacter? player = Singletons.Get<IObjectTable>().LocalPlayer;
             _dataSource.Max_Polyglot_Stacks = player == null ? 2 : (player.Level < 80 ? 1 : ((player.Level < 98 ? 2 : 3)));
 
             if (preview) { return true; }

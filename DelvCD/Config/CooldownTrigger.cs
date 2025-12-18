@@ -109,12 +109,12 @@ namespace DelvCD.Config
 
             if (RangeCheck)
             {
-                inRange = helper.GetActionInRange(actionId, Singletons.Get<IClientState>().LocalPlayer, Utils.FindTarget());
+                inRange = helper.GetActionInRange(actionId, Singletons.Get<IObjectTable>().LocalPlayer, Utils.FindTarget());
             }
 
             if (LosCheck)
             {
-                inLos = helper.IsTargetInLos(Singletons.Get<IClientState>().LocalPlayer, Utils.FindTarget(), actionId);
+                inLos = helper.IsTargetInLos(Singletons.Get<IObjectTable>().LocalPlayer, Utils.FindTarget(), actionId);
             }
 
             if (HighlightCheck)

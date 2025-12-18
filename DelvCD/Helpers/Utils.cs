@@ -44,7 +44,7 @@ namespace DelvCD.Helpers
                 return null;
             }
 
-            IGameObject? player = Singletons.Get<IClientState>().LocalPlayer;
+            IGameObject? player = Singletons.Get<IObjectTable>().LocalPlayer;
             if (target.TargetObjectId == 0 && player is not null && player.TargetObjectId == 0)
             {
                 return player;

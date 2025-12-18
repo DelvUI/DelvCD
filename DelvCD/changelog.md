@@ -1,5 +1,8 @@
+# 1.5.0.0
+- Added support for Patch 7.4 and Dalamud API 14.
+
 # 1.4.0.0
-- Added support for Patch 7.2 and Dalamud API 12.
+- Added support for Patch 7.3 and Dalamud API 13.
 - Added a setting to change the glow direction CW or CCW.
 - Fixed config window being shrunk and in the corner of the screen.
 - Fixed issues with Dancer's Technical Step.

@@ -97,7 +97,7 @@ namespace DelvCD.Config
 
             IGameObject? actor = TriggerSource switch
             {
-                TriggerSource.Player => Singletons.Get<IClientState>().LocalPlayer,
+                TriggerSource.Player => Singletons.Get<IObjectTable>().LocalPlayer,
                 TriggerSource.Target => Utils.FindTarget(),
                 TriggerSource.TargetOfTarget => Utils.FindTargetOfTarget(),
                 TriggerSource.FocusTarget => Singletons.Get<ITargetManager>().FocusTarget,
@@ -110,7 +110,7 @@ namespace DelvCD.Config
             }
             
             _dataSource.Name = actor.Name.ToString();
-            var player = Singletons.Get<IClientState>().LocalPlayer;
+            var player = Singletons.Get<IObjectTable>().LocalPlayer;
             if (player is not null)
             {
                 Vector3 delta = player.Position - actor.Position;

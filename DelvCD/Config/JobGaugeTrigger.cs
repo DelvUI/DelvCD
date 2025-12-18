@@ -69,7 +69,7 @@ namespace DelvCD.Config
                 return false;
             }
 
-            IPlayerCharacter? player = Singletons.Get<IClientState>().LocalPlayer;
+            IPlayerCharacter? player = Singletons.Get<IObjectTable>().LocalPlayer;
             if (player == null || player.ClassJob.RowId != (uint)_jobGauge.Job)
             {
                 return false;
