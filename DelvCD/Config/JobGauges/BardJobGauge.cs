@@ -90,8 +90,8 @@ namespace DelvCD.Config.JobGauges
 
         private int MaxRepertoireStacks(Song song) => song switch
         {
-            Song.Army => 4,
-            Song.Wanderer => 3,
+            Song.ArmysPaeon => 4,
+            Song.WanderersMinuet => 3,
             _ => 0
         };
     }

@@ -291,7 +291,7 @@ namespace DelvCD.Config
             if (actor is IPlayerCharacter) { return friendly; }
 
             if (actor is IBattleNpc npc) {
-                if (npc.BattleNpcKind == BattleNpcSubKind.Pet || npc.BattleNpcKind == BattleNpcSubKind.Chocobo) { return friendly; }
+                if (npc.BattleNpcKind == BattleNpcSubKind.Pet || npc.BattleNpcKind == BattleNpcSubKind.Buddy) { return friendly; }
                 
                 // For enemy trigger checks, the 'friendly' variable will be set to false, so we want to negate that first.
                 return !friendly == Utils.IsHostile((ICharacter)actor);

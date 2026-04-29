@@ -75,7 +75,7 @@ namespace DelvCD.Helpers
             CharacterStruct* chara = (CharacterStruct*)character.Address;
 
             return character != null
-                && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == (byte)BattleNpcSubKind.BattleNpcPart)
+                && ((character.SubKind == (byte)BattleNpcSubKind.Combatant || (int)character.SubKind == (byte)BattleNpcSubKind.BNpcPart)
                 && chara->CharacterData.Battalion > 0); // Since its not super clear, CharacterData.Battalion used for determining friend/enemy state
         }
 
