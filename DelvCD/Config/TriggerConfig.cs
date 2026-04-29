@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Interface.Utility;
+using Dalamud.Interface.Utility.Raii;
 using DelvCD.Helpers;
 using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
@@ -147,18 +148,20 @@ namespace DelvCD.Config
 
                     for (int i = 0; i < TriggerOptions.Count; i++)
                     {
-                        ImGui.PushID($"##Conditions_Table_Row_{i}");
+                        using var rowId = ImRaii.PushId($"##Conditions_Table_Row_{i}");
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                         DrawTriggerRow(i);
                     }
 
-                    ImGui.PushID($"##Conditions_Table_Row_{TriggerOptions.Count}");
-                    ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
-                    ImGui.TableSetColumnIndex(3);
-                    DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => AddTrigger(), "New Trigger", buttonSize);
-                    ImGui.SameLine();
-                    DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Download, () => ImportTrigger(), "Import Trigger", buttonSize);
+                    using (ImRaii.PushId($"##Conditions_Table_Row_{TriggerOptions.Count}"))
+                    {
+                        ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
+                        ImGui.TableSetColumnIndex(3);
+                        DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => AddTrigger(), "New Trigger", buttonSize);
+                        ImGui.SameLine();
+                        DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Download, () => ImportTrigger(), "Import Trigger", buttonSize);
+                    }
 
                     ImGui.EndTable();
 

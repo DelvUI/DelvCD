@@ -1,5 +1,6 @@
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
+using Dalamud.Interface.Utility.Raii;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using Dalamud.Bindings.ImGui;
@@ -196,16 +197,18 @@ namespace DelvCD.Config
 
                     for (int i = 0; i < Conditions.Count; i++)
                     {
-                        ImGui.PushID($"##Conditions_Table_Row_{i}");
+                        using var rowId = ImRaii.PushId($"##Conditions_Table_Row_{i}");
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                         DrawStyleConditionRow(i);
                     }
 
-                    ImGui.PushID($"##Conditions_Table_Row_{Conditions.Count}");
-                    ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
-                    ImGui.TableSetColumnIndex(5);
-                    DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => Conditions.Add(new StyleCondition<T>(_defaultStyle)), "New Condition", buttonSize);
+                    using (ImRaii.PushId($"##Conditions_Table_Row_{Conditions.Count}"))
+                    {
+                        ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
+                        ImGui.TableSetColumnIndex(5);
+                        DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => Conditions.Add(new StyleCondition<T>(_defaultStyle)), "New Condition", buttonSize);
+                    }
 
                     ImGui.EndTable();
                 }

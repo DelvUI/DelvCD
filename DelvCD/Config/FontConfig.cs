@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Interface.Utility;
+using Dalamud.Interface.Utility.Raii;
 using DelvCD.Helpers;
 using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
@@ -103,7 +104,7 @@ namespace DelvCD.Config
 
                         for (int i = 0; i < Fonts.Keys.Count; i++)
                         {
-                            ImGui.PushID($"##Font_Table_Row_{i}");
+                            using var rowId = ImRaii.PushId($"##Font_Table_Row_{i}");
                             ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                             string key = Fonts.Keys.ElementAt(i);

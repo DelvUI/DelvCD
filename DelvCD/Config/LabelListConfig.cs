@@ -3,6 +3,7 @@ using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Interface.Utility;
+using Dalamud.Interface.Utility.Raii;
 using DelvCD.Helpers;
 using DelvCD.UIElements;
 using Dalamud.Bindings.ImGui;
@@ -88,7 +89,7 @@ namespace DelvCD.Config
                 int i = 0;
                 for (; i < Labels.Count; i++)
                 {
-                    ImGui.PushID($"##Label_Table_Row_{i}");
+                    using var rowId = ImRaii.PushId($"##Label_Table_Row_{i}");
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                     Label label = Labels[i];
@@ -112,23 +113,25 @@ namespace DelvCD.Config
                     }
                 }
 
-                ImGui.PushID($"##Label_Table_Row_{i + 1}");
-                ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
-                if (ImGui.TableSetColumnIndex(0))
+                using (ImRaii.PushId($"##Label_Table_Row_{i + 1}"))
                 {
-                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
-                    ImGui.PushItemWidth(ImGui.GetColumnWidth());
-                    ImGui.InputTextWithHint("##LabelInput", "New Label Name", ref _labelInput, 10000);
-                    ImGui.PopItemWidth();
-                }
+                    ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
+                    if (ImGui.TableSetColumnIndex(0))
+                    {
+                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f * _scale);
+                        ImGui.PushItemWidth(ImGui.GetColumnWidth());
+                        ImGui.InputTextWithHint("##LabelInput", "New Label Name", ref _labelInput, 10000);
+                        ImGui.PopItemWidth();
+                    }
 
-                if (ImGui.TableSetColumnIndex(1))
-                {
-                    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
-                    DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => AddLabel(_labelInput), "Create Label", buttonSize);
+                    if (ImGui.TableSetColumnIndex(1))
+                    {
+                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 1f);
+                        DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => AddLabel(_labelInput), "Create Label", buttonSize);
 
-                    ImGui.SameLine();
-                    DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Download, () => ImportLabel(), "Import Label", buttonSize);
+                        ImGui.SameLine();
+                        DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Download, () => ImportLabel(), "Import Label", buttonSize);
+                    }
                 }
 
                 ImGui.EndTable();

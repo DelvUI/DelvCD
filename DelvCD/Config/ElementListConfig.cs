@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Dalamud.Interface;
 using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Interface.Utility;
+using Dalamud.Interface.Utility.Raii;
 using DelvCD.Helpers;
 using DelvCD.UIElements;
 using Dalamud.Bindings.ImGui;
@@ -103,8 +104,8 @@ namespace DelvCD.Config
                         continue;
                     }
 
-                    ImGui.PushID($"##UIElements_Table_Row_{i}");
-                    
+                    using var rowId = ImRaii.PushId($"##UIElements_Table_Row_{i}");
+
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                     if (ImGui.TableSetColumnIndex(0))

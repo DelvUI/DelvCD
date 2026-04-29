@@ -113,10 +113,10 @@ namespace DelvCD.Config
                         _dataSource.Status_Stacks = status.Param;
                         _dataSource.Max_Status_Stacks = trigger.MaxStacks;
 
-                        if (_dataSource.Max_Status_Stacks > 0) { 
-                            _dataSource.Icon = (uint)(trigger.Icon + _dataSource.Status_Stacks - 1); 
+                        if (_dataSource.Max_Status_Stacks > 0) {
+                            _dataSource.Icon = (uint)(trigger.Icon + _dataSource.Status_Stacks - 1);
                         }
-                        else 
+                        else
                         {
                             _dataSource.Icon = trigger.Icon;
                         }
@@ -155,7 +155,7 @@ namespace DelvCD.Config
             ImGui.Combo("Trigger Source", ref Unsafe.As<TriggerSource, int>(ref TriggerSource), _sourceOptions, _sourceOptions.Length);
 
             // Don't display the trigger source type option if the TriggerSource is set to Player, since player will always be friendly.
-            if( this.TriggerSource is not TriggerSource.Player) { 
+            if( this.TriggerSource is not TriggerSource.Player) {
                 ImGui.Combo("Trigger Source Type", ref Unsafe.As<TriggerSourceType, int>(ref this.TriggerSourceType), _sourceTypeOptions, _sourceTypeOptions.Length);
             }
 
@@ -188,12 +188,12 @@ namespace DelvCD.Config
                 Vector2 iconPos = ImGui.GetWindowPos() + new Vector2(width - 100 * _scale, 20 * _scale);
                 DrawHelpers.DrawIcon(
                     TriggerData[0].Icon,
-                    iconPos, 
-                    new Vector2(40 * _scale, 54 * _scale), 
-                    false, 
-                    0, 
-                    false, 
-                    1f, 
+                    iconPos,
+                    new Vector2(40 * _scale, 54 * _scale),
+                    false,
+                    0,
+                    false,
+                    1f,
                     drawList
                 );
             }
