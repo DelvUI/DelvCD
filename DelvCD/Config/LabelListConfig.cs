@@ -110,6 +110,8 @@ namespace DelvCD.Config
                         ImGui.SameLine();
                         DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Trash, () => DeleteLabel(label), "Delete", buttonSize);
                     }
+
+                    ImGui.PopID();
                 }
 
                 ImGui.PushID($"##Label_Table_Row_{i + 1}");
@@ -130,6 +132,7 @@ namespace DelvCD.Config
                     ImGui.SameLine();
                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Download, () => ImportLabel(), "Import Label", buttonSize);
                 }
+                ImGui.PopID();
 
                 ImGui.EndTable();
             }

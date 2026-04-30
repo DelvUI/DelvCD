@@ -149,8 +149,9 @@ namespace DelvCD.Config
                     {
                         ImGui.PushID($"##Conditions_Table_Row_{i}");
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
-
+                        
                         DrawTriggerRow(i);
+                        ImGui.PopID();
                     }
 
                     ImGui.PushID($"##Conditions_Table_Row_{TriggerOptions.Count}");
@@ -159,6 +160,7 @@ namespace DelvCD.Config
                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => AddTrigger(), "New Trigger", buttonSize);
                     ImGui.SameLine();
                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Download, () => ImportTrigger(), "Import Trigger", buttonSize);
+                    ImGui.PopID();
 
                     ImGui.EndTable();
 

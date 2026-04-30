@@ -200,12 +200,14 @@ namespace DelvCD.Config
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
 
                         DrawStyleConditionRow(i);
+                        ImGui.PopID();
                     }
 
                     ImGui.PushID($"##Conditions_Table_Row_{Conditions.Count}");
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, 28);
                     ImGui.TableSetColumnIndex(5);
                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Plus, () => Conditions.Add(new StyleCondition<T>(_defaultStyle)), "New Condition", buttonSize);
+                    ImGui.PopID();
 
                     ImGui.EndTable();
                 }

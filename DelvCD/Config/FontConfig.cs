@@ -141,6 +141,8 @@ namespace DelvCD.Config
                                     DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Trash, () => RemoveFont(key), "Remove Font", new Vector2(45, 0));
                                 }
                             }
+
+                            ImGui.PopID();
                         }
 
                         ImGui.EndTable();

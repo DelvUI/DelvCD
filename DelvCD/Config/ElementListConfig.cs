@@ -149,6 +149,8 @@ namespace DelvCD.Config
                         ImGui.SameLine();
                         DrawHelpers.DrawButton(string.Empty, FontAwesomeIcon.Trash, () => DeleteUIElement(element), "Delete", buttonSize);
                     }
+
+                    ImGui.PopID();
                 }
 
                 ImGui.EndTable();
