@@ -3,6 +3,7 @@ using Dalamud.Plugin.Services;
 using DelvCD.Helpers;
 using DelvCD.Helpers.DataSources;
 using DelvCD.Helpers.DataSources.JobDataSources;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using System;
 using System.Collections.Generic;
@@ -65,11 +66,11 @@ namespace DelvCD.Config.JobGauges
             };
         }
 
-        public override bool IsTriggered(bool preview)
+        public override unsafe bool IsTriggered(bool preview)
         {
-            SMNGauge gauge = Singletons.Get<IJobGauges>().Get<SMNGauge>();
+            SummonerGauge* gauge = &JobGaugeManager.Instance()->Summoner;
 
-            _dataSource.Aetherflow_Stacks = gauge.AetherflowStacks;
+            _dataSource.Aetherflow_Stacks = (int)(gauge->AetherFlags & AetherFlags.Aetherflow);
 
             int nextSummon = NextSummon(gauge);
             _dataSource.Next_Summon = _comboOptions[1][nextSummon];
@@ -77,13 +78,13 @@ namespace DelvCD.Config.JobGauges
             int activeSummon = ActiveSummon(gauge);
             _dataSource.Active_Summon = _comboOptions[2][activeSummon];
 
-            _dataSource.Summon_Timer = gauge.SummonTimerRemaining / 1000f;
+            _dataSource.Summon_Timer = gauge->SummonTimer / 1000f;
 
-            int attunement = ActiveAttunement(gauge);
+            int attunement = gauge->AttunementType;
             _dataSource.Active_Attunement = _comboOptions[7][attunement];
 
-            _dataSource.Attunement_Timer = gauge.AttunementTimerRemaining / 1000f;
-            _dataSource.Attunement_Stacks = ActiveAttunementStacks(gauge);
+            _dataSource.Attunement_Timer = gauge->AttunementTimer / 1000f;
+            _dataSource.Attunement_Stacks = gauge->AttunementCount;
             _dataSource.Max_Attunement_Stacks = MaxAttunement(attunement);
 
             if (preview) { return true; }
@@ -93,40 +94,28 @@ namespace DelvCD.Config.JobGauges
                 EvaluateCondition(1, nextSummon) &&
                 EvaluateCondition(2, activeSummon) &&
                 EvaluateCondition(3, _dataSource.Summon_Timer) &&
-                EvaluateCondition(4, gauge.IsIfritReady) &&
-                EvaluateCondition(5, gauge.IsTitanReady) &&
-                EvaluateCondition(6, gauge.IsGarudaReady) &&
+                EvaluateCondition(4, gauge->AetherFlags.HasFlag(AetherFlags.IfritReady)) &&
+                EvaluateCondition(5, gauge->AetherFlags.HasFlag(AetherFlags.TitanReady)) &&
+                EvaluateCondition(6, gauge->AetherFlags.HasFlag(AetherFlags.GarudaReady)) &&
                 EvaluateCondition(7, attunement) &&
                 EvaluateCondition(8, _dataSource.Attunement_Timer) &&
                 EvaluateCondition(9, _dataSource.Attunement_Stacks);
         }
 
-        private int NextSummon(SMNGauge gauge)
+        private unsafe int NextSummon(SummonerGauge* gauge)
         {
-            bool isSolarBahamutReady = gauge.AetherFlags.HasFlag(AetherFlags.None + 0x8) ||
-                                       gauge.AetherFlags.HasFlag(AetherFlags.None + 0xC);
-            bool isPhoenixReady = gauge.AetherFlags.HasFlag(AetherFlags.None + 0x4);
+            bool isSolarBahamutReady = gauge->AetherFlags.HasFlag(AetherFlags.SolarBahamutFirstPrimed) ||
+                                       gauge->AetherFlags.HasFlag(AetherFlags.SolarBahamutSecondPrimed);
+            bool isPhoenixReady = gauge->AetherFlags.HasFlag(AetherFlags.PhoenixPrimed);
 
             return isSolarBahamutReady ? SOLAR_BAHAMUT_INDEX : (isPhoenixReady ? PHOENIX_INDEX : BAHAMUT_INDEX);
         }
 
-        private int ActiveSummon(SMNGauge gauge)
+        private unsafe int ActiveSummon(SummonerGauge* gauge)
         {
-            if (gauge.SummonTimerRemaining <= 0) { return NONE_INDEX; }
+            if (gauge->SummonTimer <= 0) { return NONE_INDEX; }
 
             return NextSummon(gauge);
-        }
-
-        private unsafe int ActiveAttunement(SMNGauge gauge)
-        {
-            byte value = *((byte*)(new IntPtr(gauge.Address) + 0xE));
-            return (value & 3);
-        }
-
-        private unsafe int ActiveAttunementStacks(SMNGauge gauge)
-        {
-            byte value = *((byte*)(new IntPtr(gauge.Address) + 0xE));
-            return ((value >> 2) & 7);
         }
 
         private int MaxAttunement(int attunement) => attunement switch
