@@ -1,3 +1,6 @@
+# 1.6.0.1
+- Fixed Summoner's Job Gauge triggers.
+
 # 1.6.0.0
 - Added support for Patch 7.5 and Dalamud API 15.
 
